@@ -22,7 +22,6 @@
  * SOFTWARE.
  */
 
-rootProject.name = "lith"
-
-include("core")
-include("server")
+plugins {
+    java
+}
