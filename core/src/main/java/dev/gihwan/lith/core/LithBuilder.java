@@ -22,12 +22,25 @@
  * SOFTWARE.
  */
 
-plugins {
-    java
-}
+package dev.gihwan.lith.core;
 
-dependencies {
-    implementation("com.google.guava:guava:29.0-jre")
-    implementation("com.linecorp.armeria:armeria:1.1.0")
-    implementation("org.slf4j:slf4j-api:1.7.30")
+import static com.google.common.base.Preconditions.checkArgument;
+
+public final class LithBuilder {
+
+    private int port = 8080;
+
+    LithBuilder() {
+    }
+
+    public LithBuilder port(int port) {
+        checkArgument(port >= 0, "port: %s (expected: >= 0)", port);
+        checkArgument(port <= 65535, "port: %s (expected: <= 65535)", port);
+        this.port = port;
+        return this;
+    }
+
+    public Lith build() {
+        return new Lith(port);
+    }
 }
