@@ -25,4 +25,4 @@
 rootProject.name = "lith"
 
 include("core")
-include("server")
+include("standalone")
