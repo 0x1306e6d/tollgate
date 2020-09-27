@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.lith.server;
+package dev.gihwan.lith.standalone;
 
 import dev.gihwan.lith.core.Lith;
 import org.slf4j.Logger;
@@ -31,50 +31,50 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 import java.time.Instant;
 
-public final class LithServer {
+public final class Main {
 
-    private static final Logger logger = LoggerFactory.getLogger(LithServer.class);
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     private Lith lith;
     private Instant startAt;
 
     private void start() {
         startAt = Instant.now();
-        logger.info("Starting the Lith server at {}.", startAt);
+        logger.info("Starting the Lith standalone at {}.", startAt);
 
         lith = Lith.builder()
                 .port(8080)
                 .build();
         lith.start();
 
-        logger.info("The Lith server is started. ({} used to start)", Duration.between(startAt, Instant.now()));
+        logger.info("The Lith standalone is started. ({} used to start)", Duration.between(startAt, Instant.now()));
     }
 
     private void stop() {
         final Instant stopAt = Instant.now();
-        logger.info("Stopping the Lith server at {}.", stopAt);
+        logger.info("Stopping the Lith standalone at {}.", stopAt);
 
         lith.stop();
 
-        logger.info("The Lith server has served during {}.", Duration.between(startAt, stopAt));
-        logger.info("The Lith server is stopped. ({} used to stop)", Duration.between(startAt, Instant.now()));
+        logger.info("The Lith standalone has served during {}.", Duration.between(startAt, stopAt));
+        logger.info("The Lith standalone is stopped. ({} used to stop)", Duration.between(startAt, Instant.now()));
     }
 
     public static void main(String[] args) {
-        final LithServer server = new LithServer();
+        final Main server = new Main();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
                 server.stop();
             } catch (Exception e) {
-                logger.error("Failed to stop the Lith server.", e);
+                logger.error("Failed to stop the Lith standalone.", e);
             }
         }));
 
         try {
             server.start();
         } catch (Exception e) {
-            logger.error("Failed to start the Lith server.", e);
+            logger.error("Failed to start the Lith standalone.", e);
             System.exit(-1);
         }
     }
