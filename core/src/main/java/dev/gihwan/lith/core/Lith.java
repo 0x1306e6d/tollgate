@@ -55,10 +55,10 @@ public final class Lith {
 
     private Server startServer() {
         if (server != null) {
-            throw new IllegalStateException("Server is already started.");
+            throw new IllegalStateException("The Lith server is already started.");
         }
 
-        logger.info("Starting server.");
+        logger.info("Starting the Lith server.");
 
         final ServerBuilder builder = Server.builder();
 
@@ -67,7 +67,7 @@ public final class Lith {
 
         final Server server = builder.build();
         server.start().join();
-        logger.info("Started server at {}.", server.activePort());
+        logger.info("Started the Lith server at {}.", server.activePort());
         return server;
     }
 
@@ -76,8 +76,8 @@ public final class Lith {
             return;
         }
 
-        logger.info("Stopping server.");
+        logger.info("Stopping the Lith server.");
         server.stop().join();
-        logger.info("Stopped server.");
+        logger.info("Stopped the Lith server.");
     }
 }
