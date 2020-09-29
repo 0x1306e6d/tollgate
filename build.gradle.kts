@@ -22,6 +22,10 @@
  * SOFTWARE.
  */
 
+plugins {
+    id("com.google.cloud.tools.jib") version "2.5.0" apply false
+}
+
 allprojects {
     apply(plugin = "idea")
 

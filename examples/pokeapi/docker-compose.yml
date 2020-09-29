@@ -1,0 +1,26 @@
+version: "3.8"
+services:
+  berry:
+    image: pokeapi-berry
+  contest:
+    image: pokeapi-contest
+  encounter:
+    image: pokeapi-encounter
+  evolution:
+    image: pokeapi-evolution
+  game:
+    image: pokeapi-game
+  gateway:
+    image: pokeapi-gateway
+    ports:
+      - "8080:8080"
+  item:
+    image: pokeapi-item
+  location:
+    image: pokeapi-location
+  machine:
+    image: pokeapi-machine
+  move:
+    image: pokeapi-move
+  pokemon:
+    image: pokeapi-pokemon
