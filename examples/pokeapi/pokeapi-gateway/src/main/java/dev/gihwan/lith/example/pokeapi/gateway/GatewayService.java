@@ -22,19 +22,27 @@
  * SOFTWARE.
  */
 
-rootProject.name = "lith"
+package dev.gihwan.lith.example.pokeapi.gateway;
 
-include("core")
-include("standalone")
+import dev.gihwan.lith.core.Lith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-include(":examples:pokeapi:pokeapi-berry")
-include(":examples:pokeapi:pokeapi-contest")
-include(":examples:pokeapi:pokeapi-encounter")
-include(":examples:pokeapi:pokeapi-evolution")
-include(":examples:pokeapi:pokeapi-game")
-include(":examples:pokeapi:pokeapi-gateway")
-include(":examples:pokeapi:pokeapi-item")
-include(":examples:pokeapi:pokeapi-location")
-include(":examples:pokeapi:pokeapi-machine")
-include(":examples:pokeapi:pokeapi-move")
-include(":examples:pokeapi:pokeapi-pokemon")
+public final class GatewayService {
+
+    private static final Logger logger = LoggerFactory.getLogger(GatewayService.class);
+
+    public static void main(String[] args) {
+        final Lith lith = Lith.builder()
+                .port(8080)
+                .build();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            lith.stop();
+            logger.info("Stopped gateway service.");
+        }));
+
+        lith.start();
+        logger.info("Started gateway service.");
+    }
+}
