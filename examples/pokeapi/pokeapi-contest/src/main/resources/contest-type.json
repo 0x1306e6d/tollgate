@@ -1,0 +1,18 @@
+{
+  "id": 1,
+  "name": "cool",
+  "berry_flavor": {
+    "name": "spicy",
+    "url": "https://pokeapi.co/api/v2/berry-flavor/1/"
+  },
+  "names": [
+    {
+      "name": "Cool",
+      "color": "Red",
+      "language": {
+        "name": "en",
+        "url": "https://pokeapi.co/api/v2/language/9/"
+      }
+    }
+  ]
+}

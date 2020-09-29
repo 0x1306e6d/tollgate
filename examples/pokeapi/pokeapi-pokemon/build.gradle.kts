@@ -22,19 +22,15 @@
  * SOFTWARE.
  */
 
-rootProject.name = "lith"
+plugins {
+    java
+    application
+}
 
-include("core")
-include("standalone")
+dependencies {
+    implementation("com.linecorp.armeria:armeria:1.1.0")
 
-include(":examples:pokeapi:pokeapi-berry")
-include(":examples:pokeapi:pokeapi-contest")
-include(":examples:pokeapi:pokeapi-encounter")
-include(":examples:pokeapi:pokeapi-evolution")
-include(":examples:pokeapi:pokeapi-game")
-include(":examples:pokeapi:pokeapi-gateway")
-include(":examples:pokeapi:pokeapi-item")
-include(":examples:pokeapi:pokeapi-location")
-include(":examples:pokeapi:pokeapi-machine")
-include(":examples:pokeapi:pokeapi-move")
-include(":examples:pokeapi:pokeapi-pokemon")
+    implementation("org.slf4j:slf4j-api:1.7.30")
+
+    runtimeOnly("ch.qos.logback:logback-classic:1.2.3")
+}
