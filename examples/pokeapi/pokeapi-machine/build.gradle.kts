@@ -25,6 +25,7 @@
 plugins {
     java
     application
+    id("com.google.cloud.tools.jib")
 }
 
 dependencies {
@@ -33,4 +34,10 @@ dependencies {
     implementation("org.slf4j:slf4j-api:1.7.30")
 
     runtimeOnly("ch.qos.logback:logback-classic:1.2.3")
+}
+
+jib {
+    to {
+        image = "pokeapi-machine"
+    }
 }
