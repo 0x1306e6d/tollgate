@@ -54,10 +54,10 @@ public final class GameService {
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             server.stop().join();
-            logger.info("Stopped server.");
+            logger.info("Stopped game service.");
         }));
 
         server.start().join();
-        logger.info("Started server at {}.", server.activePort());
+        logger.info("Started game service at {}.", server.activePort());
     }
 }

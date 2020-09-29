@@ -54,10 +54,10 @@ public final class ContestService {
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             server.stop().join();
-            logger.info("Stopped server.");
+            logger.info("Stopped contest service.");
         }));
 
         server.start().join();
-        logger.info("Started server at {}.", server.activePort());
+        logger.info("Started contest service at {}.", server.activePort());
     }
 }

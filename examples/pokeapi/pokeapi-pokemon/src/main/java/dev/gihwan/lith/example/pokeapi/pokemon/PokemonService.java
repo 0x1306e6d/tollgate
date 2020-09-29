@@ -54,10 +54,10 @@ public final class PokemonService {
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             server.stop().join();
-            logger.info("Stopped server.");
+            logger.info("Stopped pokemon service.");
         }));
 
         server.start().join();
-        logger.info("Started server at {}.", server.activePort());
+        logger.info("Started pokemon service at {}.", server.activePort());
     }
 }
