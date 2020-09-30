@@ -31,7 +31,6 @@ plugins {
 dependencies {
     implementation(project(":core"))
 
-    implementation("com.linecorp.armeria:armeria:1.1.0")
     implementation("org.slf4j:slf4j-api:1.7.30")
 
     runtimeOnly("ch.qos.logback:logback-classic:1.2.3")
