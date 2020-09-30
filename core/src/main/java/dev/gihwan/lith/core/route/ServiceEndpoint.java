@@ -22,23 +22,33 @@
  * SOFTWARE.
  */
 
-plugins {
-    java
-    application
-    id("com.google.cloud.tools.jib")
-}
+package dev.gihwan.lith.core.route;
 
-dependencies {
-    implementation(project(":core"))
+import static java.util.Objects.requireNonNull;
 
-    implementation("com.linecorp.armeria:armeria:1.1.0")
-    implementation("org.slf4j:slf4j-api:1.7.30")
+import com.google.common.base.MoreObjects;
 
-    runtimeOnly("ch.qos.logback:logback-classic:1.2.3")
-}
+public final class ServiceEndpoint {
 
-jib {
-    to {
-        image = "pokeapi-gateway"
+    public static ServiceEndpoint of(String path) {
+        requireNonNull(path, "path");
+        return new ServiceEndpoint(path);
+    }
+
+    private final String path;
+
+    private ServiceEndpoint(String path) {
+        this.path = path;
+    }
+
+    public String path() {
+        return path;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                          .add("path", path)
+                          .toString();
     }
 }

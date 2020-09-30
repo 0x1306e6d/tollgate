@@ -22,23 +22,43 @@
  * SOFTWARE.
  */
 
-plugins {
-    java
-    application
-    id("com.google.cloud.tools.jib")
-}
+package dev.gihwan.lith.core;
 
-dependencies {
-    implementation(project(":core"))
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
 
-    implementation("com.linecorp.armeria:armeria:1.1.0")
-    implementation("org.slf4j:slf4j-api:1.7.30")
+import java.util.List;
 
-    runtimeOnly("ch.qos.logback:logback-classic:1.2.3")
-}
+import com.google.common.base.MoreObjects;
 
-jib {
-    to {
-        image = "pokeapi-gateway"
+import dev.gihwan.lith.core.route.Endpoint;
+
+public final class LithConfig {
+
+    private final int port;
+    private final List<Endpoint> endpoints;
+
+    LithConfig(int port, List<Endpoint> endpoints) {
+        checkArgument(port >= 0, "port: %s (expected: >= 0)", port);
+        checkArgument(port <= 65535, "port: %s (expected: <= 65535)", port);
+        this.port = port;
+        requireNonNull(endpoints, "endpoints");
+        this.endpoints = endpoints;
+    }
+
+    public int port() {
+        return port;
+    }
+
+    public List<Endpoint> endpoints() {
+        return endpoints;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                          .add("port", port)
+                          .add("endpoints", endpoints)
+                          .toString();
     }
 }

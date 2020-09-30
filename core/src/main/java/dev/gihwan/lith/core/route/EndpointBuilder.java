@@ -22,23 +22,39 @@
  * SOFTWARE.
  */
 
-plugins {
-    java
-    application
-    id("com.google.cloud.tools.jib")
-}
+package dev.gihwan.lith.core.route;
 
-dependencies {
-    implementation(project(":core"))
+import static java.util.Objects.requireNonNull;
 
-    implementation("com.linecorp.armeria:armeria:1.1.0")
-    implementation("org.slf4j:slf4j-api:1.7.30")
+import com.linecorp.armeria.common.HttpMethod;
 
-    runtimeOnly("ch.qos.logback:logback-classic:1.2.3")
-}
+public final class EndpointBuilder {
 
-jib {
-    to {
-        image = "pokeapi-gateway"
+    private HttpMethod method;
+    private String path;
+    private Service service;
+
+    EndpointBuilder() {}
+
+    public EndpointBuilder method(HttpMethod method) {
+        requireNonNull(method, "method");
+        this.method = method;
+        return this;
+    }
+
+    public EndpointBuilder path(String path) {
+        requireNonNull(path, "path");
+        this.path = path;
+        return this;
+    }
+
+    public EndpointBuilder service(Service service) {
+        requireNonNull(service, "service");
+        this.service = service;
+        return this;
+    }
+
+    public Endpoint build() {
+        return new Endpoint(method, path, service);
     }
 }
