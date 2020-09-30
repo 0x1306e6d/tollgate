@@ -26,6 +26,8 @@ package dev.gihwan.lith.core;
 
 import static java.util.Objects.requireNonNull;
 
+import javax.annotation.Nullable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +47,7 @@ public final class Lith {
         return new LithBuilder();
     }
 
+    @Nullable
     private Server server;
     private final LithConfig config;
 
