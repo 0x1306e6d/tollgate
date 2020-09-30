@@ -23,11 +23,11 @@
  */
 
 plugins {
-    java
+    id("java-library")
 }
 
 dependencies {
+    api("com.linecorp.armeria:armeria:1.1.0")
     implementation("com.google.guava:guava:29.0-jre")
-    implementation("com.linecorp.armeria:armeria:1.1.0")
     implementation("org.slf4j:slf4j-api:1.7.30")
 }
