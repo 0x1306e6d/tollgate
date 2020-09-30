@@ -24,13 +24,18 @@
 
 package dev.gihwan.lith.core;
 
-import com.linecorp.armeria.server.Server;
-import com.linecorp.armeria.server.ServerBuilder;
-import com.linecorp.armeria.server.docs.DocService;
+import static java.util.Objects.requireNonNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static java.util.Objects.requireNonNull;
+import com.linecorp.armeria.server.Route;
+import com.linecorp.armeria.server.Server;
+import com.linecorp.armeria.server.ServerBuilder;
+import com.linecorp.armeria.server.docs.DocService;
+import com.linecorp.armeria.server.logging.LoggingService;
+
+import dev.gihwan.lith.core.gateway.GatewayService;
 
 public final class Lith {
 
@@ -66,6 +71,17 @@ public final class Lith {
 
         builder.http(config.port());
         builder.serviceUnder("/docs", DocService.builder().build());
+
+        config.endpoints().forEach(endpoint -> {
+            logger.info("Registering endpoint {}.", endpoint);
+
+            builder.service(Route.builder()
+                                 .methods(endpoint.method())
+                                 .path(endpoint.path())
+                                 .build(),
+                            GatewayService.of(endpoint)
+                                          .decorate(LoggingService.newDecorator()));
+        });
 
         final Server server = builder.build();
         server.start().join();

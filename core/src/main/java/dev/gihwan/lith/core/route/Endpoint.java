@@ -22,39 +22,55 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.lith.core;
+package dev.gihwan.lith.core.route;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.common.base.MoreObjects;
 
-import dev.gihwan.lith.core.route.Endpoint;
+import com.linecorp.armeria.common.HttpMethod;
 
-public final class LithBuilder {
+public final class Endpoint {
 
-    private int port = 8080;
-    private final List<Endpoint> endpoints = new ArrayList<>();
-
-    LithBuilder() {
+    public static Endpoint of(HttpMethod method, String path, Service service) {
+        requireNonNull(method, "method");
+        requireNonNull(path, "path");
+        requireNonNull(service, "service");
+        return new Endpoint(method, path, service);
     }
 
-    public LithBuilder port(int port) {
-        this.port = port;
-        return this;
+    public static EndpointBuilder builder() {
+        return new EndpointBuilder();
     }
 
-    public LithBuilder endpoint(Endpoint endpoint) {
-        requireNonNull(endpoint, "endpoint");
-        endpoints.add(endpoint);
-        return this;
+    private final HttpMethod method;
+    private final String path;
+    private final Service service;
+
+    Endpoint(HttpMethod method, String path, Service service) {
+        this.method = method;
+        this.path = path;
+        this.service = service;
     }
 
-    public Lith build() {
-        return new Lith(buildConfig());
+    public HttpMethod method() {
+        return method;
     }
 
-    private LithConfig buildConfig() {
-        return new LithConfig(port, endpoints);
+    public String path() {
+        return path;
+    }
+
+    public Service service() {
+        return service;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                          .add("method", method)
+                          .add("path", path)
+                          .add("service", service)
+                          .toString();
     }
 }

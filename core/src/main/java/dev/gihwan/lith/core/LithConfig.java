@@ -24,28 +24,41 @@
 
 package dev.gihwan.lith.core;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
+
+import java.util.List;
+
 import com.google.common.base.MoreObjects;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import dev.gihwan.lith.core.route.Endpoint;
 
 public final class LithConfig {
 
     private final int port;
+    private final List<Endpoint> endpoints;
 
-    LithConfig(int port) {
+    LithConfig(int port, List<Endpoint> endpoints) {
         checkArgument(port >= 0, "port: %s (expected: >= 0)", port);
         checkArgument(port <= 65535, "port: %s (expected: <= 65535)", port);
         this.port = port;
+        requireNonNull(endpoints, "endpoints");
+        this.endpoints = endpoints;
     }
 
     public int port() {
         return port;
     }
 
+    public List<Endpoint> endpoints() {
+        return endpoints;
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("port", port)
-                .toString();
+                          .add("port", port)
+                          .add("endpoints", endpoints)
+                          .toString();
     }
 }
