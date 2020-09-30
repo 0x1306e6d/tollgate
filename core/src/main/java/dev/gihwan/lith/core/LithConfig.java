@@ -24,23 +24,28 @@
 
 package dev.gihwan.lith.core;
 
-public final class LithBuilder {
+import com.google.common.base.MoreObjects;
 
-    private int port = 8080;
+import static com.google.common.base.Preconditions.checkArgument;
 
-    LithBuilder() {
-    }
+public final class LithConfig {
 
-    public LithBuilder port(int port) {
+    private final int port;
+
+    LithConfig(int port) {
+        checkArgument(port >= 0, "port: %s (expected: >= 0)", port);
+        checkArgument(port <= 65535, "port: %s (expected: <= 65535)", port);
         this.port = port;
-        return this;
     }
 
-    public Lith build() {
-        return new Lith(buildConfig());
+    public int port() {
+        return port;
     }
 
-    private LithConfig buildConfig() {
-        return new LithConfig(port);
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("port", port)
+                .toString();
     }
 }

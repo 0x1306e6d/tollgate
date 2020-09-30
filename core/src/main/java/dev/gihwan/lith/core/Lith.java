@@ -30,6 +30,8 @@ import com.linecorp.armeria.server.docs.DocService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.util.Objects.requireNonNull;
+
 public final class Lith {
 
     private static final Logger logger = LoggerFactory.getLogger(Lith.class);
@@ -39,10 +41,10 @@ public final class Lith {
     }
 
     private Server server;
-    private final int port;
+    private final LithConfig config;
 
-    Lith(int port) {
-        this.port = port;
+    Lith(LithConfig config) {
+        this.config = requireNonNull(config, "config");
     }
 
     public void start() {
@@ -62,7 +64,7 @@ public final class Lith {
 
         final ServerBuilder builder = Server.builder();
 
-        builder.http(port);
+        builder.http(config.port());
         builder.serviceUnder("/docs", DocService.builder().build());
 
         final Server server = builder.build();
