@@ -1,7 +1,7 @@
 {
   "id": 1,
   "name": "generation-i",
-  "abilities": [],
+  "abilities": [ ],
   "main_region": {
     "name": "kanto",
     "url": "https://pokeapi.co/api/v2/region/1/"

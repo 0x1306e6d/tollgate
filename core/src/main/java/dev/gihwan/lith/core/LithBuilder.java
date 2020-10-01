@@ -36,8 +36,7 @@ public final class LithBuilder {
     private int port = 8080;
     private final List<Endpoint> endpoints = new ArrayList<>();
 
-    LithBuilder() {
-    }
+    LithBuilder() {}
 
     public LithBuilder port(int port) {
         this.port = port;

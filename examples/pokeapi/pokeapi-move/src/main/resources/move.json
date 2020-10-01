@@ -50,7 +50,7 @@
       }
     }
   ],
-  "effect_changes": [],
+  "effect_changes": [ ],
   "generation": {
     "name": "generation-i",
     "url": "https://pokeapi.co/api/v2/generation/1/"
@@ -84,8 +84,8 @@
       }
     }
   ],
-  "past_values": [],
-  "stat_changes": [],
+  "past_values": [ ],
+  "stat_changes": [ ],
   "super_contest_effect": {
     "url": "https://pokeapi.co/api/v2/super-contest-effect/5/"
   },
