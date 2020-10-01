@@ -26,6 +26,8 @@ package dev.gihwan.lith.core.route;
 
 import static java.util.Objects.requireNonNull;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 
 import com.linecorp.armeria.common.HttpMethod;
@@ -47,7 +49,10 @@ public final class Endpoint {
     private final String path;
     private final Service service;
 
-    Endpoint(HttpMethod method, String path, Service service) {
+    @JsonCreator
+    Endpoint(@JsonProperty("method") HttpMethod method,
+             @JsonProperty("path") String path,
+             @JsonProperty("service") Service service) {
         this.method = method;
         this.path = path;
         this.service = service;

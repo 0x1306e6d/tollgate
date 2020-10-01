@@ -27,18 +27,35 @@ package dev.gihwan.lith.core;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 
+import dev.gihwan.lith.core.io.Json;
 import dev.gihwan.lith.core.route.Endpoint;
 
 public final class LithConfig {
 
+    public static LithConfig fromResource(Path path) throws IOException {
+        requireNonNull(path, "path");
+        final ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        try (InputStream is = loader.getResourceAsStream(path.toString())) {
+            checkArgument(is != null, "Resource should exist.");
+            return Json.readValue(is, LithConfig.class);
+        }
+    }
+
     private final int port;
     private final List<Endpoint> endpoints;
 
-    LithConfig(int port, List<Endpoint> endpoints) {
+    @JsonCreator
+    LithConfig(@JsonProperty("port") int port,
+               @JsonProperty("endpoints") List<Endpoint> endpoints) {
         checkArgument(port >= 0, "port: %s (expected: >= 0)", port);
         checkArgument(port <= 65535, "port: %s (expected: <= 65535)", port);
         this.port = port;

@@ -22,29 +22,15 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.lith.example.pokeapi.gateway;
+package dev.gihwan.lith.core.io;
 
-import java.nio.file.Path;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public final class ObjectMapperFactory {
 
-import dev.gihwan.lith.core.Lith;
-import dev.gihwan.lith.core.LithConfig;
-
-public final class GatewayService {
-
-    private static final Logger logger = LoggerFactory.getLogger(GatewayService.class);
-
-    public static void main(String[] args) throws Exception {
-        final Lith lith = Lith.of(LithConfig.fromResource(Path.of("lith.json")));
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            lith.stop();
-            logger.info("Stopped gateway service.");
-        }));
-
-        lith.start();
-        logger.info("Started gateway service.");
+    public static ObjectMapper json() {
+        return new ObjectMapper();
     }
+
+    private ObjectMapperFactory() {}
 }

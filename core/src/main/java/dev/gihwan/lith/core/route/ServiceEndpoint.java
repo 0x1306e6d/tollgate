@@ -26,6 +26,8 @@ package dev.gihwan.lith.core.route;
 
 import static java.util.Objects.requireNonNull;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 
 public final class ServiceEndpoint {
@@ -37,7 +39,8 @@ public final class ServiceEndpoint {
 
     private final String path;
 
-    private ServiceEndpoint(String path) {
+    @JsonCreator
+    private ServiceEndpoint(@JsonProperty("path") String path) {
         this.path = path;
     }
 

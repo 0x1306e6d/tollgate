@@ -43,6 +43,11 @@ public final class Lith {
 
     private static final Logger logger = LoggerFactory.getLogger(Lith.class);
 
+    public static Lith of(LithConfig config) {
+        requireNonNull(config, "config");
+        return new Lith(config);
+    }
+
     public static LithBuilder builder() {
         return new LithBuilder();
     }
@@ -52,7 +57,7 @@ public final class Lith {
     private final LithConfig config;
 
     Lith(LithConfig config) {
-        this.config = requireNonNull(config, "config");
+        this.config = config;
     }
 
     public void start() {
