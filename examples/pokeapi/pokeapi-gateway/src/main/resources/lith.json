@@ -1,0 +1,105 @@
+{
+  "port": 8080,
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/api/v2/berry/{idOrName}",
+      "service": {
+        "uri": "http://berry:9080",
+        "endpoint": {
+          "path": "/berry/{idOrName}"
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/contest-type/{idOrName}",
+      "service": {
+        "uri": "http://contest:9180",
+        "endpoint": {
+          "path": "/contest-type/{idOrName}"
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/encounter-method/{idOrName}",
+      "service": {
+        "uri": "http://encounter:9280",
+        "endpoint": {
+          "path": "/encounter-method/{idOrName}"
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/evolution-chain/{idOrName}",
+      "service": {
+        "uri": "http://evolution:9380",
+        "endpoint": {
+          "path": "/evolution-chain/{idOrName}"
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/generation/{idOrName}",
+      "service": {
+        "uri": "http://game:9480",
+        "endpoint": {
+          "path": "/generation/{idOrName}"
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/item/{idOrName}",
+      "service": {
+        "uri": "http://item:9580",
+        "endpoint": {
+          "path": "/item/{idOrName}"
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/location/{idOrName}",
+      "service": {
+        "uri": "http://location:9680",
+        "endpoint": {
+          "path": "/location/{idOrName}"
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/machine/{idOrName}",
+      "service": {
+        "uri": "http://machine:9780",
+        "endpoint": {
+          "path": "/machine/{idOrName}"
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/move/{idOrName}",
+      "service": {
+        "uri": "http://move:9880",
+        "endpoint": {
+          "path": "/move/{idOrName}"
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/ability/{idOrName}",
+      "service": {
+        "uri": "http://pokemon:9980",
+        "endpoint": {
+          "path": "/ability/{idOrName}"
+        }
+      }
+    }
+  ]
+}
