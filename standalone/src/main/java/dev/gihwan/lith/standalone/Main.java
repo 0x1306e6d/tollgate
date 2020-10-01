@@ -24,12 +24,13 @@
 
 package dev.gihwan.lith.standalone;
 
-import dev.gihwan.lith.core.Lith;
+import java.time.Duration;
+import java.time.Instant;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
-import java.time.Instant;
+import dev.gihwan.lith.core.Lith;
 
 public final class Main {
 
@@ -43,11 +44,12 @@ public final class Main {
         logger.info("Starting the Lith standalone at {}.", startAt);
 
         lith = Lith.builder()
-                .port(8080)
-                .build();
+                   .port(8080)
+                   .build();
         lith.start();
 
-        logger.info("The Lith standalone is started. ({} used to start)", Duration.between(startAt, Instant.now()));
+        logger.info("The Lith standalone is started. ({} used to start)",
+                    Duration.between(startAt, Instant.now()));
     }
 
     private void stop() {
@@ -57,7 +59,8 @@ public final class Main {
         lith.stop();
 
         logger.info("The Lith standalone has served during {}.", Duration.between(startAt, stopAt));
-        logger.info("The Lith standalone is stopped. ({} used to stop)", Duration.between(startAt, Instant.now()));
+        logger.info("The Lith standalone is stopped. ({} used to stop)",
+                    Duration.between(startAt, Instant.now()));
     }
 
     public static void main(String[] args) {

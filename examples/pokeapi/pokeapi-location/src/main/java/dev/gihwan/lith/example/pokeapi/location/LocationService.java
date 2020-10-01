@@ -24,6 +24,11 @@
 
 package dev.gihwan.lith.example.pokeapi.location;
 
+import java.util.concurrent.Executors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.linecorp.armeria.common.HttpData;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
@@ -32,10 +37,6 @@ import com.linecorp.armeria.server.Server;
 import com.linecorp.armeria.server.file.AggregatedHttpFile;
 import com.linecorp.armeria.server.file.HttpFile;
 import com.linecorp.armeria.server.logging.LoggingService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.Executors;
 
 public final class LocationService {
 
@@ -43,14 +44,15 @@ public final class LocationService {
 
     public static void main(String[] args) {
         final HttpData data = HttpFile.of(LocationService.class.getClassLoader(), "location.json")
-                .aggregate(Executors.newSingleThreadExecutor())
-                .thenApply(AggregatedHttpFile::content)
-                .join();
+                                      .aggregate(Executors.newSingleThreadExecutor())
+                                      .thenApply(AggregatedHttpFile::content)
+                                      .join();
         final Server server = Server.builder()
-                .http(9680)
-                .service("/location/1", (ctx, req) -> HttpResponse.of(HttpStatus.OK, MediaType.JSON, data))
-                .decorator(LoggingService.newDecorator())
-                .build();
+                                    .http(9680)
+                                    .service("/location/1",
+                                             (ctx, req) -> HttpResponse.of(HttpStatus.OK, MediaType.JSON, data))
+                                    .decorator(LoggingService.newDecorator())
+                                    .build();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             server.stop().join();
