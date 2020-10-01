@@ -48,7 +48,7 @@ public final class LocationService {
                                       .thenApply(AggregatedHttpFile::content)
                                       .join();
         final Server server = Server.builder()
-                                    .http(9680)
+                                    .http(8080)
                                     .service("/location/1",
                                              (ctx, req) -> HttpResponse.of(HttpStatus.OK, MediaType.JSON, data))
                                     .decorator(LoggingService.newDecorator())

@@ -48,7 +48,7 @@ public final class BerryService {
                                       .thenApply(AggregatedHttpFile::content)
                                       .join();
         final Server server = Server.builder()
-                                    .http(9080)
+                                    .http(8080)
                                     .service("/berry/1",
                                              (ctx, req) -> HttpResponse.of(HttpStatus.OK, MediaType.JSON, data))
                                     .decorator(LoggingService.newDecorator())

@@ -48,7 +48,7 @@ public final class EvolutionService {
                                       .thenApply(AggregatedHttpFile::content)
                                       .join();
         final Server server = Server.builder()
-                                    .http(9380)
+                                    .http(8080)
                                     .service("/evolution-chain/1",
                                              (ctx, req) -> HttpResponse.of(HttpStatus.OK, MediaType.JSON, data))
                                     .decorator(LoggingService.newDecorator())

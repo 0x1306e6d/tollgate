@@ -48,7 +48,7 @@ public final class PokemonService {
                                       .thenApply(AggregatedHttpFile::content)
                                       .join();
         final Server server = Server.builder()
-                                    .http(9980)
+                                    .http(8080)
                                     .service("/ability/1",
                                              (ctx, req) -> HttpResponse.of(HttpStatus.OK, MediaType.JSON, data))
                                     .decorator(LoggingService.newDecorator())

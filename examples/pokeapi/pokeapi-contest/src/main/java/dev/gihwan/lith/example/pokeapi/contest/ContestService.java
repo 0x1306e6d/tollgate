@@ -48,7 +48,7 @@ public final class ContestService {
                                       .thenApply(AggregatedHttpFile::content)
                                       .join();
         final Server server = Server.builder()
-                                    .http(9180)
+                                    .http(8080)
                                     .service("/contest-type/1",
                                              (ctx, req) -> HttpResponse.of(HttpStatus.OK, MediaType.JSON, data))
                                     .decorator(LoggingService.newDecorator())
