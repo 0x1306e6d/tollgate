@@ -22,19 +22,35 @@
  * SOFTWARE.
  */
 
-rootProject.name = "tollgate"
+package dev.gihwan.tollgate.core.service;
 
-include("core")
-include("standalone")
+import static java.util.Objects.requireNonNull;
 
-include(":examples:pokeapi:pokeapi-berry")
-include(":examples:pokeapi:pokeapi-contest")
-include(":examples:pokeapi:pokeapi-encounter")
-include(":examples:pokeapi:pokeapi-evolution")
-include(":examples:pokeapi:pokeapi-game")
-include(":examples:pokeapi:pokeapi-gateway")
-include(":examples:pokeapi:pokeapi-item")
-include(":examples:pokeapi:pokeapi-location")
-include(":examples:pokeapi:pokeapi-machine")
-include(":examples:pokeapi:pokeapi-move")
-include(":examples:pokeapi:pokeapi-pokemon")
+import java.util.HashMap;
+import java.util.Map;
+
+public final class ServiceFactory {
+
+    private static final ServiceFactory INSTANCE = new ServiceFactory();
+
+    public static ServiceFactory instance() {
+        return INSTANCE;
+    }
+
+    private final Map<ServiceConfig, Service> services = new HashMap<>();
+
+    private ServiceFactory() {}
+
+    public Service get(ServiceConfig config) {
+        requireNonNull(config, "config");
+
+        final Service service = services.get(config);
+        if (service != null) {
+            return service;
+        }
+
+        final Service newService = Service.of(config);
+        services.put(config, newService);
+        return newService;
+    }
+}

@@ -22,19 +22,16 @@
  * SOFTWARE.
  */
 
-rootProject.name = "tollgate"
+package dev.gihwan.tollgate.core.upstream;
 
-include("core")
-include("standalone")
+import static java.util.Objects.requireNonNull;
 
-include(":examples:pokeapi:pokeapi-berry")
-include(":examples:pokeapi:pokeapi-contest")
-include(":examples:pokeapi:pokeapi-encounter")
-include(":examples:pokeapi:pokeapi-evolution")
-include(":examples:pokeapi:pokeapi-game")
-include(":examples:pokeapi:pokeapi-gateway")
-include(":examples:pokeapi:pokeapi-item")
-include(":examples:pokeapi:pokeapi-location")
-include(":examples:pokeapi:pokeapi-machine")
-include(":examples:pokeapi:pokeapi-move")
-include(":examples:pokeapi:pokeapi-pokemon")
+import com.linecorp.armeria.server.HttpService;
+
+public interface Upstream extends HttpService {
+
+    static Upstream of(UpstreamConfig config) {
+        requireNonNull(config, "config");
+        return new DefaultUpstream(config);
+    }
+}

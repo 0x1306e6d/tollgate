@@ -22,19 +22,43 @@
  * SOFTWARE.
  */
 
-rootProject.name = "tollgate"
+package dev.gihwan.tollgate.core.service;
 
-include("core")
-include("standalone")
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
 
-include(":examples:pokeapi:pokeapi-berry")
-include(":examples:pokeapi:pokeapi-contest")
-include(":examples:pokeapi:pokeapi-encounter")
-include(":examples:pokeapi:pokeapi-evolution")
-include(":examples:pokeapi:pokeapi-game")
-include(":examples:pokeapi:pokeapi-gateway")
-include(":examples:pokeapi:pokeapi-item")
-include(":examples:pokeapi:pokeapi-location")
-include(":examples:pokeapi:pokeapi-machine")
-include(":examples:pokeapi:pokeapi-move")
-include(":examples:pokeapi:pokeapi-pokemon")
+import com.linecorp.armeria.client.Endpoint;
+
+public final class Authority {
+
+    private final String host;
+    private final int port;
+
+    @JsonCreator
+    private Authority(@JsonProperty("host") String host,
+                      @JsonProperty("port") int port) {
+        this.host = host;
+        this.port = port;
+    }
+
+    public String host() {
+        return host;
+    }
+
+    public int port() {
+        return port;
+    }
+
+    public Endpoint toArmeriaEndpoint() {
+        return Endpoint.of(host, port);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                          .add("host", host)
+                          .add("port", port)
+                          .toString();
+    }
+}

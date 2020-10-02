@@ -22,19 +22,26 @@
  * SOFTWARE.
  */
 
-rootProject.name = "tollgate"
+package dev.gihwan.tollgate.core.annotation;
 
-include("core")
-include("standalone")
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-include(":examples:pokeapi:pokeapi-berry")
-include(":examples:pokeapi:pokeapi-contest")
-include(":examples:pokeapi:pokeapi-encounter")
-include(":examples:pokeapi:pokeapi-evolution")
-include(":examples:pokeapi:pokeapi-game")
-include(":examples:pokeapi:pokeapi-gateway")
-include(":examples:pokeapi:pokeapi-item")
-include(":examples:pokeapi:pokeapi-location")
-include(":examples:pokeapi:pokeapi-machine")
-include(":examples:pokeapi:pokeapi-move")
-include(":examples:pokeapi:pokeapi-pokemon")
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.meta.TypeQualifierDefault;
+
+/**
+ * Indicates the return values, parameters and fields are non-nullable by default. Annotate a package with
+ * this annotation and annotate nullable return values, parameters and fields with {@link Nullable}.
+ */
+@Nonnull
+@Documented
+@Target(ElementType.PACKAGE)
+@Retention(RetentionPolicy.RUNTIME)
+@TypeQualifierDefault({ ElementType.METHOD, ElementType.PARAMETER, ElementType.FIELD })
+public @interface NonNullByDefault {
+}

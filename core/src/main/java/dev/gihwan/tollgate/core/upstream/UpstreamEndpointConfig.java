@@ -22,19 +22,39 @@
  * SOFTWARE.
  */
 
-rootProject.name = "tollgate"
+package dev.gihwan.tollgate.core.upstream;
 
-include("core")
-include("standalone")
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
 
-include(":examples:pokeapi:pokeapi-berry")
-include(":examples:pokeapi:pokeapi-contest")
-include(":examples:pokeapi:pokeapi-encounter")
-include(":examples:pokeapi:pokeapi-evolution")
-include(":examples:pokeapi:pokeapi-game")
-include(":examples:pokeapi:pokeapi-gateway")
-include(":examples:pokeapi:pokeapi-item")
-include(":examples:pokeapi:pokeapi-location")
-include(":examples:pokeapi:pokeapi-machine")
-include(":examples:pokeapi:pokeapi-move")
-include(":examples:pokeapi:pokeapi-pokemon")
+import com.linecorp.armeria.common.HttpMethod;
+
+public final class UpstreamEndpointConfig {
+
+    private final HttpMethod method;
+    private final String path;
+
+    @JsonCreator
+    private UpstreamEndpointConfig(@JsonProperty("method") HttpMethod method,
+                                   @JsonProperty("path") String path) {
+        this.method = method;
+        this.path = path;
+    }
+
+    public HttpMethod method() {
+        return method;
+    }
+
+    public String path() {
+        return path;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                          .add("method", method)
+                          .add("path", path)
+                          .toString();
+    }
+}

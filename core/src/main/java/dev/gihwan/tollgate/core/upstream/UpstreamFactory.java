@@ -22,19 +22,35 @@
  * SOFTWARE.
  */
 
-rootProject.name = "tollgate"
+package dev.gihwan.tollgate.core.upstream;
 
-include("core")
-include("standalone")
+import static java.util.Objects.requireNonNull;
 
-include(":examples:pokeapi:pokeapi-berry")
-include(":examples:pokeapi:pokeapi-contest")
-include(":examples:pokeapi:pokeapi-encounter")
-include(":examples:pokeapi:pokeapi-evolution")
-include(":examples:pokeapi:pokeapi-game")
-include(":examples:pokeapi:pokeapi-gateway")
-include(":examples:pokeapi:pokeapi-item")
-include(":examples:pokeapi:pokeapi-location")
-include(":examples:pokeapi:pokeapi-machine")
-include(":examples:pokeapi:pokeapi-move")
-include(":examples:pokeapi:pokeapi-pokemon")
+import java.util.HashMap;
+import java.util.Map;
+
+public final class UpstreamFactory {
+
+    private static final UpstreamFactory INSTANCE = new UpstreamFactory();
+
+    public static UpstreamFactory instance() {
+        return INSTANCE;
+    }
+
+    private final Map<UpstreamConfig, Upstream> upstreams = new HashMap<>();
+
+    private UpstreamFactory() {}
+
+    public Upstream get(UpstreamConfig config) {
+        requireNonNull(config, "config");
+
+        final Upstream upstream = upstreams.get(config);
+        if (upstream != null) {
+            return upstream;
+        }
+
+        final Upstream newUpstream = Upstream.of(config);
+        upstreams.put(config, newUpstream);
+        return newUpstream;
+    }
+}
