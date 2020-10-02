@@ -36,8 +36,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 
+import dev.gihwan.lith.core.endpoint.Endpoint;
 import dev.gihwan.lith.core.io.Json;
-import dev.gihwan.lith.core.route.Endpoint;
 
 public final class LithConfig {
 

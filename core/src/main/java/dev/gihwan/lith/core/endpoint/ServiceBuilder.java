@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.lith.core.route;
+package dev.gihwan.lith.core.endpoint;
 
 import static java.util.Objects.requireNonNull;
 
