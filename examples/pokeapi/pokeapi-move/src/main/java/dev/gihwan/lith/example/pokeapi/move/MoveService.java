@@ -36,6 +36,8 @@ import com.linecorp.armeria.common.MediaType;
 import com.linecorp.armeria.server.Server;
 import com.linecorp.armeria.server.file.AggregatedHttpFile;
 import com.linecorp.armeria.server.file.HttpFile;
+import com.linecorp.armeria.server.healthcheck.HealthCheckService;
+import com.linecorp.armeria.server.healthcheck.SettableHealthChecker;
 import com.linecorp.armeria.server.logging.LoggingService;
 
 public final class MoveService {
@@ -49,6 +51,7 @@ public final class MoveService {
                                       .join();
         final Server server = Server.builder()
                                     .http(8080)
+                                    .service("/health", HealthCheckService.of(new SettableHealthChecker()))
                                     .service("/move/1",
                                              (ctx, req) -> HttpResponse.of(HttpStatus.OK, MediaType.JSON, data))
                                     .decorator(LoggingService.newDecorator())
