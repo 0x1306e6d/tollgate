@@ -22,19 +22,39 @@
  * SOFTWARE.
  */
 
-rootProject.name = "tollgate"
+package dev.gihwan.tollgate.core.upstream;
 
-include("core")
-include("standalone")
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
 
-include(":examples:pokeapi:pokeapi-berry")
-include(":examples:pokeapi:pokeapi-contest")
-include(":examples:pokeapi:pokeapi-encounter")
-include(":examples:pokeapi:pokeapi-evolution")
-include(":examples:pokeapi:pokeapi-game")
-include(":examples:pokeapi:pokeapi-gateway")
-include(":examples:pokeapi:pokeapi-item")
-include(":examples:pokeapi:pokeapi-location")
-include(":examples:pokeapi:pokeapi-machine")
-include(":examples:pokeapi:pokeapi-move")
-include(":examples:pokeapi:pokeapi-pokemon")
+import dev.gihwan.tollgate.core.service.ServiceConfig;
+
+public final class UpstreamConfig {
+
+    private final ServiceConfig service;
+    private final UpstreamEndpointConfig endpoint;
+
+    @JsonCreator
+    private UpstreamConfig(@JsonProperty("service") ServiceConfig service,
+                           @JsonProperty("endpoint") UpstreamEndpointConfig endpoint) {
+        this.service = service;
+        this.endpoint = endpoint;
+    }
+
+    public ServiceConfig service() {
+        return service;
+    }
+
+    public UpstreamEndpointConfig endpoint() {
+        return endpoint;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                          .add("service", service)
+                          .add("endpoint", endpoint)
+                          .toString();
+    }
+}

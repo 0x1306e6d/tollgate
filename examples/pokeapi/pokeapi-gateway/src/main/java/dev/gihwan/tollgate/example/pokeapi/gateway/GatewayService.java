@@ -22,19 +22,29 @@
  * SOFTWARE.
  */
 
-rootProject.name = "tollgate"
+package dev.gihwan.tollgate.example.pokeapi.gateway;
 
-include("core")
-include("standalone")
+import java.nio.file.Path;
 
-include(":examples:pokeapi:pokeapi-berry")
-include(":examples:pokeapi:pokeapi-contest")
-include(":examples:pokeapi:pokeapi-encounter")
-include(":examples:pokeapi:pokeapi-evolution")
-include(":examples:pokeapi:pokeapi-game")
-include(":examples:pokeapi:pokeapi-gateway")
-include(":examples:pokeapi:pokeapi-item")
-include(":examples:pokeapi:pokeapi-location")
-include(":examples:pokeapi:pokeapi-machine")
-include(":examples:pokeapi:pokeapi-move")
-include(":examples:pokeapi:pokeapi-pokemon")
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import dev.gihwan.tollgate.core.Tollgate;
+import dev.gihwan.tollgate.core.TollgateConfig;
+
+public final class GatewayService {
+
+    private static final Logger logger = LoggerFactory.getLogger(GatewayService.class);
+
+    public static void main(String[] args) throws Exception {
+        final Tollgate tollgate = Tollgate.of(TollgateConfig.fromResource(Path.of("tollgate.json")));
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            tollgate.stop();
+            logger.info("Stopped gateway service.");
+        }));
+
+        tollgate.start();
+        logger.info("Started gateway service.");
+    }
+}

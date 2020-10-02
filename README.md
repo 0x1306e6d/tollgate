@@ -1,7 +1,7 @@
-# lith
+# tollgate
 
-![Build master](https://github.com/ghkim3221/lith/workflows/Build%20master/badge.svg)
-![Build pull request](https://github.com/ghkim3221/lith/workflows/Build%20pull%20request/badge.svg)
+![Build master](https://github.com/ghkim3221/tollgate/workflows/Build%20master/badge.svg)
+![Build pull request](https://github.com/ghkim3221/tollgate/workflows/Build%20pull%20request/badge.svg)
 
 A gateway for your microservice.
 

@@ -22,19 +22,45 @@
  * SOFTWARE.
  */
 
-rootProject.name = "tollgate"
+package dev.gihwan.tollgate.core;
 
-include("core")
-include("standalone")
+import static java.util.Objects.requireNonNull;
 
-include(":examples:pokeapi:pokeapi-berry")
-include(":examples:pokeapi:pokeapi-contest")
-include(":examples:pokeapi:pokeapi-encounter")
-include(":examples:pokeapi:pokeapi-evolution")
-include(":examples:pokeapi:pokeapi-game")
-include(":examples:pokeapi:pokeapi-gateway")
-include(":examples:pokeapi:pokeapi-item")
-include(":examples:pokeapi:pokeapi-location")
-include(":examples:pokeapi:pokeapi-machine")
-include(":examples:pokeapi:pokeapi-move")
-include(":examples:pokeapi:pokeapi-pokemon")
+import java.util.ArrayList;
+import java.util.List;
+
+import dev.gihwan.tollgate.core.endpoint.EndpointConfig;
+
+public final class TollgateBuilder {
+
+    private int port = 8080;
+    private String healthCheckPath = "/health";
+    private final List<EndpointConfig> endpoints = new ArrayList<>();
+
+    TollgateBuilder() {}
+
+    public TollgateBuilder port(int port) {
+        this.port = port;
+        return this;
+    }
+
+    public TollgateBuilder healthCheckPath(String healthCheckPath) {
+        requireNonNull(healthCheckPath, "healthCheckPath");
+        this.healthCheckPath = healthCheckPath;
+        return this;
+    }
+
+    public TollgateBuilder endpoint(EndpointConfig endpoint) {
+        requireNonNull(endpoint, "endpoint");
+        endpoints.add(endpoint);
+        return this;
+    }
+
+    public Tollgate build() {
+        return new Tollgate(buildConfig());
+    }
+
+    private TollgateConfig buildConfig() {
+        return new TollgateConfig(port, healthCheckPath, endpoints);
+    }
+}

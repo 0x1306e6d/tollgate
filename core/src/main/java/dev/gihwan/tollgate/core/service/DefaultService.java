@@ -22,19 +22,27 @@
  * SOFTWARE.
  */
 
-rootProject.name = "tollgate"
+package dev.gihwan.tollgate.core.service;
 
-include("core")
-include("standalone")
+import com.linecorp.armeria.client.WebClient;
+import com.linecorp.armeria.client.logging.LoggingClient;
+import com.linecorp.armeria.common.HttpRequest;
+import com.linecorp.armeria.common.HttpResponse;
 
-include(":examples:pokeapi:pokeapi-berry")
-include(":examples:pokeapi:pokeapi-contest")
-include(":examples:pokeapi:pokeapi-encounter")
-include(":examples:pokeapi:pokeapi-evolution")
-include(":examples:pokeapi:pokeapi-game")
-include(":examples:pokeapi:pokeapi-gateway")
-include(":examples:pokeapi:pokeapi-item")
-include(":examples:pokeapi:pokeapi-location")
-include(":examples:pokeapi:pokeapi-machine")
-include(":examples:pokeapi:pokeapi-move")
-include(":examples:pokeapi:pokeapi-pokemon")
+public final class DefaultService implements Service {
+
+    private final ServiceConfig config;
+    private final WebClient client;
+
+    DefaultService(ServiceConfig config) {
+        this.config = config;
+        client = config.webClientBuilder()
+                       .decorator(LoggingClient.newDecorator())
+                       .build();
+    }
+
+    @Override
+    public HttpResponse send(HttpRequest req) {
+        return client.execute(req);
+    }
+}

@@ -22,19 +22,23 @@
  * SOFTWARE.
  */
 
-rootProject.name = "tollgate"
+package dev.gihwan.tollgate.core.endpoint;
 
-include("core")
-include("standalone")
+import dev.gihwan.tollgate.core.upstream.Upstream;
+import dev.gihwan.tollgate.core.upstream.UpstreamFactory;
 
-include(":examples:pokeapi:pokeapi-berry")
-include(":examples:pokeapi:pokeapi-contest")
-include(":examples:pokeapi:pokeapi-encounter")
-include(":examples:pokeapi:pokeapi-evolution")
-include(":examples:pokeapi:pokeapi-game")
-include(":examples:pokeapi:pokeapi-gateway")
-include(":examples:pokeapi:pokeapi-item")
-include(":examples:pokeapi:pokeapi-location")
-include(":examples:pokeapi:pokeapi-machine")
-include(":examples:pokeapi:pokeapi-move")
-include(":examples:pokeapi:pokeapi-pokemon")
+public final class DefaultEndpoint implements Endpoint {
+
+    private final EndpointConfig config;
+    private final Upstream upstream;
+
+    DefaultEndpoint(EndpointConfig config) {
+        this.config = config;
+        upstream = UpstreamFactory.instance().get(config.upstream());
+    }
+
+    @Override
+    public Upstream upstream() {
+        return upstream;
+    }
+}
