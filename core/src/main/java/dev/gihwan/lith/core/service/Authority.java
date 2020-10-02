@@ -24,25 +24,41 @@
 
 package dev.gihwan.lith.core.service;
 
-import com.linecorp.armeria.client.WebClient;
-import com.linecorp.armeria.client.logging.LoggingClient;
-import com.linecorp.armeria.common.HttpRequest;
-import com.linecorp.armeria.common.HttpResponse;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
 
-public final class DefaultService implements Service {
+import com.linecorp.armeria.client.Endpoint;
 
-    private final ServiceConfig config;
-    private final WebClient client;
+public final class Authority {
 
-    DefaultService(ServiceConfig config) {
-        this.config = config;
-        client = config.webClientBuilder()
-                       .decorator(LoggingClient.newDecorator())
-                       .build();
+    private final String host;
+    private final int port;
+
+    @JsonCreator
+    private Authority(@JsonProperty("host") String host,
+                      @JsonProperty("port") int port) {
+        this.host = host;
+        this.port = port;
+    }
+
+    public String host() {
+        return host;
+    }
+
+    public int port() {
+        return port;
+    }
+
+    public Endpoint toArmeriaEndpoint() {
+        return Endpoint.of(host, port);
     }
 
     @Override
-    public HttpResponse send(HttpRequest req) {
-        return client.execute(req);
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                          .add("host", host)
+                          .add("port", port)
+                          .toString();
     }
 }
