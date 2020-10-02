@@ -51,20 +51,28 @@ public final class LithConfig {
     }
 
     private final int port;
+    private final String healthCheckPath;
     private final List<Endpoint> endpoints;
 
     @JsonCreator
     LithConfig(@JsonProperty("port") int port,
+               @JsonProperty("healthCheckPath") String healthCheckPath,
                @JsonProperty("endpoints") List<Endpoint> endpoints) {
         checkArgument(port >= 0, "port: %s (expected: >= 0)", port);
         checkArgument(port <= 65535, "port: %s (expected: <= 65535)", port);
         this.port = port;
+        requireNonNull(healthCheckPath, "healthCheckPath");
+        this.healthCheckPath = healthCheckPath;
         requireNonNull(endpoints, "endpoints");
         this.endpoints = endpoints;
     }
 
     public int port() {
         return port;
+    }
+
+    public String healthCheckPath() {
+        return healthCheckPath;
     }
 
     public List<Endpoint> endpoints() {
@@ -75,6 +83,7 @@ public final class LithConfig {
     public String toString() {
         return MoreObjects.toStringHelper(this)
                           .add("port", port)
+                          .add("healthCheckPath", healthCheckPath)
                           .add("endpoints", endpoints)
                           .toString();
     }
