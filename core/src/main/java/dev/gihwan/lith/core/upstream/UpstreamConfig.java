@@ -22,45 +22,39 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.lith.core;
+package dev.gihwan.lith.core.upstream;
 
-import static java.util.Objects.requireNonNull;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
 
-import java.util.ArrayList;
-import java.util.List;
+import dev.gihwan.lith.core.service.ServiceConfig;
 
-import dev.gihwan.lith.core.endpoint.EndpointConfig;
+public final class UpstreamConfig {
 
-public final class LithBuilder {
+    private final ServiceConfig service;
+    private final UpstreamEndpointConfig endpoint;
 
-    private int port = 8080;
-    private String healthCheckPath = "/health";
-    private final List<EndpointConfig> endpoints = new ArrayList<>();
-
-    LithBuilder() {}
-
-    public LithBuilder port(int port) {
-        this.port = port;
-        return this;
+    @JsonCreator
+    private UpstreamConfig(@JsonProperty("service") ServiceConfig service,
+                           @JsonProperty("endpoint") UpstreamEndpointConfig endpoint) {
+        this.service = service;
+        this.endpoint = endpoint;
     }
 
-    public LithBuilder healthCheckPath(String healthCheckPath) {
-        requireNonNull(healthCheckPath, "healthCheckPath");
-        this.healthCheckPath = healthCheckPath;
-        return this;
+    public ServiceConfig service() {
+        return service;
     }
 
-    public LithBuilder endpoint(EndpointConfig endpoint) {
-        requireNonNull(endpoint, "endpoint");
-        endpoints.add(endpoint);
-        return this;
+    public UpstreamEndpointConfig endpoint() {
+        return endpoint;
     }
 
-    public Lith build() {
-        return new Lith(buildConfig());
-    }
-
-    private LithConfig buildConfig() {
-        return new LithConfig(port, healthCheckPath, endpoints);
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                          .add("service", service)
+                          .add("endpoint", endpoint)
+                          .toString();
     }
 }

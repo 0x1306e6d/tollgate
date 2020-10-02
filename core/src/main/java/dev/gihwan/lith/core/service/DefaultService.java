@@ -22,45 +22,27 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.lith.core;
+package dev.gihwan.lith.core.service;
 
-import static java.util.Objects.requireNonNull;
+import com.linecorp.armeria.client.WebClient;
+import com.linecorp.armeria.client.logging.LoggingClient;
+import com.linecorp.armeria.common.HttpRequest;
+import com.linecorp.armeria.common.HttpResponse;
 
-import java.util.ArrayList;
-import java.util.List;
+public final class DefaultService implements Service {
 
-import dev.gihwan.lith.core.endpoint.EndpointConfig;
+    private final ServiceConfig config;
+    private final WebClient client;
 
-public final class LithBuilder {
-
-    private int port = 8080;
-    private String healthCheckPath = "/health";
-    private final List<EndpointConfig> endpoints = new ArrayList<>();
-
-    LithBuilder() {}
-
-    public LithBuilder port(int port) {
-        this.port = port;
-        return this;
+    DefaultService(ServiceConfig config) {
+        this.config = config;
+        client = WebClient.builder(config.uri())
+                          .decorator(LoggingClient.newDecorator())
+                          .build();
     }
 
-    public LithBuilder healthCheckPath(String healthCheckPath) {
-        requireNonNull(healthCheckPath, "healthCheckPath");
-        this.healthCheckPath = healthCheckPath;
-        return this;
-    }
-
-    public LithBuilder endpoint(EndpointConfig endpoint) {
-        requireNonNull(endpoint, "endpoint");
-        endpoints.add(endpoint);
-        return this;
-    }
-
-    public Lith build() {
-        return new Lith(buildConfig());
-    }
-
-    private LithConfig buildConfig() {
-        return new LithConfig(port, healthCheckPath, endpoints);
+    @Override
+    public HttpResponse send(HttpRequest req) {
+        return client.execute(req);
     }
 }

@@ -24,37 +24,21 @@
 
 package dev.gihwan.lith.core.endpoint;
 
-import static java.util.Objects.requireNonNull;
+import dev.gihwan.lith.core.upstream.Upstream;
+import dev.gihwan.lith.core.upstream.UpstreamFactory;
 
-import com.linecorp.armeria.common.HttpMethod;
+public final class DefaultEndpoint implements Endpoint {
 
-public final class EndpointBuilder {
+    private final EndpointConfig config;
+    private final Upstream upstream;
 
-    private HttpMethod method;
-    private String path;
-    private Service service;
-
-    EndpointBuilder() {}
-
-    public EndpointBuilder method(HttpMethod method) {
-        requireNonNull(method, "method");
-        this.method = method;
-        return this;
+    DefaultEndpoint(EndpointConfig config) {
+        this.config = config;
+        upstream = UpstreamFactory.instance().get(config.upstream());
     }
 
-    public EndpointBuilder path(String path) {
-        requireNonNull(path, "path");
-        this.path = path;
-        return this;
-    }
-
-    public EndpointBuilder service(Service service) {
-        requireNonNull(service, "service");
-        this.service = service;
-        return this;
-    }
-
-    public Endpoint build() {
-        return new Endpoint(method, path, service);
+    @Override
+    public Upstream upstream() {
+        return upstream;
     }
 }

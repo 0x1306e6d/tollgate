@@ -1,0 +1,17 @@
+{
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/api/v2/berry/{idOrName}",
+      "upstream": {
+        "service": {
+          "uri": "http://berry:8080"
+        },
+        "endpoint": {
+          "method": "GET",
+          "path": "/berry/{idOrName}"
+        }
+      }
+    }
+  ]
+}

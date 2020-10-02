@@ -22,36 +22,19 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.lith.core.endpoint;
+package dev.gihwan.lith.core.service;
 
 import static java.util.Objects.requireNonNull;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.MoreObjects;
+import com.linecorp.armeria.common.HttpRequest;
+import com.linecorp.armeria.common.HttpResponse;
 
-public final class ServiceEndpoint {
+public interface Service {
 
-    public static ServiceEndpoint of(String path) {
-        requireNonNull(path, "path");
-        return new ServiceEndpoint(path);
+    static Service of(ServiceConfig config) {
+        requireNonNull(config, "config");
+        return new DefaultService(config);
     }
 
-    private final String path;
-
-    @JsonCreator
-    private ServiceEndpoint(@JsonProperty("path") String path) {
-        this.path = path;
-    }
-
-    public String path() {
-        return path;
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                          .add("path", path)
-                          .toString();
-    }
+    HttpResponse send(HttpRequest req);
 }

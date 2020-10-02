@@ -22,9 +22,7 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.lith.core.gateway;
-
-import static java.util.Objects.requireNonNull;
+package dev.gihwan.lith.core.upstream;
 
 import javax.annotation.Nullable;
 
@@ -33,56 +31,47 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Splitter;
 
-import com.linecorp.armeria.client.WebClient;
-import com.linecorp.armeria.client.logging.LoggingClient;
 import com.linecorp.armeria.common.AggregatedHttpRequest;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.common.RequestHeaders;
-import com.linecorp.armeria.server.HttpService;
 import com.linecorp.armeria.server.ServiceRequestContext;
 
-import dev.gihwan.lith.core.endpoint.Endpoint;
+import dev.gihwan.lith.core.service.Service;
+import dev.gihwan.lith.core.service.ServiceFactory;
 
-public final class GatewayService implements HttpService {
+public final class DefaultUpstream implements Upstream {
 
-    public static GatewayService of(Endpoint endpoint) {
-        requireNonNull(endpoint, "endpoint");
-        return new GatewayService(endpoint);
-    }
-
-    private static final Logger logger = LoggerFactory.getLogger(GatewayService.class);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultUpstream.class);
 
     private static final String PATH_SEPARATOR = "/";
     private static final Splitter PATH_SPLITTER = Splitter.on(PATH_SEPARATOR);
 
-    private final Endpoint endpoint;
-    private final WebClient client;
+    private final UpstreamConfig config;
+    private final Service service;
 
-    private GatewayService(Endpoint endpoint) {
-        this.endpoint = endpoint;
-        client = WebClient.builder(endpoint.service().uri())
-                          .decorator(LoggingClient.newDecorator())
-                          .build();
+    DefaultUpstream(UpstreamConfig config) {
+        this.config = config;
+        service = ServiceFactory.instance().get(config.service());
     }
 
     @Override
     public HttpResponse serve(ServiceRequestContext ctx, HttpRequest req) {
-        final String servicePath = buildServicePath(ctx);
-        if (servicePath == null) {
+        final String path = buildPath(ctx);
+        if (path == null) {
             return HttpResponse.of(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return HttpResponse.from(req.aggregate()
-                                    .thenApply(aggregated -> buildRequest(aggregated, servicePath))
-                                    .thenApply(client::execute));
+                                    .thenApply(aggregated -> buildRequest(aggregated, path))
+                                    .thenApply(service::send));
     }
 
     @Nullable
-    private String buildServicePath(ServiceRequestContext ctx) {
+    private String buildPath(ServiceRequestContext ctx) {
         final StringBuilder sb = new StringBuilder();
-        for (String token : PATH_SPLITTER.split(endpoint.service().endpoint().path())) {
+        for (String token : PATH_SPLITTER.split(config.endpoint().path())) {
             sb.append(PATH_SEPARATOR);
             if (token.startsWith("{") && token.endsWith("}")) {
                 final String pathParamName = token.substring(1, token.length() - 1);
@@ -99,10 +88,10 @@ public final class GatewayService implements HttpService {
         return sb.toString();
     }
 
-    private static HttpRequest buildRequest(AggregatedHttpRequest req, String servicePath) {
-        final RequestHeaders headers = req.headers()
-                                          .toBuilder()
-                                          .path(servicePath)
+    private HttpRequest buildRequest(AggregatedHttpRequest req, String path) {
+        final RequestHeaders headers = req.headers().toBuilder()
+                                          .method(config.endpoint().method())
+                                          .path(path)
                                           .build();
         return HttpRequest.of(headers, req.content(), req.trailers());
     }

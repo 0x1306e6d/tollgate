@@ -22,45 +22,35 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.lith.core;
+package dev.gihwan.lith.core.service;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import dev.gihwan.lith.core.endpoint.EndpointConfig;
+public final class ServiceFactory {
 
-public final class LithBuilder {
+    private static final ServiceFactory INSTANCE = new ServiceFactory();
 
-    private int port = 8080;
-    private String healthCheckPath = "/health";
-    private final List<EndpointConfig> endpoints = new ArrayList<>();
-
-    LithBuilder() {}
-
-    public LithBuilder port(int port) {
-        this.port = port;
-        return this;
+    public static ServiceFactory instance() {
+        return INSTANCE;
     }
 
-    public LithBuilder healthCheckPath(String healthCheckPath) {
-        requireNonNull(healthCheckPath, "healthCheckPath");
-        this.healthCheckPath = healthCheckPath;
-        return this;
-    }
+    private final Map<ServiceConfig, Service> services = new HashMap<>();
 
-    public LithBuilder endpoint(EndpointConfig endpoint) {
-        requireNonNull(endpoint, "endpoint");
-        endpoints.add(endpoint);
-        return this;
-    }
+    private ServiceFactory() {}
 
-    public Lith build() {
-        return new Lith(buildConfig());
-    }
+    public Service get(ServiceConfig config) {
+        requireNonNull(config, "config");
 
-    private LithConfig buildConfig() {
-        return new LithConfig(port, healthCheckPath, endpoints);
+        final Service service = services.get(config);
+        if (service != null) {
+            return service;
+        }
+
+        final Service newService = Service.of(config);
+        services.put(config, newService);
+        return newService;
     }
 }

@@ -22,45 +22,16 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.lith.core;
+package dev.gihwan.lith.core.upstream;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.linecorp.armeria.server.HttpService;
 
-import dev.gihwan.lith.core.endpoint.EndpointConfig;
+public interface Upstream extends HttpService {
 
-public final class LithBuilder {
-
-    private int port = 8080;
-    private String healthCheckPath = "/health";
-    private final List<EndpointConfig> endpoints = new ArrayList<>();
-
-    LithBuilder() {}
-
-    public LithBuilder port(int port) {
-        this.port = port;
-        return this;
-    }
-
-    public LithBuilder healthCheckPath(String healthCheckPath) {
-        requireNonNull(healthCheckPath, "healthCheckPath");
-        this.healthCheckPath = healthCheckPath;
-        return this;
-    }
-
-    public LithBuilder endpoint(EndpointConfig endpoint) {
-        requireNonNull(endpoint, "endpoint");
-        endpoints.add(endpoint);
-        return this;
-    }
-
-    public Lith build() {
-        return new Lith(buildConfig());
-    }
-
-    private LithConfig buildConfig() {
-        return new LithConfig(port, healthCheckPath, endpoints);
+    static Upstream of(UpstreamConfig config) {
+        requireNonNull(config, "config");
+        return new DefaultUpstream(config);
     }
 }

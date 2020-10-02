@@ -40,7 +40,7 @@ import com.linecorp.armeria.server.healthcheck.HealthChecker;
 import com.linecorp.armeria.server.healthcheck.SettableHealthChecker;
 import com.linecorp.armeria.server.logging.LoggingService;
 
-import dev.gihwan.lith.core.gateway.GatewayService;
+import dev.gihwan.lith.core.endpoint.Endpoint;
 
 public final class Lith {
 
@@ -86,15 +86,16 @@ public final class Lith {
         builder.serviceUnder("/docs", DocService.builder().build());
         builder.service(config.healthCheckPath(), HealthCheckService.of(healthChecker));
 
-        config.endpoints().forEach(endpoint -> {
-            logger.info("Registering endpoint {}.", endpoint);
+        config.endpoints().forEach(endpointConfig -> {
+            logger.info("Registering endpoint {}.", endpointConfig);
 
+            final Endpoint endpoint = Endpoint.of(endpointConfig);
             builder.service(Route.builder()
-                                 .methods(endpoint.method())
-                                 .path(endpoint.path())
+                                 .methods(endpointConfig.method())
+                                 .path(endpointConfig.path())
                                  .build(),
-                            GatewayService.of(endpoint)
-                                          .decorate(LoggingService.newDecorator()));
+                            endpoint.upstream()
+                                    .decorate(LoggingService.newDecorator()));
         });
 
         final Server server = builder.build();
