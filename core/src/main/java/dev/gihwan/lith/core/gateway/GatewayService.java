@@ -43,7 +43,7 @@ import com.linecorp.armeria.common.RequestHeaders;
 import com.linecorp.armeria.server.HttpService;
 import com.linecorp.armeria.server.ServiceRequestContext;
 
-import dev.gihwan.lith.core.route.Endpoint;
+import dev.gihwan.lith.core.endpoint.Endpoint;
 
 public final class GatewayService implements HttpService {
 

@@ -22,7 +22,36 @@
  * SOFTWARE.
  */
 
-@NonNullByDefault
-package dev.gihwan.lith.core.route;
+package dev.gihwan.lith.core.endpoint;
 
-import dev.gihwan.lith.core.annotation.NonNullByDefault;
+import static java.util.Objects.requireNonNull;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
+
+public final class ServiceEndpoint {
+
+    public static ServiceEndpoint of(String path) {
+        requireNonNull(path, "path");
+        return new ServiceEndpoint(path);
+    }
+
+    private final String path;
+
+    @JsonCreator
+    private ServiceEndpoint(@JsonProperty("path") String path) {
+        this.path = path;
+    }
+
+    public String path() {
+        return path;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                          .add("path", path)
+                          .toString();
+    }
+}
