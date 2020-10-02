@@ -35,6 +35,9 @@ import com.linecorp.armeria.server.Route;
 import com.linecorp.armeria.server.Server;
 import com.linecorp.armeria.server.ServerBuilder;
 import com.linecorp.armeria.server.docs.DocService;
+import com.linecorp.armeria.server.healthcheck.HealthCheckService;
+import com.linecorp.armeria.server.healthcheck.HealthChecker;
+import com.linecorp.armeria.server.healthcheck.SettableHealthChecker;
 import com.linecorp.armeria.server.logging.LoggingService;
 
 import dev.gihwan.lith.core.gateway.GatewayService;
@@ -55,9 +58,11 @@ public final class Lith {
     @Nullable
     private Server server;
     private final LithConfig config;
+    private final HealthChecker healthChecker;
 
     Lith(LithConfig config) {
         this.config = config;
+        healthChecker = new SettableHealthChecker();
     }
 
     public void start() {
@@ -79,6 +84,7 @@ public final class Lith {
 
         builder.http(config.port());
         builder.serviceUnder("/docs", DocService.builder().build());
+        builder.service(config.healthCheckPath(), HealthCheckService.of(healthChecker));
 
         config.endpoints().forEach(endpoint -> {
             logger.info("Registering endpoint {}.", endpoint);

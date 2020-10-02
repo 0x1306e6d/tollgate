@@ -34,12 +34,19 @@ import dev.gihwan.lith.core.route.Endpoint;
 public final class LithBuilder {
 
     private int port = 8080;
+    private String healthCheckPath = "/health";
     private final List<Endpoint> endpoints = new ArrayList<>();
 
     LithBuilder() {}
 
     public LithBuilder port(int port) {
         this.port = port;
+        return this;
+    }
+
+    public LithBuilder healthCheckPath(String healthCheckPath) {
+        requireNonNull(healthCheckPath, "healthCheckPath");
+        this.healthCheckPath = healthCheckPath;
         return this;
     }
 
@@ -54,6 +61,6 @@ public final class LithBuilder {
     }
 
     private LithConfig buildConfig() {
-        return new LithConfig(port, endpoints);
+        return new LithConfig(port, healthCheckPath, endpoints);
     }
 }
