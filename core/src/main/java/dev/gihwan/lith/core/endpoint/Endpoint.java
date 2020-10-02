@@ -26,56 +26,14 @@ package dev.gihwan.lith.core.endpoint;
 
 import static java.util.Objects.requireNonNull;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.MoreObjects;
+import dev.gihwan.lith.core.upstream.Upstream;
 
-import com.linecorp.armeria.common.HttpMethod;
+public interface Endpoint {
 
-public final class Endpoint {
-
-    public static Endpoint of(HttpMethod method, String path, Service service) {
-        requireNonNull(method, "method");
-        requireNonNull(path, "path");
-        requireNonNull(service, "service");
-        return new Endpoint(method, path, service);
+    static Endpoint of(EndpointConfig config) {
+        requireNonNull(config, "config");
+        return new DefaultEndpoint(config);
     }
 
-    public static EndpointBuilder builder() {
-        return new EndpointBuilder();
-    }
-
-    private final HttpMethod method;
-    private final String path;
-    private final Service service;
-
-    @JsonCreator
-    Endpoint(@JsonProperty("method") HttpMethod method,
-             @JsonProperty("path") String path,
-             @JsonProperty("service") Service service) {
-        this.method = method;
-        this.path = path;
-        this.service = service;
-    }
-
-    public HttpMethod method() {
-        return method;
-    }
-
-    public String path() {
-        return path;
-    }
-
-    public Service service() {
-        return service;
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                          .add("method", method)
-                          .add("path", path)
-                          .add("service", service)
-                          .toString();
-    }
+    Upstream upstream();
 }

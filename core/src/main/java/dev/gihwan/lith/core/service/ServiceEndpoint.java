@@ -22,45 +22,36 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.lith.core;
+package dev.gihwan.lith.core.service;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
 
-import dev.gihwan.lith.core.endpoint.EndpointConfig;
+public final class ServiceEndpoint {
 
-public final class LithBuilder {
-
-    private int port = 8080;
-    private String healthCheckPath = "/health";
-    private final List<EndpointConfig> endpoints = new ArrayList<>();
-
-    LithBuilder() {}
-
-    public LithBuilder port(int port) {
-        this.port = port;
-        return this;
+    public static ServiceEndpoint of(String path) {
+        requireNonNull(path, "path");
+        return new ServiceEndpoint(path);
     }
 
-    public LithBuilder healthCheckPath(String healthCheckPath) {
-        requireNonNull(healthCheckPath, "healthCheckPath");
-        this.healthCheckPath = healthCheckPath;
-        return this;
+    private final String path;
+
+    @JsonCreator
+    private ServiceEndpoint(@JsonProperty("path") String path) {
+        this.path = path;
     }
 
-    public LithBuilder endpoint(EndpointConfig endpoint) {
-        requireNonNull(endpoint, "endpoint");
-        endpoints.add(endpoint);
-        return this;
+    public String path() {
+        return path;
     }
 
-    public Lith build() {
-        return new Lith(buildConfig());
-    }
-
-    private LithConfig buildConfig() {
-        return new LithConfig(port, healthCheckPath, endpoints);
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                          .add("path", path)
+                          .toString();
     }
 }

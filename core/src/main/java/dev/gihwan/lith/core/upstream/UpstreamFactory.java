@@ -22,48 +22,35 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.lith.core.endpoint;
+package dev.gihwan.lith.core.upstream;
 
 import static java.util.Objects.requireNonNull;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.MoreObjects;
+import java.util.HashMap;
+import java.util.Map;
 
-public final class Service {
+public final class UpstreamFactory {
 
-    public static Service of(String uri, ServiceEndpoint endpoint) {
-        requireNonNull(uri, "uri");
-        requireNonNull(endpoint, "endpoint");
-        return new Service(uri, endpoint);
+    private static final UpstreamFactory INSTANCE = new UpstreamFactory();
+
+    public static UpstreamFactory instance() {
+        return INSTANCE;
     }
 
-    public static ServiceBuilder builder() {
-        return new ServiceBuilder();
-    }
+    private final Map<UpstreamConfig, Upstream> upstreams = new HashMap<>();
 
-    private final String uri;
-    private final ServiceEndpoint endpoint;
+    private UpstreamFactory() {}
 
-    @JsonCreator
-    Service(@JsonProperty("uri") String uri, @JsonProperty("endpoint") ServiceEndpoint endpoint) {
-        this.uri = uri;
-        this.endpoint = endpoint;
-    }
+    public Upstream get(UpstreamConfig config) {
+        requireNonNull(config, "config");
 
-    public String uri() {
-        return uri;
-    }
+        final Upstream upstream = upstreams.get(config);
+        if (upstream != null) {
+            return upstream;
+        }
 
-    public ServiceEndpoint endpoint() {
-        return endpoint;
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                          .add("uri", uri)
-                          .add("endpoint", endpoint)
-                          .toString();
+        final Upstream newUpstream = Upstream.of(config);
+        upstreams.put(config, newUpstream);
+        return newUpstream;
     }
 }

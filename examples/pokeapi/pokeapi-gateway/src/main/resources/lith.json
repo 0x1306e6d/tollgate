@@ -5,9 +5,12 @@
     {
       "method": "GET",
       "path": "/api/v2/berry/{idOrName}",
-      "service": {
-        "uri": "http://berry:8080",
+      "upstream": {
+        "service": {
+          "uri": "http://berry:8080"
+        },
         "endpoint": {
+          "method": "GET",
           "path": "/berry/{idOrName}"
         }
       }
@@ -15,9 +18,12 @@
     {
       "method": "GET",
       "path": "/api/v2/contest-type/{idOrName}",
-      "service": {
-        "uri": "http://contest:8080",
+      "upstream": {
+        "service": {
+          "uri": "http://contest:8080"
+        },
         "endpoint": {
+          "method": "GET",
           "path": "/contest-type/{idOrName}"
         }
       }
@@ -25,9 +31,12 @@
     {
       "method": "GET",
       "path": "/api/v2/encounter-method/{idOrName}",
-      "service": {
-        "uri": "http://encounter:8080",
+      "upstream": {
+        "service": {
+          "uri": "http://encounter:8080"
+        },
         "endpoint": {
+          "method": "GET",
           "path": "/encounter-method/{idOrName}"
         }
       }
@@ -35,9 +44,12 @@
     {
       "method": "GET",
       "path": "/api/v2/evolution-chain/{idOrName}",
-      "service": {
-        "uri": "http://evolution:8080",
+      "upstream": {
+        "service": {
+          "uri": "http://evolution:8080"
+        },
         "endpoint": {
+          "method": "GET",
           "path": "/evolution-chain/{idOrName}"
         }
       }
@@ -45,9 +57,12 @@
     {
       "method": "GET",
       "path": "/api/v2/generation/{idOrName}",
-      "service": {
-        "uri": "http://game:8080",
+      "upstream": {
+        "service": {
+          "uri": "http://game:8080"
+        },
         "endpoint": {
+          "method": "GET",
           "path": "/generation/{idOrName}"
         }
       }
@@ -55,9 +70,12 @@
     {
       "method": "GET",
       "path": "/api/v2/item/{idOrName}",
-      "service": {
-        "uri": "http://item:8080",
+      "upstream": {
+        "service": {
+          "uri": "http://item:8080"
+        },
         "endpoint": {
+          "method": "GET",
           "path": "/item/{idOrName}"
         }
       }
@@ -65,9 +83,12 @@
     {
       "method": "GET",
       "path": "/api/v2/location/{idOrName}",
-      "service": {
-        "uri": "http://location:8080",
+      "upstream": {
+        "service": {
+          "uri": "http://location:8080"
+        },
         "endpoint": {
+          "method": "GET",
           "path": "/location/{idOrName}"
         }
       }
@@ -75,9 +96,12 @@
     {
       "method": "GET",
       "path": "/api/v2/machine/{idOrName}",
-      "service": {
-        "uri": "http://machine:8080",
+      "upstream": {
+        "service": {
+          "uri": "http://machine:8080"
+        },
         "endpoint": {
+          "method": "GET",
           "path": "/machine/{idOrName}"
         }
       }
@@ -85,9 +109,12 @@
     {
       "method": "GET",
       "path": "/api/v2/move/{idOrName}",
-      "service": {
-        "uri": "http://move:8080",
+      "upstream": {
+        "service": {
+          "uri": "http://move:8080"
+        },
         "endpoint": {
+          "method": "GET",
           "path": "/move/{idOrName}"
         }
       }
@@ -95,9 +122,12 @@
     {
       "method": "GET",
       "path": "/api/v2/ability/{idOrName}",
-      "service": {
-        "uri": "http://pokemon:8080",
+      "upstream": {
+        "service": {
+          "uri": "http://pokemon:8080"
+        },
         "endpoint": {
+          "method": "GET",
           "path": "/ability/{idOrName}"
         }
       }

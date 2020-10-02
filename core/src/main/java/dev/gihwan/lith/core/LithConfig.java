@@ -36,7 +36,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 
-import dev.gihwan.lith.core.endpoint.Endpoint;
+import dev.gihwan.lith.core.endpoint.EndpointConfig;
 import dev.gihwan.lith.core.io.Json;
 
 public final class LithConfig {
@@ -52,12 +52,12 @@ public final class LithConfig {
 
     private final int port;
     private final String healthCheckPath;
-    private final List<Endpoint> endpoints;
+    private final List<EndpointConfig> endpoints;
 
     @JsonCreator
     LithConfig(@JsonProperty("port") int port,
                @JsonProperty("healthCheckPath") String healthCheckPath,
-               @JsonProperty("endpoints") List<Endpoint> endpoints) {
+               @JsonProperty("endpoints") List<EndpointConfig> endpoints) {
         checkArgument(port >= 0, "port: %s (expected: >= 0)", port);
         checkArgument(port <= 65535, "port: %s (expected: <= 65535)", port);
         this.port = port;
@@ -75,7 +75,7 @@ public final class LithConfig {
         return healthCheckPath;
     }
 
-    public List<Endpoint> endpoints() {
+    public List<EndpointConfig> endpoints() {
         return endpoints;
     }
 

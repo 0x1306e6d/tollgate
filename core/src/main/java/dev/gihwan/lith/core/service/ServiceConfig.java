@@ -22,7 +22,45 @@
  * SOFTWARE.
  */
 
-@NonNullByDefault
-package dev.gihwan.lith.core.gateway;
+package dev.gihwan.lith.core.service;
 
-import dev.gihwan.lith.core.annotation.NonNullByDefault;
+import static java.util.Objects.requireNonNull;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
+
+public final class ServiceConfig {
+
+    public static ServiceConfig of(String uri, ServiceEndpoint endpoint) {
+        requireNonNull(uri, "uri");
+        requireNonNull(endpoint, "endpoint");
+        return new ServiceConfig(uri, endpoint);
+    }
+
+    private final String uri;
+    private final ServiceEndpoint endpoint;
+
+    @JsonCreator
+    ServiceConfig(@JsonProperty("uri") String uri,
+                  @JsonProperty("endpoint") ServiceEndpoint endpoint) {
+        this.uri = uri;
+        this.endpoint = endpoint;
+    }
+
+    public String uri() {
+        return uri;
+    }
+
+    public ServiceEndpoint endpoint() {
+        return endpoint;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                          .add("uri", uri)
+                          .add("endpoint", endpoint)
+                          .toString();
+    }
+}

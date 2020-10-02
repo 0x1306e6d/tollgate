@@ -22,35 +22,7 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.lith.core.endpoint;
+@NonNullByDefault
+package dev.gihwan.lith.core.upstream;
 
-import static java.util.Objects.requireNonNull;
-
-public final class ServiceBuilder {
-
-    private String uri;
-    private ServiceEndpoint endpoint;
-
-    ServiceBuilder() {}
-
-    public ServiceBuilder uri(String uri) {
-        requireNonNull(uri, "uri");
-        this.uri = uri;
-        return this;
-    }
-
-    public ServiceBuilder endpoint(String path) {
-        requireNonNull(path, "path");
-        return endpoint(ServiceEndpoint.of(path));
-    }
-
-    public ServiceBuilder endpoint(ServiceEndpoint endpoint) {
-        requireNonNull(endpoint, "endpoint");
-        this.endpoint = endpoint;
-        return this;
-    }
-
-    public Service build() {
-        return new Service(uri, endpoint);
-    }
-}
+import dev.gihwan.lith.core.annotation.NonNullByDefault;
