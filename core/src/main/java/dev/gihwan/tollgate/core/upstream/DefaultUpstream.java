@@ -35,8 +35,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Splitter;
 
 import com.linecorp.armeria.client.UnprocessedRequestException;
-import com.linecorp.armeria.common.AggregatedHttpRequest;
 import com.linecorp.armeria.common.HttpRequest;
+import com.linecorp.armeria.common.HttpRequestDuplicator;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.common.RequestHeaders;
@@ -67,9 +67,8 @@ public final class DefaultUpstream implements Upstream {
             return HttpResponse.of(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return HttpResponse.from(req.aggregate()
-                                    .thenApply(aggregated -> buildRequest(aggregated, path))
-                                    .thenApply(this::sendRequest));
+        final HttpRequest duplicatedReq = duplicateRequest(req, path);
+        return sendRequest(duplicatedReq);
     }
 
     @Nullable
@@ -92,12 +91,13 @@ public final class DefaultUpstream implements Upstream {
         return sb.toString();
     }
 
-    private HttpRequest buildRequest(AggregatedHttpRequest req, String path) {
-        final RequestHeaders headers = req.headers().toBuilder()
-                                          .method(config.endpoint().method())
-                                          .path(path)
-                                          .build();
-        return HttpRequest.of(headers, req.content(), req.trailers());
+    private HttpRequest duplicateRequest(HttpRequest req, String path) {
+        final HttpRequestDuplicator duplicator = req.toDuplicator();
+        final RequestHeaders newHeaders = req.headers().toBuilder()
+                                             .method(config.endpoint().method())
+                                             .path(path)
+                                             .build();
+        return duplicator.duplicate(newHeaders);
     }
 
     private HttpResponse sendRequest(HttpRequest req) {
