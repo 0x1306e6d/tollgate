@@ -24,6 +24,9 @@
 
 package dev.gihwan.tollgate.core.upstream;
 
+import java.net.UnknownHostException;
+import java.util.concurrent.CompletableFuture;
+
 import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
@@ -31,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Splitter;
 
+import com.linecorp.armeria.client.UnprocessedRequestException;
 import com.linecorp.armeria.common.AggregatedHttpRequest;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
@@ -65,7 +69,7 @@ public final class DefaultUpstream implements Upstream {
 
         return HttpResponse.from(req.aggregate()
                                     .thenApply(aggregated -> buildRequest(aggregated, path))
-                                    .thenApply(service::send));
+                                    .thenApply(this::sendRequest));
     }
 
     @Nullable
@@ -94,5 +98,32 @@ public final class DefaultUpstream implements Upstream {
                                           .path(path)
                                           .build();
         return HttpRequest.of(headers, req.content(), req.trailers());
+    }
+
+    private HttpResponse sendRequest(HttpRequest req) {
+        final CompletableFuture<HttpResponse> responseFuture = new CompletableFuture<>();
+        final HttpResponse res = HttpResponse.from(responseFuture);
+        service.send(req).aggregate().handle((aggregated, t) -> {
+            if (t != null) {
+                resolveException(responseFuture, t);
+                return null;
+            }
+
+            responseFuture.complete(aggregated.toHttpResponse());
+            return null;
+        });
+        return res;
+    }
+
+    private void resolveException(CompletableFuture<HttpResponse> responseFuture, Throwable t) {
+        if (t instanceof UnprocessedRequestException) {
+            resolveException(responseFuture, ((UnprocessedRequestException) t).getCause());
+            return;
+        }
+        if (t instanceof UnknownHostException) {
+            responseFuture.complete(HttpResponse.of(HttpStatus.BAD_GATEWAY));
+            return;
+        }
+        responseFuture.completeExceptionally(t);
     }
 }
