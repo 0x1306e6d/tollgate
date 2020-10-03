@@ -30,7 +30,13 @@ plugins {
 dependencies {
     implementation(project(":core"))
 
+    implementation("com.google.code.findbugs:jsr305:3.0.2")
     implementation("org.slf4j:slf4j-api:1.7.30")
 
     runtimeOnly("ch.qos.logback:logback-classic:1.2.3")
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
