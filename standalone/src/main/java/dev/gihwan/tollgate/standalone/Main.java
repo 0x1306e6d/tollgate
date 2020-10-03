@@ -27,6 +27,8 @@ package dev.gihwan.tollgate.standalone;
 import java.time.Duration;
 import java.time.Instant;
 
+import javax.annotation.Nullable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +38,9 @@ public final class Main {
 
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
+    @Nullable
     private Tollgate tollgate;
+    @Nullable
     private Instant startAt;
 
     private void start() {
@@ -48,6 +52,7 @@ public final class Main {
                            .build();
         tollgate.start();
 
+        assert startAt != null;
         logger.info("The Tollgate standalone is started. ({} used to start)",
                     Duration.between(startAt, Instant.now()));
     }
@@ -56,8 +61,11 @@ public final class Main {
         final Instant stopAt = Instant.now();
         logger.info("Stopping the Tollgate standalone at {}.", stopAt);
 
-        tollgate.stop();
+        if (tollgate != null) {
+            tollgate.stop();
+        }
 
+        assert startAt != null;
         logger.info("The Tollgate standalone has served during {}.", Duration.between(startAt, stopAt));
         logger.info("The Tollgate standalone is stopped. ({} used to stop)",
                     Duration.between(startAt, Instant.now()));
