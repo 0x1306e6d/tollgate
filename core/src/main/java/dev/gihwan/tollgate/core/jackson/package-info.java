@@ -22,15 +22,7 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.core.io;
+@NonNullByDefault
+package dev.gihwan.tollgate.core.jackson;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-public final class ObjectMapperFactory {
-
-    public static ObjectMapper json() {
-        return new ObjectMapper();
-    }
-
-    private ObjectMapperFactory() {}
-}
+import dev.gihwan.tollgate.core.annotation.NonNullByDefault;

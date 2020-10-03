@@ -22,24 +22,15 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.core.io;
-
-import static java.util.Objects.requireNonNull;
-
-import java.io.IOException;
-import java.io.InputStream;
+package dev.gihwan.tollgate.core.jackson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public final class Json {
+public final class ObjectMapperFactory {
 
-    private static final ObjectMapper MAPPER = ObjectMapperFactory.json();
-
-    public static <T> T readValue(InputStream src, Class<T> valueType) throws IOException {
-        requireNonNull(src, "src");
-        requireNonNull(valueType, "valueType");
-        return MAPPER.readValue(src, valueType);
+    public static ObjectMapper json() {
+        return new ObjectMapper();
     }
 
-    private Json() {}
+    private ObjectMapperFactory() {}
 }
