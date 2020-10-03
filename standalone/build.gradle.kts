@@ -34,3 +34,8 @@ dependencies {
 
     runtimeOnly("ch.qos.logback:logback-classic:1.2.3")
 }
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
