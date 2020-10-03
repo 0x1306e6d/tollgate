@@ -37,7 +37,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 
 import dev.gihwan.tollgate.core.endpoint.EndpointConfig;
-import dev.gihwan.tollgate.core.io.Json;
+import dev.gihwan.tollgate.core.jackson.Json;
 
 public final class TollgateConfig {
 
