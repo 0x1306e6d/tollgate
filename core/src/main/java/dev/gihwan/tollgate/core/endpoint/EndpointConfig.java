@@ -24,15 +24,24 @@
 
 package dev.gihwan.tollgate.core.endpoint;
 
+import static java.util.Objects.requireNonNull;
+
+import javax.annotation.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
 
 import com.linecorp.armeria.common.HttpMethod;
 
 import dev.gihwan.tollgate.core.upstream.UpstreamConfig;
 
 public final class EndpointConfig {
+
+    public static EndpointConfig of(HttpMethod method, String path, UpstreamConfig upstream) {
+        return new EndpointConfig(method, path, upstream);
+    }
 
     private final HttpMethod method;
     private final String path;
@@ -42,9 +51,9 @@ public final class EndpointConfig {
     private EndpointConfig(@JsonProperty("method") HttpMethod method,
                            @JsonProperty("path") String path,
                            @JsonProperty("upstream") UpstreamConfig upstream) {
-        this.method = method;
-        this.path = path;
-        this.upstream = upstream;
+        this.method = requireNonNull(method, "method");
+        this.path = requireNonNull(path, "path");
+        this.upstream = requireNonNull(upstream, "upstream");
     }
 
     public HttpMethod method() {
@@ -57,6 +66,27 @@ public final class EndpointConfig {
 
     public UpstreamConfig upstream() {
         return upstream;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof EndpointConfig)) {
+            return false;
+        }
+
+        final EndpointConfig that = (EndpointConfig) o;
+        return Objects.equal(method, that.method) &&
+               Objects.equal(path, that.path) &&
+               Objects.equal(upstream, that.upstream);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(method, path, upstream);
     }
 
     @Override

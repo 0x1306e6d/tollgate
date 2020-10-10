@@ -24,13 +24,22 @@
 
 package dev.gihwan.tollgate.core.upstream;
 
+import static java.util.Objects.requireNonNull;
+
+import javax.annotation.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
 
 import dev.gihwan.tollgate.core.service.ServiceConfig;
 
 public final class UpstreamConfig {
+
+    public static UpstreamConfig of(ServiceConfig service, UpstreamEndpointConfig endpoint) {
+        return new UpstreamConfig(service, endpoint);
+    }
 
     private final ServiceConfig service;
     private final UpstreamEndpointConfig endpoint;
@@ -38,8 +47,8 @@ public final class UpstreamConfig {
     @JsonCreator
     private UpstreamConfig(@JsonProperty("service") ServiceConfig service,
                            @JsonProperty("endpoint") UpstreamEndpointConfig endpoint) {
-        this.service = service;
-        this.endpoint = endpoint;
+        this.service = requireNonNull(service, "service");
+        this.endpoint = requireNonNull(endpoint, "endpoint");
     }
 
     public ServiceConfig service() {
@@ -48,6 +57,27 @@ public final class UpstreamConfig {
 
     public UpstreamEndpointConfig endpoint() {
         return endpoint;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof UpstreamConfig)) {
+            return false;
+        }
+
+        final UpstreamConfig that = (UpstreamConfig) o;
+
+        return Objects.equal(service, that.service) &&
+               Objects.equal(endpoint, that.endpoint);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(service, endpoint);
     }
 
     @Override

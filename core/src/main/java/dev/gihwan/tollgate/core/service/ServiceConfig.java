@@ -35,6 +35,7 @@ import javax.annotation.Nullable;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
 
 import com.linecorp.armeria.client.WebClient;
 import com.linecorp.armeria.client.WebClientBuilder;
@@ -42,6 +43,14 @@ import com.linecorp.armeria.client.endpoint.EndpointGroup;
 import com.linecorp.armeria.common.Scheme;
 
 public final class ServiceConfig {
+
+    public static ServiceConfig of(String uri) {
+        return new ServiceConfig(requireNonNull(uri, "uri"), null, null);
+    }
+
+    public static ServiceConfig of(String scheme, List<Authority> authorities) {
+        return new ServiceConfig(null, scheme, authorities);
+    }
 
     @Nullable
     private final String uri;
@@ -51,18 +60,17 @@ public final class ServiceConfig {
     private List<Authority> authorities;
 
     @JsonCreator
-    ServiceConfig(@JsonProperty("uri") @Nullable String uri,
-                  @JsonProperty("scheme") @Nullable String scheme,
-                  @JsonProperty("authorities") @Nullable List<Authority> authorities) {
+    private ServiceConfig(@JsonProperty("uri") @Nullable String uri,
+                          @JsonProperty("scheme") @Nullable String scheme,
+                          @JsonProperty("authorities") @Nullable List<Authority> authorities) {
         if (uri != null) {
             this.uri = uri;
             this.scheme = null;
             this.authorities = null;
         } else {
-            requireNonNull(scheme, "scheme");
+            this.scheme = Scheme.parse(requireNonNull(scheme, "scheme"));
             requireNonNull(authorities, "authorities");
             checkArgument(!authorities.isEmpty(), "Authorities should not be empty.");
-            this.scheme = Scheme.parse(scheme);
             this.authorities = authorities;
             this.uri = null;
         }
@@ -95,6 +103,27 @@ public final class ServiceConfig {
                                                                             .collect(toUnmodifiableList()));
             return WebClient.builder(scheme.sessionProtocol(), endpointGroup);
         }
+    }
+
+    @Override
+    public boolean equals(@Nullable Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof ServiceConfig)) {
+            return false;
+        }
+
+        final ServiceConfig that = (ServiceConfig) o;
+        return Objects.equal(uri, that.uri) &&
+               Objects.equal(scheme, that.scheme) &&
+               Objects.equal(authorities, that.authorities);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(uri, scheme, authorities);
     }
 
     @Override

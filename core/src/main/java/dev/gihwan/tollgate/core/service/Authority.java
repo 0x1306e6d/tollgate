@@ -24,13 +24,23 @@
 
 package dev.gihwan.tollgate.core.service;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
+
+import javax.annotation.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
 
 import com.linecorp.armeria.client.Endpoint;
 
 public final class Authority {
+
+    public static Authority of(String host, int port) {
+        return new Authority(host, port);
+    }
 
     private final String host;
     private final int port;
@@ -38,7 +48,9 @@ public final class Authority {
     @JsonCreator
     private Authority(@JsonProperty("host") String host,
                       @JsonProperty("port") int port) {
-        this.host = host;
+        this.host = requireNonNull(host, "host");
+        checkArgument(port >= 0, "port: %s (expected: >= 0)", port);
+        checkArgument(port <= 65535, "port: %s (expected: <= 65535)", port);
         this.port = port;
     }
 
@@ -52,6 +64,26 @@ public final class Authority {
 
     public Endpoint toArmeriaEndpoint() {
         return Endpoint.of(host, port);
+    }
+
+    @Override
+    public boolean equals(@Nullable Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof Authority)) {
+            return false;
+        }
+
+        final Authority that = (Authority) o;
+        return Objects.equal(host, that.host) &&
+               port == that.port;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(host, port);
     }
 
     @Override
