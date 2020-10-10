@@ -31,9 +31,21 @@ dependencies {
     implementation("com.google.guava:guava:29.0-jre")
     implementation("com.google.code.findbugs:jsr305:3.0.2")
     implementation("org.slf4j:slf4j-api:1.7.30")
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
+    testImplementation("org.assertj:assertj-core:3.17.2")
+    testImplementation("org.mockito:mockito-core:3.5.13")
+    testImplementation("org.awaitility:awaitility:4.0.3")
+    testImplementation("com.linecorp.armeria:armeria-junit5:1.1.0")
+
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.0")
 }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
