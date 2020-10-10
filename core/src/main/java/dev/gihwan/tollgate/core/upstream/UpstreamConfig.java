@@ -70,7 +70,6 @@ public final class UpstreamConfig {
         }
 
         final UpstreamConfig that = (UpstreamConfig) o;
-
         return Objects.equal(service, that.service) &&
                Objects.equal(endpoint, that.endpoint);
     }

@@ -105,7 +105,6 @@ class ServiceConfigTest {
 
         assertThat(config.equals(null)).isFalse();
         assertThat(config.equals(new Dummy())).isFalse();
-
     }
 
     private static class Dummy {}
