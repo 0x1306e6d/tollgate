@@ -29,7 +29,7 @@ import com.linecorp.armeria.client.logging.LoggingClient;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 
-public final class DefaultService implements Service {
+final class DefaultService implements Service {
 
     private final ServiceConfig config;
     private final WebClient client;

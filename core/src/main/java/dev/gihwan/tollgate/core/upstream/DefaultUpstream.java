@@ -47,7 +47,7 @@ import com.linecorp.armeria.server.ServiceRequestContext;
 import dev.gihwan.tollgate.core.service.Service;
 import dev.gihwan.tollgate.core.service.ServiceFactory;
 
-public final class DefaultUpstream implements Upstream {
+final class DefaultUpstream implements Upstream {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultUpstream.class);
 
