@@ -27,7 +27,7 @@ package dev.gihwan.tollgate.core.endpoint;
 import dev.gihwan.tollgate.core.upstream.Upstream;
 import dev.gihwan.tollgate.core.upstream.UpstreamFactory;
 
-public final class DefaultEndpoint implements Endpoint {
+final class DefaultEndpoint implements Endpoint {
 
     private final EndpointConfig config;
     private final Upstream upstream;
