@@ -25,6 +25,8 @@
 package dev.gihwan.tollgate.core.upstream;
 
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
@@ -35,8 +37,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Splitter;
 
 import com.linecorp.armeria.client.UnprocessedRequestException;
+import com.linecorp.armeria.common.AggregatedHttpRequest;
 import com.linecorp.armeria.common.HttpRequest;
-import com.linecorp.armeria.common.HttpRequestDuplicator;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.common.RequestHeaders;
@@ -67,37 +69,36 @@ public final class DefaultUpstream implements Upstream {
             return HttpResponse.of(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        final HttpRequest duplicatedReq = duplicateRequest(req, path);
-        return sendRequest(duplicatedReq);
+        return HttpResponse.from(req.aggregate()
+                                    .thenApply(aggregated -> duplicateRequest(aggregated, path))
+                                    .thenApply(this::sendRequest));
     }
 
     @Nullable
     private String buildPath(ServiceRequestContext ctx) {
-        final StringBuilder sb = new StringBuilder();
-        for (String token : PATH_SPLITTER.split(config.endpoint().path())) {
-            sb.append(PATH_SEPARATOR);
-            if (token.startsWith("{") && token.endsWith("}")) {
-                final String pathParamName = token.substring(1, token.length() - 1);
+        final List<String> segments = new ArrayList<>();
+        for (String segment : PATH_SPLITTER.split(config.endpoint().path())) {
+            if (segment.startsWith("{") && segment.endsWith("}")) {
+                final String pathParamName = segment.substring(1, segment.length() - 1);
                 final String pathParamValue = ctx.pathParam(pathParamName);
                 if (pathParamValue == null) {
                     logger.error("Path parameter {} is not found on path {}.", pathParamName, ctx.path());
                     return null;
                 }
-                sb.append(pathParamValue);
+                segments.add(pathParamValue);
             } else {
-                sb.append(token);
+                segments.add(segment);
             }
         }
-        return sb.toString();
+        return String.join("/", segments);
     }
 
-    private HttpRequest duplicateRequest(HttpRequest req, String path) {
-        final HttpRequestDuplicator duplicator = req.toDuplicator();
-        final RequestHeaders newHeaders = req.headers().toBuilder()
-                                             .method(config.endpoint().method())
-                                             .path(path)
-                                             .build();
-        return duplicator.duplicate(newHeaders);
+    private HttpRequest duplicateRequest(AggregatedHttpRequest req, String path) {
+        final RequestHeaders headers = req.headers().toBuilder()
+                                          .method(config.endpoint().method())
+                                          .path(path)
+                                          .build();
+        return HttpRequest.of(headers, req.content(), req.trailers());
     }
 
     private HttpResponse sendRequest(HttpRequest req) {

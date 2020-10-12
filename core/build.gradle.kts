@@ -39,6 +39,7 @@ dependencies {
     testImplementation("com.linecorp.armeria:armeria-junit5:1.1.0")
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.0")
+    testRuntimeOnly("ch.qos.logback:logback-classic:1.2.3")
 }
 
 java {
