@@ -30,6 +30,8 @@ plugins {
 dependencies {
     implementation(project(":core"))
 
+    implementation("com.typesafe:config:1.4.0")
+
     implementation("com.google.code.findbugs:jsr305:3.0.2")
     implementation("org.slf4j:slf4j-api:1.7.30")
 
