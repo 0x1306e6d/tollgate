@@ -25,6 +25,7 @@
 plugins {
     java
     application
+    id("com.google.cloud.tools.jib")
 }
 
 dependencies {
@@ -53,4 +54,16 @@ java {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+jib {
+    from {
+        image = "openjdk:11-jre-slim"
+    }
+    to {
+        image = "ghkim3221/tollgate-standalone"
+    }
+    container {
+        ports = listOf("8080")
+    }
 }
