@@ -11,6 +11,7 @@ services:
   game:
     image: pokeapi-game
   gateway:
+    build: ./pokeapi-gateway
     image: pokeapi-gateway
     ports:
       - "8080:8080"
