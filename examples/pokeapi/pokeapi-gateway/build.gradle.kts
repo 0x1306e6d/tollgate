@@ -21,28 +21,3 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-plugins {
-    java
-    application
-    id("com.google.cloud.tools.jib")
-}
-
-dependencies {
-    implementation(project(":core"))
-
-    implementation("org.slf4j:slf4j-api:1.7.30")
-
-    runtimeOnly("ch.qos.logback:logback-classic:1.2.3")
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-
-jib {
-    to {
-        image = "pokeapi-gateway"
-    }
-}
