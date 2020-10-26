@@ -32,8 +32,6 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
@@ -55,14 +53,13 @@ public final class ServiceConfig {
     @Nullable
     private final String uri;
     @Nullable
-    private Scheme scheme;
+    private final Scheme scheme;
     @Nullable
-    private List<Authority> authorities;
+    private final List<Authority> authorities;
 
-    @JsonCreator
-    private ServiceConfig(@JsonProperty("uri") @Nullable String uri,
-                          @JsonProperty("scheme") @Nullable String scheme,
-                          @JsonProperty("authorities") @Nullable List<Authority> authorities) {
+    private ServiceConfig(@Nullable String uri,
+                          @Nullable String scheme,
+                          @Nullable List<Authority> authorities) {
         if (uri != null) {
             this.uri = uri;
             this.scheme = null;

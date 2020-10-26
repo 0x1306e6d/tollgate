@@ -28,8 +28,6 @@ import static java.util.Objects.requireNonNull;
 
 import javax.annotation.Nullable;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
@@ -44,9 +42,7 @@ public final class UpstreamConfig {
     private final ServiceConfig service;
     private final UpstreamEndpointConfig endpoint;
 
-    @JsonCreator
-    private UpstreamConfig(@JsonProperty("service") ServiceConfig service,
-                           @JsonProperty("endpoint") UpstreamEndpointConfig endpoint) {
+    private UpstreamConfig(ServiceConfig service, UpstreamEndpointConfig endpoint) {
         this.service = requireNonNull(service, "service");
         this.endpoint = requireNonNull(endpoint, "endpoint");
     }

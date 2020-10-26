@@ -27,37 +27,19 @@ package dev.gihwan.tollgate.core;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Path;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 
 import dev.gihwan.tollgate.core.endpoint.EndpointConfig;
-import dev.gihwan.tollgate.core.jackson.Json;
 
 public final class TollgateConfig {
-
-    public static TollgateConfig fromResource(Path path) throws IOException {
-        requireNonNull(path, "path");
-        final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        try (InputStream is = loader.getResourceAsStream(path.toString())) {
-            checkArgument(is != null, "Resource should exist.");
-            return Json.readValue(is, TollgateConfig.class);
-        }
-    }
 
     private final int port;
     private final String healthCheckPath;
     private final List<EndpointConfig> endpoints;
 
-    @JsonCreator
-    TollgateConfig(@JsonProperty("port") int port,
-                   @JsonProperty("healthCheckPath") String healthCheckPath,
-                   @JsonProperty("endpoints") List<EndpointConfig> endpoints) {
+    TollgateConfig(int port, String healthCheckPath, List<EndpointConfig> endpoints) {
         checkArgument(port >= 0, "port: %s (expected: >= 0)", port);
         checkArgument(port <= 65535, "port: %s (expected: <= 65535)", port);
         this.port = port;
