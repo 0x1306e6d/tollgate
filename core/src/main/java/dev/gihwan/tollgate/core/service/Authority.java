@@ -29,8 +29,6 @@ import static java.util.Objects.requireNonNull;
 
 import javax.annotation.Nullable;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
@@ -45,9 +43,7 @@ public final class Authority {
     private final String host;
     private final int port;
 
-    @JsonCreator
-    private Authority(@JsonProperty("host") String host,
-                      @JsonProperty("port") int port) {
+    private Authority(String host, int port) {
         this.host = requireNonNull(host, "host");
         checkArgument(port >= 0, "port: %s (expected: >= 0)", port);
         checkArgument(port <= 65535, "port: %s (expected: <= 65535)", port);

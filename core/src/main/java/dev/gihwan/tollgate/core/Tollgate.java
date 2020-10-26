@@ -24,8 +24,6 @@
 
 package dev.gihwan.tollgate.core;
 
-import static java.util.Objects.requireNonNull;
-
 import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
@@ -45,11 +43,6 @@ import dev.gihwan.tollgate.core.endpoint.Endpoint;
 public final class Tollgate {
 
     private static final Logger logger = LoggerFactory.getLogger(Tollgate.class);
-
-    public static Tollgate of(TollgateConfig config) {
-        requireNonNull(config, "config");
-        return new Tollgate(config);
-    }
 
     public static TollgateBuilder builder() {
         return new TollgateBuilder();
