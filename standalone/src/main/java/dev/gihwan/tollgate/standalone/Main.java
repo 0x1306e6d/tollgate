@@ -27,6 +27,7 @@ package dev.gihwan.tollgate.standalone;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
@@ -68,10 +69,11 @@ public final class Main {
                                                 .port(config.getInt("tollgate.port"))
                                                 .healthCheckPath(config.getString("tollgate.healthCheckPath"));
 
-        config.getObjectList("tollgate.endpoints")
-              .stream()
-              .map(ConfigObject::toConfig)
-              .forEach(endpointConfig -> buildEndpoint(builder, endpointConfig));
+        final Set<String> endpointNames = config.getObject("tollgate.endpoints").keySet();
+        endpointNames.stream()
+                     .map(name -> config.getObject("tollgate.endpoints." + name))
+                     .map(ConfigObject::toConfig)
+                     .forEach(endpointConfig -> buildEndpoint(builder, endpointConfig));
 
         tollgate = builder.build();
         tollgate.start();
