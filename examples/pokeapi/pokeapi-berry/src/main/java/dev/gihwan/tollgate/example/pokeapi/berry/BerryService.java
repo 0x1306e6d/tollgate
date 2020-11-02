@@ -30,9 +30,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.linecorp.armeria.common.HttpData;
+import com.linecorp.armeria.common.HttpHeaders;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.common.MediaType;
+import com.linecorp.armeria.common.ResponseHeaders;
 import com.linecorp.armeria.server.Server;
 import com.linecorp.armeria.server.file.AggregatedHttpFile;
 import com.linecorp.armeria.server.file.HttpFile;
@@ -45,15 +47,31 @@ public final class BerryService {
     private static final Logger logger = LoggerFactory.getLogger(BerryService.class);
 
     public static void main(String[] args) {
-        final HttpData data = HttpFile.of(BerryService.class.getClassLoader(), "berry.json")
-                                      .aggregate(Executors.newSingleThreadExecutor())
-                                      .thenApply(AggregatedHttpFile::content)
-                                      .join();
+        final HttpHeaders headers = ResponseHeaders.builder(HttpStatus.OK)
+                                                   .contentType(MediaType.JSON)
+                                                   .build();
+
+        final HttpData berry = HttpFile.of(BerryService.class.getClassLoader(), "berry.json")
+                                       .aggregate(Executors.newSingleThreadExecutor())
+                                       .thenApply(AggregatedHttpFile::content)
+                                       .join();
+        final HttpData berryFirmness = HttpFile.of(BerryService.class.getClassLoader(), "berry-firmness.json")
+                                               .aggregate(Executors.newSingleThreadExecutor())
+                                               .thenApply(AggregatedHttpFile::content)
+                                               .join();
+        final HttpData berryFlavor = HttpFile.of(BerryService.class.getClassLoader(), "berry-flavor.json")
+                                             .aggregate(Executors.newSingleThreadExecutor())
+                                             .thenApply(AggregatedHttpFile::content)
+                                             .join();
+
         final Server server = Server.builder()
                                     .http(8080)
                                     .service("/health", HealthCheckService.of(new SettableHealthChecker()))
-                                    .service("/berry/1",
-                                             (ctx, req) -> HttpResponse.of(HttpStatus.OK, MediaType.JSON, data))
+                                    .service("/berry/1", (ctx, req) -> HttpResponse.of(headers, berry))
+                                    .service("/berry-firmness/1",
+                                             (ctx, req) -> HttpResponse.of(headers, berryFirmness))
+                                    .service("/berry-flavor/1",
+                                             (ctx, req) -> HttpResponse.of(headers, berryFlavor))
                                     .decorator(LoggingService.newDecorator())
                                     .build();
 
