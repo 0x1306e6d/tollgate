@@ -38,7 +38,7 @@ import com.linecorp.armeria.server.healthcheck.HealthChecker;
 import com.linecorp.armeria.server.healthcheck.SettableHealthChecker;
 import com.linecorp.armeria.server.logging.LoggingService;
 
-import dev.gihwan.tollgate.core.endpoint.Endpoint;
+import dev.gihwan.tollgate.core.endpoint.EndpointService;
 
 public final class Tollgate {
 
@@ -82,13 +82,13 @@ public final class Tollgate {
         config.endpoints().forEach(endpointConfig -> {
             logger.info("Registering endpoint {}.", endpointConfig);
 
-            final Endpoint endpoint = Endpoint.of(endpointConfig);
+            final EndpointService endpointService = EndpointService.of(endpointConfig);
             builder.service(Route.builder()
                                  .methods(endpointConfig.method())
                                  .path(endpointConfig.path())
                                  .build(),
-                            endpoint.upstream()
-                                    .decorate(LoggingService.newDecorator()));
+                            endpointService.upstream()
+                                           .decorate(LoggingService.newDecorator()));
         });
 
         final Server server = builder.build();

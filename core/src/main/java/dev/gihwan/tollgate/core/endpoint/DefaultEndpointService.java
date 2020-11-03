@@ -24,16 +24,21 @@
 
 package dev.gihwan.tollgate.core.endpoint;
 
-import static java.util.Objects.requireNonNull;
-
 import dev.gihwan.tollgate.core.upstream.Upstream;
+import dev.gihwan.tollgate.core.upstream.UpstreamFactory;
 
-public interface Endpoint {
+final class DefaultEndpointService implements EndpointService {
 
-    static Endpoint of(EndpointConfig config) {
-        requireNonNull(config, "config");
-        return new DefaultEndpoint(config);
+    private final EndpointConfig config;
+    private final Upstream upstream;
+
+    DefaultEndpointService(EndpointConfig config) {
+        this.config = config;
+        upstream = UpstreamFactory.instance().get(config.upstream());
     }
 
-    Upstream upstream();
+    @Override
+    public Upstream upstream() {
+        return upstream;
+    }
 }
