@@ -37,20 +37,20 @@ public final class UpstreamFactory {
         return INSTANCE;
     }
 
-    private final Map<UpstreamConfig, Upstream> upstreams = new HashMap<>();
+    private final Map<UpstreamConfig, UpstreamService> upstreams = new HashMap<>();
 
     private UpstreamFactory() {}
 
-    public Upstream get(UpstreamConfig config) {
+    public UpstreamService get(UpstreamConfig config) {
         requireNonNull(config, "config");
 
-        final Upstream upstream = upstreams.get(config);
-        if (upstream != null) {
-            return upstream;
+        final UpstreamService upstreamService = upstreams.get(config);
+        if (upstreamService != null) {
+            return upstreamService;
         }
 
-        final Upstream newUpstream = Upstream.of(config);
-        upstreams.put(config, newUpstream);
-        return newUpstream;
+        final UpstreamService newUpstreamService = UpstreamService.of(config);
+        upstreams.put(config, newUpstreamService);
+        return newUpstreamService;
     }
 }

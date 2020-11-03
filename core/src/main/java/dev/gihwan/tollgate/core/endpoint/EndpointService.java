@@ -22,16 +22,18 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.core.upstream;
+package dev.gihwan.tollgate.core.endpoint;
 
 import static java.util.Objects.requireNonNull;
 
-import com.linecorp.armeria.server.HttpService;
+import dev.gihwan.tollgate.core.upstream.UpstreamService;
 
-public interface Upstream extends HttpService {
+public interface EndpointService {
 
-    static Upstream of(UpstreamConfig config) {
+    static EndpointService of(EndpointConfig config) {
         requireNonNull(config, "config");
-        return new DefaultUpstream(config);
+        return new DefaultEndpointService(config);
     }
+
+    UpstreamService upstream();
 }

@@ -24,21 +24,21 @@
 
 package dev.gihwan.tollgate.core.endpoint;
 
-import dev.gihwan.tollgate.core.upstream.Upstream;
 import dev.gihwan.tollgate.core.upstream.UpstreamFactory;
+import dev.gihwan.tollgate.core.upstream.UpstreamService;
 
-final class DefaultEndpoint implements Endpoint {
+final class DefaultEndpointService implements EndpointService {
 
     private final EndpointConfig config;
-    private final Upstream upstream;
+    private final UpstreamService upstreamService;
 
-    DefaultEndpoint(EndpointConfig config) {
+    DefaultEndpointService(EndpointConfig config) {
         this.config = config;
-        upstream = UpstreamFactory.instance().get(config.upstream());
+        upstreamService = UpstreamFactory.instance().get(config.upstream());
     }
 
     @Override
-    public Upstream upstream() {
-        return upstream;
+    public UpstreamService upstream() {
+        return upstreamService;
     }
 }
