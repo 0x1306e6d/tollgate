@@ -43,7 +43,7 @@ import com.linecorp.armeria.testing.junit5.server.ServerExtension;
 
 import dev.gihwan.tollgate.core.service.ServiceConfig;
 
-class DefaultUpstreamTest {
+class DefaultUpstreamServiceTest {
 
     private static final AtomicReference<AggregatedHttpRequest> reqCapture = new AtomicReference<>();
 
@@ -75,28 +75,28 @@ class DefaultUpstreamTest {
             final ServiceConfig service = ServiceConfig.of(serviceServer.httpUri().toString());
             final UpstreamEndpointConfig endpoint = UpstreamEndpointConfig.of(HttpMethod.GET, "/path");
             final UpstreamConfig config = UpstreamConfig.of(service, endpoint);
-            sb.service("/get", new DefaultUpstream(config));
+            sb.service("/get", new DefaultUpstreamService(config));
         }
 
         private void configurePostService(ServerBuilder sb) {
             final ServiceConfig service = ServiceConfig.of(serviceServer.httpUri().toString());
             final UpstreamEndpointConfig endpoint = UpstreamEndpointConfig.of(HttpMethod.POST, "/path");
             final UpstreamConfig config = UpstreamConfig.of(service, endpoint);
-            sb.service("/post", new DefaultUpstream(config));
+            sb.service("/post", new DefaultUpstreamService(config));
         }
 
         private void configurePutService(ServerBuilder sb) {
             final ServiceConfig service = ServiceConfig.of(serviceServer.httpUri().toString());
             final UpstreamEndpointConfig endpoint = UpstreamEndpointConfig.of(HttpMethod.PUT, "/path");
             final UpstreamConfig config = UpstreamConfig.of(service, endpoint);
-            sb.service("/put", new DefaultUpstream(config));
+            sb.service("/put", new DefaultUpstreamService(config));
         }
 
         private void configureDeleteService(ServerBuilder sb) {
             final ServiceConfig service = ServiceConfig.of(serviceServer.httpUri().toString());
             final UpstreamEndpointConfig endpoint = UpstreamEndpointConfig.of(HttpMethod.DELETE, "/path");
             final UpstreamConfig config = UpstreamConfig.of(service, endpoint);
-            sb.service("/delete", new DefaultUpstream(config));
+            sb.service("/delete", new DefaultUpstreamService(config));
         }
     };
 

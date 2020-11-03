@@ -26,7 +26,7 @@ package dev.gihwan.tollgate.core.endpoint;
 
 import static java.util.Objects.requireNonNull;
 
-import dev.gihwan.tollgate.core.upstream.Upstream;
+import dev.gihwan.tollgate.core.upstream.UpstreamService;
 
 public interface EndpointService {
 
@@ -35,5 +35,5 @@ public interface EndpointService {
         return new DefaultEndpointService(config);
     }
 
-    Upstream upstream();
+    UpstreamService upstream();
 }

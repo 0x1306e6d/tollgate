@@ -47,9 +47,9 @@ import com.linecorp.armeria.server.ServiceRequestContext;
 import dev.gihwan.tollgate.core.service.Service;
 import dev.gihwan.tollgate.core.service.ServiceFactory;
 
-final class DefaultUpstream implements Upstream {
+final class DefaultUpstreamService implements UpstreamService {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultUpstream.class);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultUpstreamService.class);
 
     private static final String PATH_SEPARATOR = "/";
     private static final Splitter PATH_SPLITTER = Splitter.on(PATH_SEPARATOR);
@@ -57,7 +57,7 @@ final class DefaultUpstream implements Upstream {
     private final UpstreamConfig config;
     private final Service service;
 
-    DefaultUpstream(UpstreamConfig config) {
+    DefaultUpstreamService(UpstreamConfig config) {
         this.config = config;
         service = ServiceFactory.instance().get(config.service());
     }

@@ -28,10 +28,10 @@ import static java.util.Objects.requireNonNull;
 
 import com.linecorp.armeria.server.HttpService;
 
-public interface Upstream extends HttpService {
+public interface UpstreamService extends HttpService {
 
-    static Upstream of(UpstreamConfig config) {
+    static UpstreamService of(UpstreamConfig config) {
         requireNonNull(config, "config");
-        return new DefaultUpstream(config);
+        return new DefaultUpstreamService(config);
     }
 }
