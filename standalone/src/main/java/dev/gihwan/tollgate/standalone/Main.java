@@ -132,18 +132,18 @@ public final class Main {
     }
 
     public static void main(String[] args) {
-        final Main server = new Main();
+        final Main main = new Main();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
-                server.stop();
+                main.stop();
             } catch (Exception e) {
                 logger.error("Failed to stop the Tollgate standalone.", e);
             }
         }));
 
         try {
-            server.start();
+            main.start();
         } catch (Exception e) {
             logger.error("Failed to start the Tollgate standalone.", e);
             System.exit(-1);
