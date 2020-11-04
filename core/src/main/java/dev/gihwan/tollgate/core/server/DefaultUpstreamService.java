@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.core.upstream;
+package dev.gihwan.tollgate.core.server;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;

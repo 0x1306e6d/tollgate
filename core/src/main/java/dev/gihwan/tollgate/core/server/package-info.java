@@ -23,6 +23,6 @@
  */
 
 @NonNullByDefault
-package dev.gihwan.tollgate.core.endpoint;
+package dev.gihwan.tollgate.core.server;
 
 import dev.gihwan.tollgate.core.annotation.NonNullByDefault;

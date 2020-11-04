@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.core.endpoint;
+package dev.gihwan.tollgate.core.server;
 
 import static java.util.Objects.requireNonNull;
 
@@ -33,22 +33,18 @@ import com.google.common.base.Objects;
 
 import com.linecorp.armeria.common.HttpMethod;
 
-import dev.gihwan.tollgate.core.upstream.UpstreamConfig;
+public final class UpstreamEndpointConfig {
 
-public final class EndpointConfig {
-
-    public static EndpointConfig of(HttpMethod method, String path, UpstreamConfig upstream) {
-        return new EndpointConfig(method, path, upstream);
+    public static UpstreamEndpointConfig of(HttpMethod method, String path) {
+        return new UpstreamEndpointConfig(method, path);
     }
 
     private final HttpMethod method;
     private final String path;
-    private final UpstreamConfig upstream;
 
-    private EndpointConfig(HttpMethod method, String path, UpstreamConfig upstream) {
+    private UpstreamEndpointConfig(HttpMethod method, String path) {
         this.method = requireNonNull(method, "method");
         this.path = requireNonNull(path, "path");
-        this.upstream = requireNonNull(upstream, "upstream");
     }
 
     public HttpMethod method() {
@@ -59,29 +55,24 @@ public final class EndpointConfig {
         return path;
     }
 
-    public UpstreamConfig upstream() {
-        return upstream;
-    }
-
     @Override
     public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }
 
-        if (!(o instanceof EndpointConfig)) {
+        if (!(o instanceof UpstreamEndpointConfig)) {
             return false;
         }
 
-        final EndpointConfig that = (EndpointConfig) o;
+        final UpstreamEndpointConfig that = (UpstreamEndpointConfig) o;
         return Objects.equal(method, that.method) &&
-               Objects.equal(path, that.path) &&
-               Objects.equal(upstream, that.upstream);
+               Objects.equal(path, that.path);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(method, path, upstream);
+        return Objects.hashCode(method, path);
     }
 
     @Override
@@ -89,7 +80,6 @@ public final class EndpointConfig {
         return MoreObjects.toStringHelper(this)
                           .add("method", method)
                           .add("path", path)
-                          .add("upstream", upstream)
                           .toString();
     }
 }

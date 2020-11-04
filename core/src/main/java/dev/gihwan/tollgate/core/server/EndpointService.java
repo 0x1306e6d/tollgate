@@ -22,35 +22,16 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.core.upstream;
+package dev.gihwan.tollgate.core.server;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.HashMap;
-import java.util.Map;
+public interface EndpointService {
 
-public final class UpstreamFactory {
-
-    private static final UpstreamFactory INSTANCE = new UpstreamFactory();
-
-    public static UpstreamFactory instance() {
-        return INSTANCE;
-    }
-
-    private final Map<UpstreamConfig, UpstreamService> upstreams = new HashMap<>();
-
-    private UpstreamFactory() {}
-
-    public UpstreamService get(UpstreamConfig config) {
+    static EndpointService of(EndpointConfig config) {
         requireNonNull(config, "config");
-
-        final UpstreamService upstreamService = upstreams.get(config);
-        if (upstreamService != null) {
-            return upstreamService;
-        }
-
-        final UpstreamService newUpstreamService = UpstreamService.of(config);
-        upstreams.put(config, newUpstreamService);
-        return newUpstreamService;
+        return new DefaultEndpointService(config);
     }
+
+    UpstreamService upstream();
 }

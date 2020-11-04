@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.core.upstream;
+package dev.gihwan.tollgate.core.server;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,6 +41,9 @@ import com.linecorp.armeria.server.ServerBuilder;
 import com.linecorp.armeria.server.logging.LoggingService;
 import com.linecorp.armeria.testing.junit5.server.ServerExtension;
 
+import dev.gihwan.tollgate.core.server.DefaultUpstreamService;
+import dev.gihwan.tollgate.core.server.UpstreamConfig;
+import dev.gihwan.tollgate.core.server.UpstreamEndpointConfig;
 import dev.gihwan.tollgate.core.service.ServiceConfig;
 
 class DefaultUpstreamServiceTest {
