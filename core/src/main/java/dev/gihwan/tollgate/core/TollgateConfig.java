@@ -31,7 +31,7 @@ import java.util.List;
 
 import com.google.common.base.MoreObjects;
 
-import dev.gihwan.tollgate.core.endpoint.EndpointConfig;
+import dev.gihwan.tollgate.core.server.EndpointConfig;
 
 public final class TollgateConfig {
 

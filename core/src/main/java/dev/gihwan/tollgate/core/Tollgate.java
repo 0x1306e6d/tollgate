@@ -38,8 +38,8 @@ import com.linecorp.armeria.server.healthcheck.HealthChecker;
 import com.linecorp.armeria.server.healthcheck.SettableHealthChecker;
 import com.linecorp.armeria.server.logging.LoggingService;
 
-import dev.gihwan.tollgate.core.endpoint.EndpointService;
-import dev.gihwan.tollgate.core.upstream.UpstreamService;
+import dev.gihwan.tollgate.core.server.EndpointService;
+import dev.gihwan.tollgate.core.server.UpstreamService;
 
 public final class Tollgate {
 

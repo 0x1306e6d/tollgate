@@ -43,11 +43,11 @@ import com.linecorp.armeria.common.HttpMethod;
 
 import dev.gihwan.tollgate.core.Tollgate;
 import dev.gihwan.tollgate.core.TollgateBuilder;
-import dev.gihwan.tollgate.core.endpoint.EndpointConfig;
+import dev.gihwan.tollgate.core.server.EndpointConfig;
+import dev.gihwan.tollgate.core.server.UpstreamConfig;
+import dev.gihwan.tollgate.core.server.UpstreamEndpointConfig;
 import dev.gihwan.tollgate.core.service.Authority;
 import dev.gihwan.tollgate.core.service.ServiceConfig;
-import dev.gihwan.tollgate.core.upstream.UpstreamConfig;
-import dev.gihwan.tollgate.core.upstream.UpstreamEndpointConfig;
 
 public final class Main {
 

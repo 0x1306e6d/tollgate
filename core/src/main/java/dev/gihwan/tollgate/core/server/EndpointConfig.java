@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.core.upstream;
+package dev.gihwan.tollgate.core.server;
 
 import static java.util.Objects.requireNonNull;
 
@@ -31,28 +31,34 @@ import javax.annotation.Nullable;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
-import dev.gihwan.tollgate.core.service.ServiceConfig;
+import com.linecorp.armeria.common.HttpMethod;
 
-public final class UpstreamConfig {
+public final class EndpointConfig {
 
-    public static UpstreamConfig of(ServiceConfig service, UpstreamEndpointConfig endpoint) {
-        return new UpstreamConfig(service, endpoint);
+    public static EndpointConfig of(HttpMethod method, String path, UpstreamConfig upstream) {
+        return new EndpointConfig(method, path, upstream);
     }
 
-    private final ServiceConfig service;
-    private final UpstreamEndpointConfig endpoint;
+    private final HttpMethod method;
+    private final String path;
+    private final UpstreamConfig upstream;
 
-    private UpstreamConfig(ServiceConfig service, UpstreamEndpointConfig endpoint) {
-        this.service = requireNonNull(service, "service");
-        this.endpoint = requireNonNull(endpoint, "endpoint");
+    private EndpointConfig(HttpMethod method, String path, UpstreamConfig upstream) {
+        this.method = requireNonNull(method, "method");
+        this.path = requireNonNull(path, "path");
+        this.upstream = requireNonNull(upstream, "upstream");
     }
 
-    public ServiceConfig service() {
-        return service;
+    public HttpMethod method() {
+        return method;
     }
 
-    public UpstreamEndpointConfig endpoint() {
-        return endpoint;
+    public String path() {
+        return path;
+    }
+
+    public UpstreamConfig upstream() {
+        return upstream;
     }
 
     @Override
@@ -61,25 +67,27 @@ public final class UpstreamConfig {
             return true;
         }
 
-        if (!(o instanceof UpstreamConfig)) {
+        if (!(o instanceof EndpointConfig)) {
             return false;
         }
 
-        final UpstreamConfig that = (UpstreamConfig) o;
-        return Objects.equal(service, that.service) &&
-               Objects.equal(endpoint, that.endpoint);
+        final EndpointConfig that = (EndpointConfig) o;
+        return Objects.equal(method, that.method) &&
+               Objects.equal(path, that.path) &&
+               Objects.equal(upstream, that.upstream);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(service, endpoint);
+        return Objects.hashCode(method, path, upstream);
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                          .add("service", service)
-                          .add("endpoint", endpoint)
+                          .add("method", method)
+                          .add("path", path)
+                          .add("upstream", upstream)
                           .toString();
     }
 }

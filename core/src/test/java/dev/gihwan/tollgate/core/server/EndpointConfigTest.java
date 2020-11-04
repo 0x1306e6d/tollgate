@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.core.endpoint;
+package dev.gihwan.tollgate.core.server;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -31,9 +31,10 @@ import org.junit.jupiter.api.Test;
 
 import com.linecorp.armeria.common.HttpMethod;
 
+import dev.gihwan.tollgate.core.server.EndpointConfig;
 import dev.gihwan.tollgate.core.service.ServiceConfig;
-import dev.gihwan.tollgate.core.upstream.UpstreamConfig;
-import dev.gihwan.tollgate.core.upstream.UpstreamEndpointConfig;
+import dev.gihwan.tollgate.core.server.UpstreamConfig;
+import dev.gihwan.tollgate.core.server.UpstreamEndpointConfig;
 
 @SuppressWarnings("ConstantConditions")
 class EndpointConfigTest {

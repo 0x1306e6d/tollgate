@@ -29,7 +29,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.gihwan.tollgate.core.endpoint.EndpointConfig;
+import dev.gihwan.tollgate.core.server.EndpointConfig;
 
 public final class TollgateBuilder {
 
