@@ -29,17 +29,17 @@ import static java.util.Objects.requireNonNull;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class UpstreamFactory {
+public final class UpstreamRegistry {
 
-    private static final UpstreamFactory INSTANCE = new UpstreamFactory();
+    private static final UpstreamRegistry INSTANCE = new UpstreamRegistry();
 
-    public static UpstreamFactory instance() {
+    public static UpstreamRegistry instance() {
         return INSTANCE;
     }
 
     private final Map<UpstreamConfig, UpstreamService> upstreams = new HashMap<>();
 
-    private UpstreamFactory() {}
+    private UpstreamRegistry() {}
 
     public UpstreamService get(UpstreamConfig config) {
         requireNonNull(config, "config");
