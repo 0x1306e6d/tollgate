@@ -29,6 +29,9 @@ import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
+
+import com.linecorp.armeria.server.HttpService;
 import com.linecorp.armeria.server.Route;
 import com.linecorp.armeria.server.Server;
 import com.linecorp.armeria.server.ServerBuilder;
@@ -38,8 +41,8 @@ import com.linecorp.armeria.server.healthcheck.HealthChecker;
 import com.linecorp.armeria.server.healthcheck.SettableHealthChecker;
 import com.linecorp.armeria.server.logging.LoggingService;
 
+import dev.gihwan.tollgate.core.server.RemappingRequestHeadersService;
 import dev.gihwan.tollgate.core.server.UpstreamRegistry;
-import dev.gihwan.tollgate.core.server.UpstreamService;
 
 public final class Tollgate {
 
@@ -83,7 +86,14 @@ public final class Tollgate {
         config.endpoints().forEach(endpointConfig -> {
             logger.info("Registering endpoint {}.", endpointConfig);
 
-            final UpstreamService upstreamService = UpstreamRegistry.instance().get(endpointConfig.upstream());
+            HttpService upstreamService = UpstreamRegistry.instance().get(endpointConfig.upstream());
+
+            if (!Strings.isNullOrEmpty(endpointConfig.path())) {
+                final String pathPattern = endpointConfig.path();
+                upstreamService = upstreamService.decorate(
+                        RemappingRequestHeadersService.newDecorator(pathPattern));
+            }
+
             builder.service(Route.builder()
                                  .methods(endpointConfig.method())
                                  .path(endpointConfig.path())
