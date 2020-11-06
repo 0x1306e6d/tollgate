@@ -24,29 +24,19 @@
 
 package dev.gihwan.tollgate.core.server;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
-
-import java.time.Duration;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import com.linecorp.armeria.client.WebClient;
 import com.linecorp.armeria.common.AggregatedHttpRequest;
-import com.linecorp.armeria.common.AggregatedHttpResponse;
-import com.linecorp.armeria.common.HttpMethod;
 import com.linecorp.armeria.common.HttpResponse;
-import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.server.ServerBuilder;
 import com.linecorp.armeria.testing.junit5.server.ServerExtension;
 
 import dev.gihwan.tollgate.core.service.Service;
 import dev.gihwan.tollgate.core.service.ServiceConfig;
 
-class DefaultUpstreamServiceTest {
+class RemappingHttpPathServiceTest {
 
     private static final AtomicReference<AggregatedHttpRequest> reqCapture = new AtomicReference<>();
 
@@ -54,10 +44,10 @@ class DefaultUpstreamServiceTest {
     static final ServerExtension serviceServer = new ServerExtension() {
         @Override
         protected void configure(ServerBuilder sb) {
-            sb.service("/foo",
+            sb.service("/bar",
                        (ctx, req) -> HttpResponse.from(req.aggregate().thenApply(aggregated -> {
                            reqCapture.set(aggregated);
-                           return HttpResponse.of("bar");
+                           return HttpResponse.of("baz");
                        })));
         }
     };
@@ -69,38 +59,9 @@ class DefaultUpstreamServiceTest {
             final ServiceConfig serviceConfig = ServiceConfig.of(serviceServer.httpUri().toString());
             final Service service = Service.of(serviceConfig);
 
-            sb.service("/foo", new DefaultUpstreamService(service));
+            sb.service("/foo", new DefaultUpstreamService(service)
+                    .decorate(RemappingRequestHeadersService.newDecorator("/bar")));
         }
     };
 
-    @Test
-    void proxy() {
-        final WebClient webClient = WebClient.builder(tollgateServer.httpUri()).build();
-
-        final CompletableFuture<AggregatedHttpResponse> future = webClient.get("/foo").aggregate();
-        await().atMost(Duration.ofSeconds(1)).until(future::isDone);
-        final AggregatedHttpResponse res = future.join();
-        assertThat(res.status()).isEqualTo(HttpStatus.OK);
-        assertThat(res.contentUtf8()).isEqualTo("bar");
-
-        final AggregatedHttpRequest req = reqCapture.get();
-        assertThat(req.method()).isEqualTo(HttpMethod.GET);
-        assertThat(req.path()).isEqualTo("/foo");
-    }
-
-    @Test
-    void proxyWithBody() {
-        final WebClient webClient = WebClient.builder(tollgateServer.httpUri()).build();
-
-        final CompletableFuture<AggregatedHttpResponse> future = webClient.post("/foo", "qux").aggregate();
-        await().atMost(Duration.ofSeconds(1)).until(future::isDone);
-        final AggregatedHttpResponse res = future.join();
-        assertThat(res.status()).isEqualTo(HttpStatus.OK);
-        assertThat(res.contentUtf8()).isEqualTo("bar");
-
-        final AggregatedHttpRequest req = reqCapture.get();
-        assertThat(req.method()).isEqualTo(HttpMethod.POST);
-        assertThat(req.path()).isEqualTo("/foo");
-        assertThat(req.contentUtf8()).isEqualTo("qux");
-    }
 }

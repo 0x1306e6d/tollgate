@@ -24,17 +24,12 @@
 
 package dev.gihwan.tollgate.core.server;
 
+import static dev.gihwan.tollgate.core.server.AttributeKeys.REQUEST_HEADERS;
+import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
-
-import javax.annotation.Nullable;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Splitter;
 
 import com.linecorp.armeria.client.UnprocessedRequestException;
 import com.linecorp.armeria.common.AggregatedHttpRequest;
@@ -45,60 +40,25 @@ import com.linecorp.armeria.common.RequestHeaders;
 import com.linecorp.armeria.server.ServiceRequestContext;
 
 import dev.gihwan.tollgate.core.service.Service;
-import dev.gihwan.tollgate.core.service.ServiceFactory;
 
 final class DefaultUpstreamService implements UpstreamService {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultUpstreamService.class);
-
-    private static final String PATH_SEPARATOR = "/";
-    private static final Splitter PATH_SPLITTER = Splitter.on(PATH_SEPARATOR);
-
-    private final UpstreamConfig config;
     private final Service service;
 
-    DefaultUpstreamService(UpstreamConfig config) {
-        this.config = config;
-        service = ServiceFactory.instance().get(config.service());
+    DefaultUpstreamService(Service service) {
+        this.service = requireNonNull(service, "service");
     }
 
     @Override
     public HttpResponse serve(ServiceRequestContext ctx, HttpRequest req) {
-        final String path = buildPath(ctx);
-        if (path == null) {
-            return HttpResponse.of(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
         return HttpResponse.from(req.aggregate()
-                                    .thenApply(aggregated -> duplicateRequest(aggregated, path))
+                                    .thenApply(aggregated -> duplicateRequest(ctx, aggregated))
                                     .thenApply(this::sendRequest));
     }
 
-    @Nullable
-    private String buildPath(ServiceRequestContext ctx) {
-        final List<String> segments = new ArrayList<>();
-        for (String segment : PATH_SPLITTER.split(config.endpoint().path())) {
-            if (segment.startsWith("{") && segment.endsWith("}")) {
-                final String pathParamName = segment.substring(1, segment.length() - 1);
-                final String pathParamValue = ctx.pathParam(pathParamName);
-                if (pathParamValue == null) {
-                    logger.error("Path parameter {} is not found on path {}.", pathParamName, ctx.path());
-                    return null;
-                }
-                segments.add(pathParamValue);
-            } else {
-                segments.add(segment);
-            }
-        }
-        return String.join("/", segments);
-    }
-
-    private HttpRequest duplicateRequest(AggregatedHttpRequest req, String path) {
-        final RequestHeaders headers = req.headers().toBuilder()
-                                          .method(config.endpoint().method())
-                                          .path(path)
-                                          .build();
-        return HttpRequest.of(headers, req.content(), req.trailers());
+    private HttpRequest duplicateRequest(ServiceRequestContext ctx, AggregatedHttpRequest req) {
+        final RequestHeaders requestHeaders = defaultIfNull(ctx.attr(REQUEST_HEADERS), req.headers());
+        return HttpRequest.of(requestHeaders, req.content(), req.trailers());
     }
 
     private HttpResponse sendRequest(HttpRequest req) {

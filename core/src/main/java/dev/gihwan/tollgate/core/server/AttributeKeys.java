@@ -24,18 +24,13 @@
 
 package dev.gihwan.tollgate.core.server;
 
-import static java.util.Objects.requireNonNull;
+import com.linecorp.armeria.common.RequestHeaders;
 
-import com.linecorp.armeria.server.HttpService;
+import io.netty.util.AttributeKey;
 
-import dev.gihwan.tollgate.core.service.Service;
-import dev.gihwan.tollgate.core.service.ServiceFactory;
+final class AttributeKeys {
 
-public interface UpstreamService extends HttpService {
+    static final AttributeKey<RequestHeaders> REQUEST_HEADERS = AttributeKey.newInstance("RequestHeaders");
 
-    static UpstreamService of(UpstreamConfig config) {
-        requireNonNull(config, "config");
-        final Service service = ServiceFactory.instance().get(config.service());
-        return new DefaultUpstreamService(service);
-    }
+    private AttributeKeys() {}
 }
