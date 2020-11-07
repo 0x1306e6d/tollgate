@@ -24,33 +24,19 @@
 
 package dev.gihwan.tollgate.core.server;
 
-import static java.util.Objects.requireNonNull;
+import com.linecorp.armeria.common.HttpRequest;
+import com.linecorp.armeria.common.HttpResponse;
+import com.linecorp.armeria.server.Service;
+import com.linecorp.armeria.server.SimpleDecoratingService;
 
-import java.util.HashMap;
-import java.util.Map;
+public abstract class SimpleDecoratingUpstreamHttpService
+        extends SimpleDecoratingService<HttpRequest, HttpResponse>
+        implements UpstreamHttpService {
 
-public final class UpstreamRegistry {
-
-    private static final UpstreamRegistry INSTANCE = new UpstreamRegistry();
-
-    public static UpstreamRegistry instance() {
-        return INSTANCE;
-    }
-
-    private final Map<UpstreamConfig, UpstreamHttpService> upstreams = new HashMap<>();
-
-    private UpstreamRegistry() {}
-
-    public UpstreamHttpService get(UpstreamConfig config) {
-        requireNonNull(config, "config");
-
-        final UpstreamHttpService upstreamService = upstreams.get(config);
-        if (upstreamService != null) {
-            return upstreamService;
-        }
-
-        final UpstreamHttpService newUpstreamService = UpstreamHttpService.of(config);
-        upstreams.put(config, newUpstreamService);
-        return newUpstreamService;
+    /**
+     * Creates a new instance that decorates the specified {@link Service}.
+     */
+    protected SimpleDecoratingUpstreamHttpService(Service<HttpRequest, HttpResponse> delegate) {
+        super(delegate);
     }
 }

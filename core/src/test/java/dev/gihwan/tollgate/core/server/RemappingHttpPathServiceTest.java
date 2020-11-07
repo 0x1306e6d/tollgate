@@ -59,7 +59,7 @@ class RemappingHttpPathServiceTest {
             final ServiceConfig serviceConfig = ServiceConfig.of(serviceServer.httpUri().toString());
             final Service service = Service.of(serviceConfig);
 
-            sb.service("/foo", new DefaultUpstreamService(service)
+            sb.service("/foo", new DefaultUpstreamHttpService(service)
                     .decorate(RemappingRequestHeadersService.newDecorator("/bar")));
         }
     };
