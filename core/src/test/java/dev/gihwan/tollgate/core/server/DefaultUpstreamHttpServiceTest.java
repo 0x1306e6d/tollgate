@@ -46,7 +46,7 @@ import com.linecorp.armeria.testing.junit5.server.ServerExtension;
 import dev.gihwan.tollgate.core.service.Service;
 import dev.gihwan.tollgate.core.service.ServiceConfig;
 
-class DefaultUpstreamServiceTest {
+class DefaultUpstreamHttpServiceTest {
 
     private static final AtomicReference<AggregatedHttpRequest> reqCapture = new AtomicReference<>();
 
@@ -69,7 +69,7 @@ class DefaultUpstreamServiceTest {
             final ServiceConfig serviceConfig = ServiceConfig.of(serviceServer.httpUri().toString());
             final Service service = Service.of(serviceConfig);
 
-            sb.service("/foo", new DefaultUpstreamService(service));
+            sb.service("/foo", new DefaultUpstreamHttpService(service));
         }
     };
 

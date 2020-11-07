@@ -41,11 +41,11 @@ import com.linecorp.armeria.server.ServiceRequestContext;
 
 import dev.gihwan.tollgate.core.service.Service;
 
-final class DefaultUpstreamService implements UpstreamService {
+final class DefaultUpstreamHttpService implements UpstreamHttpService {
 
     private final Service service;
 
-    DefaultUpstreamService(Service service) {
+    DefaultUpstreamHttpService(Service service) {
         this.service = requireNonNull(service, "service");
     }
 
