@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
-import dev.gihwan.tollgate.core.service.ServiceConfig;
+import dev.gihwan.tollgate.core.client.ServiceConfig;
 
 public final class UpstreamConfig {
 

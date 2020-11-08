@@ -22,27 +22,35 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.core.service;
+package dev.gihwan.tollgate.core.client;
 
-import com.linecorp.armeria.client.WebClient;
-import com.linecorp.armeria.client.logging.LoggingClient;
-import com.linecorp.armeria.common.HttpRequest;
-import com.linecorp.armeria.common.HttpResponse;
+import static java.util.Objects.requireNonNull;
 
-final class DefaultService implements Service {
+import java.util.HashMap;
+import java.util.Map;
 
-    private final ServiceConfig config;
-    private final WebClient client;
+public final class UpstreamClientFactory {
 
-    DefaultService(ServiceConfig config) {
-        this.config = config;
-        client = config.webClientBuilder()
-                       .decorator(LoggingClient.newDecorator())
-                       .build();
+    private static final UpstreamClientFactory INSTANCE = new UpstreamClientFactory();
+
+    public static UpstreamClientFactory instance() {
+        return INSTANCE;
     }
 
-    @Override
-    public HttpResponse send(HttpRequest req) {
-        return client.execute(req);
+    private final Map<ServiceConfig, UpstreamClient> services = new HashMap<>();
+
+    private UpstreamClientFactory() {}
+
+    public UpstreamClient get(ServiceConfig config) {
+        requireNonNull(config, "config");
+
+        final UpstreamClient upstreamClient = services.get(config);
+        if (upstreamClient != null) {
+            return upstreamClient;
+        }
+
+        final UpstreamClient newUpstreamClient = UpstreamClient.of(config);
+        services.put(config, newUpstreamClient);
+        return newUpstreamClient;
     }
 }

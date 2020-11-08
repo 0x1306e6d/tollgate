@@ -22,19 +22,7 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.core.service;
+@NonNullByDefault
+package dev.gihwan.tollgate.core.client;
 
-import static java.util.Objects.requireNonNull;
-
-import com.linecorp.armeria.common.HttpRequest;
-import com.linecorp.armeria.common.HttpResponse;
-
-public interface Service {
-
-    static Service of(ServiceConfig config) {
-        requireNonNull(config, "config");
-        return new DefaultService(config);
-    }
-
-    HttpResponse send(HttpRequest req);
-}
+import dev.gihwan.tollgate.core.annotation.NonNullByDefault;
