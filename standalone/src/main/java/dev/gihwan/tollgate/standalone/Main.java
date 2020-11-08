@@ -46,8 +46,8 @@ import dev.gihwan.tollgate.core.TollgateBuilder;
 import dev.gihwan.tollgate.core.server.EndpointConfig;
 import dev.gihwan.tollgate.core.server.UpstreamConfig;
 import dev.gihwan.tollgate.core.server.UpstreamEndpointConfig;
-import dev.gihwan.tollgate.core.service.Authority;
-import dev.gihwan.tollgate.core.service.ServiceConfig;
+import dev.gihwan.tollgate.core.client.Authority;
+import dev.gihwan.tollgate.core.client.ServiceConfig;
 
 public final class Main {
 

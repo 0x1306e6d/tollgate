@@ -39,14 +39,14 @@ import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.common.RequestHeaders;
 import com.linecorp.armeria.server.ServiceRequestContext;
 
-import dev.gihwan.tollgate.core.service.Service;
+import dev.gihwan.tollgate.core.client.UpstreamClient;
 
 final class DefaultUpstreamService implements UpstreamService {
 
-    private final Service service;
+    private final UpstreamClient client;
 
-    DefaultUpstreamService(Service service) {
-        this.service = requireNonNull(service, "service");
+    DefaultUpstreamService(UpstreamClient client) {
+        this.client = requireNonNull(client, "client");
     }
 
     @Override
@@ -64,7 +64,7 @@ final class DefaultUpstreamService implements UpstreamService {
     private HttpResponse sendRequest(HttpRequest req) {
         final CompletableFuture<HttpResponse> responseFuture = new CompletableFuture<>();
         final HttpResponse res = HttpResponse.from(responseFuture);
-        service.send(req).aggregate().handle((aggregated, t) -> {
+        client.execute(req).aggregate().handle((aggregated, t) -> {
             if (t != null) {
                 resolveException(responseFuture, t);
                 return null;

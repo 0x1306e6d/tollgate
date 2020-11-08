@@ -31,9 +31,7 @@ import org.junit.jupiter.api.Test;
 
 import com.linecorp.armeria.common.HttpMethod;
 
-import dev.gihwan.tollgate.core.server.UpstreamConfig;
-import dev.gihwan.tollgate.core.server.UpstreamEndpointConfig;
-import dev.gihwan.tollgate.core.service.ServiceConfig;
+import dev.gihwan.tollgate.core.client.ServiceConfig;
 
 @SuppressWarnings("ConstantConditions")
 class UpstreamConfigTest {

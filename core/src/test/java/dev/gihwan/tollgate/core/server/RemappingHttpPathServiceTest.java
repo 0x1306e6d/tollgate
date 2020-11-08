@@ -33,8 +33,8 @@ import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.server.ServerBuilder;
 import com.linecorp.armeria.testing.junit5.server.ServerExtension;
 
-import dev.gihwan.tollgate.core.service.Service;
-import dev.gihwan.tollgate.core.service.ServiceConfig;
+import dev.gihwan.tollgate.core.client.ServiceConfig;
+import dev.gihwan.tollgate.core.client.UpstreamClient;
 
 class RemappingHttpPathServiceTest {
 
@@ -57,9 +57,9 @@ class RemappingHttpPathServiceTest {
         @Override
         protected void configure(ServerBuilder sb) {
             final ServiceConfig serviceConfig = ServiceConfig.of(serviceServer.httpUri().toString());
-            final Service service = Service.of(serviceConfig);
+            final UpstreamClient client = UpstreamClient.of(serviceConfig);
 
-            sb.service("/foo", new DefaultUpstreamService(service)
+            sb.service("/foo", new DefaultUpstreamService(client)
                     .decorate(RemappingRequestHeadersService.newDecorator("/bar")));
         }
     };

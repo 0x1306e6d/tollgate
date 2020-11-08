@@ -22,7 +22,19 @@
  * SOFTWARE.
  */
 
-@NonNullByDefault
-package dev.gihwan.tollgate.core.service;
+package dev.gihwan.tollgate.core.client;
 
-import dev.gihwan.tollgate.core.annotation.NonNullByDefault;
+import static java.util.Objects.requireNonNull;
+
+import com.linecorp.armeria.common.HttpRequest;
+import com.linecorp.armeria.common.HttpResponse;
+
+public interface UpstreamClient {
+
+    static UpstreamClient of(ServiceConfig config) {
+        requireNonNull(config, "config");
+        return new DefaultUpstreamClient(config);
+    }
+
+    HttpResponse execute(HttpRequest req);
+}

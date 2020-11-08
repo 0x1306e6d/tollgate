@@ -28,14 +28,14 @@ import static java.util.Objects.requireNonNull;
 
 import com.linecorp.armeria.server.HttpService;
 
-import dev.gihwan.tollgate.core.service.Service;
-import dev.gihwan.tollgate.core.service.ServiceFactory;
+import dev.gihwan.tollgate.core.client.UpstreamClient;
+import dev.gihwan.tollgate.core.client.UpstreamClientFactory;
 
 public interface UpstreamService extends HttpService {
 
     static UpstreamService of(UpstreamConfig config) {
         requireNonNull(config, "config");
-        final Service service = ServiceFactory.instance().get(config.service());
-        return new DefaultUpstreamService(service);
+        final UpstreamClient upstreamClient = UpstreamClientFactory.instance().get(config.service());
+        return new DefaultUpstreamService(upstreamClient);
     }
 }
