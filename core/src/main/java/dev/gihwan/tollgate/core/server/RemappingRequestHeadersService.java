@@ -43,8 +43,9 @@ import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.common.RequestHeaders;
 import com.linecorp.armeria.server.HttpService;
 import com.linecorp.armeria.server.ServiceRequestContext;
+import com.linecorp.armeria.server.SimpleDecoratingHttpService;
 
-public final class RemappingRequestHeadersService extends SimpleDecoratingUpstreamHttpService {
+public final class RemappingRequestHeadersService extends SimpleDecoratingHttpService {
 
     private static final Logger logger = LoggerFactory.getLogger(RemappingRequestHeadersService.class);
 

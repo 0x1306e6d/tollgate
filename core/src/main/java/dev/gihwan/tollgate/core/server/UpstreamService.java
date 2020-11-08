@@ -31,11 +31,11 @@ import com.linecorp.armeria.server.HttpService;
 import dev.gihwan.tollgate.core.service.Service;
 import dev.gihwan.tollgate.core.service.ServiceFactory;
 
-public interface UpstreamHttpService extends HttpService {
+public interface UpstreamService extends HttpService {
 
-    static UpstreamHttpService of(UpstreamConfig config) {
+    static UpstreamService of(UpstreamConfig config) {
         requireNonNull(config, "config");
         final Service service = ServiceFactory.instance().get(config.service());
-        return new DefaultUpstreamHttpService(service);
+        return new DefaultUpstreamService(service);
     }
 }

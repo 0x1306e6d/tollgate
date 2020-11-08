@@ -37,19 +37,19 @@ public final class UpstreamRegistry {
         return INSTANCE;
     }
 
-    private final Map<UpstreamConfig, UpstreamHttpService> upstreams = new HashMap<>();
+    private final Map<UpstreamConfig, UpstreamService> upstreams = new HashMap<>();
 
     private UpstreamRegistry() {}
 
-    public UpstreamHttpService get(UpstreamConfig config) {
+    public UpstreamService get(UpstreamConfig config) {
         requireNonNull(config, "config");
 
-        final UpstreamHttpService upstreamService = upstreams.get(config);
+        final UpstreamService upstreamService = upstreams.get(config);
         if (upstreamService != null) {
             return upstreamService;
         }
 
-        final UpstreamHttpService newUpstreamService = UpstreamHttpService.of(config);
+        final UpstreamService newUpstreamService = UpstreamService.of(config);
         upstreams.put(config, newUpstreamService);
         return newUpstreamService;
     }
