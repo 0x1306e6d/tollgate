@@ -43,11 +43,11 @@ import com.linecorp.armeria.common.HttpMethod;
 
 import dev.gihwan.tollgate.core.Tollgate;
 import dev.gihwan.tollgate.core.TollgateBuilder;
-import dev.gihwan.tollgate.core.server.EndpointConfig;
-import dev.gihwan.tollgate.core.server.UpstreamConfig;
-import dev.gihwan.tollgate.core.server.UpstreamEndpointConfig;
 import dev.gihwan.tollgate.core.client.Authority;
 import dev.gihwan.tollgate.core.client.ServiceConfig;
+import dev.gihwan.tollgate.core.server.RouteConfig;
+import dev.gihwan.tollgate.core.server.UpstreamConfig;
+import dev.gihwan.tollgate.core.server.UpstreamEndpointConfig;
 
 public final class Main {
 
@@ -69,11 +69,11 @@ public final class Main {
                                                 .port(config.getInt("tollgate.port"))
                                                 .healthCheckPath(config.getString("tollgate.healthCheckPath"));
 
-        final Set<String> endpointNames = config.getObject("tollgate.endpoints").keySet();
-        endpointNames.stream()
-                     .map(name -> config.getObject("tollgate.endpoints." + name))
-                     .map(ConfigObject::toConfig)
-                     .forEach(endpointConfig -> buildEndpoint(builder, endpointConfig));
+        final Set<String> routeNames = config.getObject("tollgate.routing").keySet();
+        routeNames.stream()
+                  .map(name -> config.getObject("tollgate.routing." + name))
+                  .map(ConfigObject::toConfig)
+                  .forEach(routeConfig -> buildRoute(builder, routeConfig));
 
         tollgate = builder.build();
         tollgate.start();
@@ -83,16 +83,16 @@ public final class Main {
                     Duration.between(startAt, Instant.now()));
     }
 
-    private void buildEndpoint(TollgateBuilder builder, Config endpointConfig) {
-        final Config upstreamServiceConfig = endpointConfig.getObject("upstream.service").toConfig();
+    private void buildRoute(TollgateBuilder builder, Config routeConfig) {
+        final Config upstreamServiceConfig = routeConfig.getObject("upstream.service").toConfig();
         final ServiceConfig service = buildService(upstreamServiceConfig);
 
-        final Config upstreamEndpointConfig = endpointConfig.getObject("upstream.endpoint").toConfig();
+        final Config upstreamEndpointConfig = routeConfig.getObject("upstream.endpoint").toConfig();
         final UpstreamEndpointConfig upstreamEndpoint = buildUpstreamEndpoint(upstreamEndpointConfig);
 
-        builder.endpoint(EndpointConfig.of(endpointConfig.getEnum(HttpMethod.class, "method"),
-                                           endpointConfig.getString("path"),
-                                           UpstreamConfig.of(service, upstreamEndpoint)));
+        builder.route(RouteConfig.of(routeConfig.getEnum(HttpMethod.class, "method"),
+                                     routeConfig.getString("path"),
+                                     UpstreamConfig.of(service, upstreamEndpoint)));
     }
 
     private ServiceConfig buildService(Config config) {

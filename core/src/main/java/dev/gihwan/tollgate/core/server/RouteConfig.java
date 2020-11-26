@@ -33,17 +33,17 @@ import com.google.common.base.Objects;
 
 import com.linecorp.armeria.common.HttpMethod;
 
-public final class EndpointConfig {
+public final class RouteConfig {
 
-    public static EndpointConfig of(HttpMethod method, String path, UpstreamConfig upstream) {
-        return new EndpointConfig(method, path, upstream);
+    public static RouteConfig of(HttpMethod method, String path, UpstreamConfig upstream) {
+        return new RouteConfig(method, path, upstream);
     }
 
     private final HttpMethod method;
     private final String path;
     private final UpstreamConfig upstream;
 
-    private EndpointConfig(HttpMethod method, String path, UpstreamConfig upstream) {
+    private RouteConfig(HttpMethod method, String path, UpstreamConfig upstream) {
         this.method = requireNonNull(method, "method");
         this.path = requireNonNull(path, "path");
         this.upstream = requireNonNull(upstream, "upstream");
@@ -67,11 +67,11 @@ public final class EndpointConfig {
             return true;
         }
 
-        if (!(o instanceof EndpointConfig)) {
+        if (!(o instanceof RouteConfig)) {
             return false;
         }
 
-        final EndpointConfig that = (EndpointConfig) o;
+        final RouteConfig that = (RouteConfig) o;
         return Objects.equal(method, that.method) &&
                Objects.equal(path, that.path) &&
                Objects.equal(upstream, that.upstream);

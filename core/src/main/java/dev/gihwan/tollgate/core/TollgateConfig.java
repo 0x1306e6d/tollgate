@@ -31,22 +31,22 @@ import java.util.List;
 
 import com.google.common.base.MoreObjects;
 
-import dev.gihwan.tollgate.core.server.EndpointConfig;
+import dev.gihwan.tollgate.core.server.RouteConfig;
 
 public final class TollgateConfig {
 
     private final int port;
     private final String healthCheckPath;
-    private final List<EndpointConfig> endpoints;
+    private final List<RouteConfig> routes;
 
-    TollgateConfig(int port, String healthCheckPath, List<EndpointConfig> endpoints) {
+    TollgateConfig(int port, String healthCheckPath, List<RouteConfig> routes) {
         checkArgument(port >= 0, "port: %s (expected: >= 0)", port);
         checkArgument(port <= 65535, "port: %s (expected: <= 65535)", port);
         this.port = port;
         requireNonNull(healthCheckPath, "healthCheckPath");
         this.healthCheckPath = healthCheckPath;
-        requireNonNull(endpoints, "endpoints");
-        this.endpoints = endpoints;
+        requireNonNull(routes, "routes");
+        this.routes = routes;
     }
 
     public int port() {
@@ -57,8 +57,8 @@ public final class TollgateConfig {
         return healthCheckPath;
     }
 
-    public List<EndpointConfig> endpoints() {
-        return endpoints;
+    public List<RouteConfig> routes() {
+        return routes;
     }
 
     @Override
@@ -66,7 +66,7 @@ public final class TollgateConfig {
         return MoreObjects.toStringHelper(this)
                           .add("port", port)
                           .add("healthCheckPath", healthCheckPath)
-                          .add("endpoints", endpoints)
+                          .add("routes", routes)
                           .toString();
     }
 }

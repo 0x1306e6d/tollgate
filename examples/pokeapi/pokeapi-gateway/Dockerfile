@@ -3,10 +3,10 @@ FROM ghkim3221/tollgate-standalone
 ENV TOLLGATE_HOME "/opt/tollgate"
 
 RUN mkdir -p "$TOLLGATE_HOME"
-RUN mkdir -p "$TOLLGATE_HOME/endpoints"
+RUN mkdir -p "$TOLLGATE_HOME/routing"
 
 COPY *.conf "$TOLLGATE_HOME"
-COPY endpoints/*.conf "$TOLLGATE_HOME/endpoints/"
+COPY routing "$TOLLGATE_HOME/routing/"
 
 WORKDIR "$TOLLGATE_HOME"
 

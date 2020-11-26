@@ -34,20 +34,20 @@ import com.linecorp.armeria.common.HttpMethod;
 import dev.gihwan.tollgate.core.client.ServiceConfig;
 
 @SuppressWarnings("ConstantConditions")
-class EndpointConfigTest {
+class RouteConfigTest {
 
     @Test
     void of() {
-        assertThatThrownBy(() -> EndpointConfig.of(null, null, null))
+        assertThatThrownBy(() -> RouteConfig.of(null, null, null))
                 .isInstanceOf(NullPointerException.class);
-        assertThatThrownBy(() -> EndpointConfig.of(null, "/api", newUpstreamConfig()))
+        assertThatThrownBy(() -> RouteConfig.of(null, "/api", newUpstreamConfig()))
                 .isInstanceOf(NullPointerException.class);
-        assertThatThrownBy(() -> EndpointConfig.of(HttpMethod.GET, null, newUpstreamConfig()))
+        assertThatThrownBy(() -> RouteConfig.of(HttpMethod.GET, null, newUpstreamConfig()))
                 .isInstanceOf(NullPointerException.class);
-        assertThatThrownBy(() -> EndpointConfig.of(HttpMethod.GET, "/api", null))
+        assertThatThrownBy(() -> RouteConfig.of(HttpMethod.GET, "/api", null))
                 .isInstanceOf(NullPointerException.class);
 
-        final EndpointConfig config = EndpointConfig.of(HttpMethod.GET, "/api", newUpstreamConfig());
+        final RouteConfig config = RouteConfig.of(HttpMethod.GET, "/api", newUpstreamConfig());
         assertThat(config.method()).isEqualTo(HttpMethod.GET);
         assertThat(config.path()).isEqualTo("/api");
         assertThat(config.upstream()).isEqualTo(newUpstreamConfig());
@@ -56,13 +56,13 @@ class EndpointConfigTest {
     @SuppressWarnings("EqualsBetweenInconvertibleTypes")
     @Test
     void equals() {
-        final EndpointConfig config = EndpointConfig.of(HttpMethod.GET, "/api", newUpstreamConfig());
+        final RouteConfig config = RouteConfig.of(HttpMethod.GET, "/api", newUpstreamConfig());
 
-        final EndpointConfig same = EndpointConfig.of(HttpMethod.GET, "/api", newUpstreamConfig());
-        final EndpointConfig differentMethod = EndpointConfig.of(HttpMethod.POST, "/api", newUpstreamConfig());
-        final EndpointConfig differentPath = EndpointConfig.of(HttpMethod.GET, "/api/v1", newUpstreamConfig());
-        final EndpointConfig differentUpstream =
-                EndpointConfig.of(HttpMethod.GET, "/api", newUpstreamConfig("http://example.org"));
+        final RouteConfig same = RouteConfig.of(HttpMethod.GET, "/api", newUpstreamConfig());
+        final RouteConfig differentMethod = RouteConfig.of(HttpMethod.POST, "/api", newUpstreamConfig());
+        final RouteConfig differentPath = RouteConfig.of(HttpMethod.GET, "/api/v1", newUpstreamConfig());
+        final RouteConfig differentUpstream =
+                RouteConfig.of(HttpMethod.GET, "/api", newUpstreamConfig("http://example.org"));
 
         assertThat(config.equals(same)).isTrue();
         assertThat(config.equals(differentMethod)).isFalse();
