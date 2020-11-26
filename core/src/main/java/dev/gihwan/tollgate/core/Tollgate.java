@@ -83,20 +83,20 @@ public final class Tollgate {
         builder.serviceUnder("/docs", DocService.builder().build());
         builder.service(config.healthCheckPath(), HealthCheckService.of(healthChecker));
 
-        config.endpoints().forEach(endpointConfig -> {
-            logger.info("Registering endpoint {}.", endpointConfig);
+        config.routes().forEach(route -> {
+            logger.info("Registering route {}.", route);
 
-            HttpService upstreamService = UpstreamRegistry.instance().get(endpointConfig.upstream());
+            HttpService upstreamService = UpstreamRegistry.instance().get(route.upstream());
 
-            if (!Strings.isNullOrEmpty(endpointConfig.path())) {
-                final String pathPattern = endpointConfig.path();
+            if (!Strings.isNullOrEmpty(route.path())) {
+                final String pathPattern = route.path();
                 upstreamService = upstreamService.decorate(
                         RemappingRequestHeadersService.newDecorator(pathPattern));
             }
 
             builder.service(Route.builder()
-                                 .methods(endpointConfig.method())
-                                 .path(endpointConfig.path())
+                                 .methods(route.method())
+                                 .path(route.path())
                                  .build(),
                             upstreamService.decorate(LoggingService.newDecorator()));
         });

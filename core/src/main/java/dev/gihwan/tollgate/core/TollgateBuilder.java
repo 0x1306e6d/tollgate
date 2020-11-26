@@ -29,13 +29,13 @@ import static java.util.Objects.requireNonNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.gihwan.tollgate.core.server.EndpointConfig;
+import dev.gihwan.tollgate.core.server.RouteConfig;
 
 public final class TollgateBuilder {
 
     private int port = 8080;
     private String healthCheckPath = "/health";
-    private final List<EndpointConfig> endpoints = new ArrayList<>();
+    private final List<RouteConfig> routes = new ArrayList<>();
 
     TollgateBuilder() {}
 
@@ -50,9 +50,9 @@ public final class TollgateBuilder {
         return this;
     }
 
-    public TollgateBuilder endpoint(EndpointConfig endpoint) {
-        requireNonNull(endpoint, "endpoint");
-        endpoints.add(endpoint);
+    public TollgateBuilder route(RouteConfig route) {
+        requireNonNull(route, "route");
+        routes.add(route);
         return this;
     }
 
@@ -61,6 +61,6 @@ public final class TollgateBuilder {
     }
 
     private TollgateConfig buildConfig() {
-        return new TollgateConfig(port, healthCheckPath, endpoints);
+        return new TollgateConfig(port, healthCheckPath, routes);
     }
 }
