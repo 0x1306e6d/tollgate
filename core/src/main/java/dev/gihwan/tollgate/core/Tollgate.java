@@ -81,7 +81,10 @@ public final class Tollgate {
 
         builder.http(config.port());
         builder.serviceUnder("/docs", DocService.builder().build());
-        builder.service(config.healthCheckPath(), HealthCheckService.of(healthChecker));
+
+        if (!Strings.isNullOrEmpty(config.healthCheckPath())) {
+            builder.service(config.healthCheckPath(), HealthCheckService.of(healthChecker));
+        }
 
         config.routes().forEach(route -> {
             logger.info("Registering route {}.", route);
