@@ -42,7 +42,7 @@ import com.linecorp.armeria.server.healthcheck.SettableHealthChecker;
 import com.linecorp.armeria.server.logging.LoggingService;
 
 import dev.gihwan.tollgate.core.server.RemappingRequestHeadersService;
-import dev.gihwan.tollgate.core.server.UpstreamRegistry;
+import dev.gihwan.tollgate.core.server.UpstreamService;
 
 public final class Tollgate {
 
@@ -89,7 +89,7 @@ public final class Tollgate {
         config.routes().forEach(route -> {
             logger.info("Registering route {}.", route);
 
-            HttpService upstreamService = UpstreamRegistry.instance().get(route.upstream());
+            HttpService upstreamService = UpstreamService.of(route.upstream());
 
             if (!Strings.isNullOrEmpty(route.path())) {
                 final String pathPattern = route.path();
