@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 Gihwan Kim
+ * Copyright (c) 2020 - 2021 Gihwan Kim
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
  */
 
 plugins {
-    id("com.google.cloud.tools.jib") version "2.5.0" apply false
+    id("com.google.cloud.tools.jib") version "2.7.0" apply false
 }
 
 allprojects {

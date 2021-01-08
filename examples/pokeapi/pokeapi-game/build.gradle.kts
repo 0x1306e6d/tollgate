@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 Gihwan Kim
+ * Copyright (c) 2020 - 2021 Gihwan Kim
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@ plugins {
 }
 
 dependencies {
-    implementation("com.linecorp.armeria:armeria:1.1.0")
+    implementation("com.linecorp.armeria:armeria:1.3.0")
 
     implementation("org.slf4j:slf4j-api:1.7.30")
 

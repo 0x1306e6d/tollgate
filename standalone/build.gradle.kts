@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 Gihwan Kim
+ * Copyright (c) 2020 - 2021 Gihwan Kim
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ plugins {
 dependencies {
     implementation(project(":core"))
 
-    implementation("com.typesafe:config:1.4.0")
+    implementation("com.typesafe:config:1.4.1")
 
     implementation("com.google.code.findbugs:jsr305:3.0.2")
     implementation("org.slf4j:slf4j-api:1.7.30")
@@ -39,10 +39,10 @@ dependencies {
     runtimeOnly("ch.qos.logback:logback-classic:1.2.3")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
-    testImplementation("org.assertj:assertj-core:3.17.2")
-    testImplementation("org.mockito:mockito-core:3.5.13")
+    testImplementation("org.assertj:assertj-core:3.18.1")
+    testImplementation("org.mockito:mockito-core:3.7.0")
     testImplementation("org.awaitility:awaitility:4.0.3")
-    testImplementation("com.linecorp.armeria:armeria-junit5:1.1.0")
+    testImplementation("com.linecorp.armeria:armeria-junit5:1.3.0")
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.0")
 }
