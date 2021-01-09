@@ -22,25 +22,27 @@
  * SOFTWARE.
  */
 
+import dev.gihwan.tollgate.Dependency
+
 plugins {
     id("java-library")
 }
 
 dependencies {
-    api("com.linecorp.armeria:armeria:1.3.0")
-    implementation("com.google.guava:guava:30.1-jre")
-    implementation("com.google.code.findbugs:jsr305:3.0.2")
-    implementation("org.apache.commons:commons-lang3:3.11")
-    implementation("org.slf4j:slf4j-api:1.7.30")
+    api(Dependency.armeria)
+    implementation(Dependency.commonsLang3)
+    implementation(Dependency.guava)
+    implementation(Dependency.jsr305)
+    implementation(Dependency.slf4j)
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
-    testImplementation("org.assertj:assertj-core:3.18.1")
-    testImplementation("org.mockito:mockito-core:3.7.0")
-    testImplementation("org.awaitility:awaitility:4.0.3")
-    testImplementation("com.linecorp.armeria:armeria-junit5:1.3.0")
+    testImplementation(Dependency.junitApi)
+    testImplementation(Dependency.assertj)
+    testImplementation(Dependency.awaitility)
+    testImplementation(Dependency.mockito)
+    testImplementation(Dependency.armeriaJunit)
 
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.0")
-    testRuntimeOnly("ch.qos.logback:logback-classic:1.2.3")
+    testRuntimeOnly(Dependency.junitEngine)
+    testRuntimeOnly(Dependency.logback)
 }
 
 java {

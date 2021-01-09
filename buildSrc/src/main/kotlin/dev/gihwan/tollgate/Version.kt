@@ -22,29 +22,20 @@
  * SOFTWARE.
  */
 
-import dev.gihwan.tollgate.Dependency
+package dev.gihwan.tollgate
 
-plugins {
-    java
-    application
-    id("com.google.cloud.tools.jib")
-}
+object Version {
+    const val armeria = "1.3.0"
 
-dependencies {
-    implementation(Dependency.armeria)
+    const val commonsLang3 = "3.11"
+    const val config = "1.4.1"
+    const val guava = "30.1-jre"
+    const val jsr305 = "3.0.2"
+    const val logback = "1.2.3"
+    const val slf4j = "1.7.30"
 
-    implementation(Dependency.slf4j)
-
-    runtimeOnly(Dependency.logback)
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-
-jib {
-    to {
-        image = "pokeapi-item"
-    }
+    const val assertj = "3.18.1"
+    const val awaitility = "4.0.3"
+    const val junit = "5.7.0"
+    const val mockito = "3.7.0"
 }
