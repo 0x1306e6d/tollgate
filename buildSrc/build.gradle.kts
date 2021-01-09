@@ -22,29 +22,10 @@
  * SOFTWARE.
  */
 
-import dev.gihwan.tollgate.Dependency
-
 plugins {
-    java
-    application
-    id("com.google.cloud.tools.jib")
+    `kotlin-dsl`
 }
 
-dependencies {
-    implementation(Dependency.armeria)
-
-    implementation(Dependency.slf4j)
-
-    runtimeOnly(Dependency.logback)
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-
-jib {
-    to {
-        image = "pokeapi-item"
-    }
+repositories {
+    jcenter()
 }

@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+import dev.gihwan.tollgate.Dependency
+
 plugins {
     java
     application
@@ -29,11 +31,11 @@ plugins {
 }
 
 dependencies {
-    implementation("com.linecorp.armeria:armeria:1.3.0")
+    implementation(Dependency.armeria)
 
-    implementation("org.slf4j:slf4j-api:1.7.30")
+    implementation(Dependency.slf4j)
 
-    runtimeOnly("ch.qos.logback:logback-classic:1.2.3")
+    runtimeOnly(Dependency.logback)
 }
 
 java {

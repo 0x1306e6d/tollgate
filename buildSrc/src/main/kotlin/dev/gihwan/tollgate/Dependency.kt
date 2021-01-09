@@ -22,29 +22,22 @@
  * SOFTWARE.
  */
 
-import dev.gihwan.tollgate.Dependency
+package dev.gihwan.tollgate
 
-plugins {
-    java
-    application
-    id("com.google.cloud.tools.jib")
-}
+object Dependency {
+    const val armeria = "com.linecorp.armeria:armeria:${Version.armeria}"
+    const val armeriaJunit = "com.linecorp.armeria:armeria-junit5:${Version.armeria}"
 
-dependencies {
-    implementation(Dependency.armeria)
+    const val commonsLang3 = "org.apache.commons:commons-lang3:${Version.commonsLang3}"
+    const val config = "com.typesafe:config:${Version.config}"
+    const val guava = "com.google.guava:guava:${Version.guava}"
+    const val jsr305 = "com.google.code.findbugs:jsr305:${Version.jsr305}"
+    const val logback = "ch.qos.logback:logback-classic:${Version.logback}"
+    const val slf4j = "org.slf4j:slf4j-api:${Version.slf4j}"
 
-    implementation(Dependency.slf4j)
-
-    runtimeOnly(Dependency.logback)
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-
-jib {
-    to {
-        image = "pokeapi-item"
-    }
+    const val assertj = "org.assertj:assertj-core:${Version.assertj}"
+    const val awaitility = "org.awaitility:awaitility:${Version.awaitility}"
+    const val junitApi = "org.junit.jupiter:junit-jupiter-api:${Version.junit}"
+    const val junitEngine = "org.junit.jupiter:junit-jupiter-engine:${Version.junit}"
+    const val mockito = "org.mockito:mockito-core:${Version.mockito}"
 }

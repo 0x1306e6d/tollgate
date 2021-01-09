@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+import dev.gihwan.tollgate.Dependency
+
 plugins {
     java
     application
@@ -31,20 +33,19 @@ plugins {
 dependencies {
     implementation(project(":core"))
 
-    implementation("com.typesafe:config:1.4.1")
+    implementation(Dependency.config)
+    implementation(Dependency.jsr305)
+    implementation(Dependency.slf4j)
 
-    implementation("com.google.code.findbugs:jsr305:3.0.2")
-    implementation("org.slf4j:slf4j-api:1.7.30")
+    runtimeOnly(Dependency.logback)
 
-    runtimeOnly("ch.qos.logback:logback-classic:1.2.3")
+    testImplementation(Dependency.junitApi)
+    testImplementation(Dependency.assertj)
+    testImplementation(Dependency.awaitility)
+    testImplementation(Dependency.mockito)
+    testImplementation(Dependency.armeriaJunit)
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
-    testImplementation("org.assertj:assertj-core:3.18.1")
-    testImplementation("org.mockito:mockito-core:3.7.0")
-    testImplementation("org.awaitility:awaitility:4.0.3")
-    testImplementation("com.linecorp.armeria:armeria-junit5:1.3.0")
-
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.0")
+    testRuntimeOnly(Dependency.junitEngine)
 }
 
 java {
