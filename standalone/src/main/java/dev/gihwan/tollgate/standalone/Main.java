@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 Gihwan Kim
+ * Copyright (c) 2020 - 2021 Gihwan Kim
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,15 +39,15 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigObject;
 
+import com.linecorp.armeria.client.Endpoint;
+import com.linecorp.armeria.client.endpoint.EndpointGroup;
 import com.linecorp.armeria.common.HttpMethod;
 
 import dev.gihwan.tollgate.core.Tollgate;
 import dev.gihwan.tollgate.core.TollgateBuilder;
-import dev.gihwan.tollgate.core.client.Authority;
-import dev.gihwan.tollgate.core.client.ServiceConfig;
-import dev.gihwan.tollgate.core.server.RouteConfig;
-import dev.gihwan.tollgate.core.server.UpstreamConfig;
-import dev.gihwan.tollgate.core.server.UpstreamEndpointConfig;
+import dev.gihwan.tollgate.core.Upstream;
+import dev.gihwan.tollgate.core.UpstreamBuilder;
+import dev.gihwan.tollgate.core.remapping.RemappingRule;
 
 public final class Main {
 
@@ -66,8 +66,8 @@ public final class Main {
         logger.debug("Loaded configuration: {}", config);
 
         final TollgateBuilder builder = Tollgate.builder()
-                                                .port(config.getInt("tollgate.port"))
-                                                .healthCheckPath(config.getString("tollgate.healthCheckPath"));
+                                                .http(config.getInt("tollgate.port"))
+                                                .healthCheck(config.getString("tollgate.healthCheckPath"));
 
         final Set<String> routeNames = config.getObject("tollgate.routing").keySet();
         routeNames.stream()
@@ -84,37 +84,37 @@ public final class Main {
     }
 
     private void buildRoute(TollgateBuilder builder, Config routeConfig) {
-        final Config upstreamServiceConfig = routeConfig.getObject("upstream.service").toConfig();
-        final ServiceConfig service = buildService(upstreamServiceConfig);
-
-        final Config upstreamEndpointConfig = routeConfig.getObject("upstream.endpoint").toConfig();
-        final UpstreamEndpointConfig upstreamEndpoint = buildUpstreamEndpoint(upstreamEndpointConfig);
-
-        builder.route(RouteConfig.of(routeConfig.getEnum(HttpMethod.class, "method"),
-                                     routeConfig.getString("path"),
-                                     UpstreamConfig.of(service, upstreamEndpoint)));
+        builder.route()
+               .methods(routeConfig.getEnum(HttpMethod.class, "method"))
+               .path(routeConfig.getString("path"))
+               .build(buildUpstream(routeConfig.getObject("upstream").toConfig()));
     }
 
-    private ServiceConfig buildService(Config config) {
+    private Upstream buildUpstream(Config config) {
+        final UpstreamBuilder builder;
         if (config.hasPath("uri")) {
-            return ServiceConfig.of(config.getString("uri"));
+            builder = Upstream.builder(config.getString("uri"));
         } else {
-            List<Authority> authorities = config.getObjectList("authorities")
-                                                .stream()
-                                                .map(ConfigObject::toConfig)
-                                                .map(authorityConfig -> {
-                                                    final String host = authorityConfig.getString("host");
-                                                    final int port = authorityConfig.getInt("port");
-                                                    return Authority.of(host, port);
-                                                })
-                                                .collect(Collectors.toUnmodifiableList());
-            return ServiceConfig.of(config.getString("scheme"), authorities);
+            List<Endpoint> endpoints = config.getObjectList("endpoints")
+                                             .stream()
+                                             .map(ConfigObject::toConfig)
+                                             .map(authorityConfig -> {
+                                                 final String host = authorityConfig.getString("host");
+                                                 final int port = authorityConfig.getInt("port");
+                                                 return Endpoint.of(host, port);
+                                             })
+                                             .collect(Collectors.toUnmodifiableList());
+            builder = Upstream.builder(config.getString("scheme"), EndpointGroup.of(endpoints));
         }
-    }
 
-    private UpstreamEndpointConfig buildUpstreamEndpoint(Config config) {
-        return UpstreamEndpointConfig.of(config.getEnum(HttpMethod.class, "method"),
-                                         config.getString("path"));
+        if (config.hasPath("remapping")) {
+            final Config remappingConfig = config.getObject("remapping").toConfig();
+            if (remappingConfig.hasPath("path")) {
+                builder.remapping(RemappingRule.path(remappingConfig.getString("path")));
+            }
+        }
+
+        return builder.build();
     }
 
     private void stop() {

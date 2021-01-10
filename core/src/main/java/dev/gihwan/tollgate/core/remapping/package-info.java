@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 Gihwan Kim
+ * Copyright (c) 2020 - 2021 Gihwan Kim
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,20 +22,7 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.core.server;
+@NonNullByDefault
+package dev.gihwan.tollgate.core.remapping;
 
-import static java.util.Objects.requireNonNull;
-
-import com.linecorp.armeria.server.HttpService;
-
-import dev.gihwan.tollgate.core.client.UpstreamClient;
-import dev.gihwan.tollgate.core.client.UpstreamClientFactory;
-
-public interface UpstreamService extends HttpService {
-
-    static UpstreamService of(UpstreamConfig config) {
-        requireNonNull(config, "config");
-        final UpstreamClient upstreamClient = UpstreamClientFactory.instance().get(config.service());
-        return new DefaultUpstreamService(upstreamClient);
-    }
-}
+import dev.gihwan.tollgate.core.annotation.NonNullByDefault;

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 Gihwan Kim
+ * Copyright (c) 2020 - 2021 Gihwan Kim
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,23 @@
  * SOFTWARE.
  */
 
-@NonNullByDefault
-package dev.gihwan.tollgate.core.server;
+package dev.gihwan.tollgate.core;
 
-import dev.gihwan.tollgate.core.annotation.NonNullByDefault;
+import com.linecorp.armeria.common.HttpRequest;
+import com.linecorp.armeria.common.HttpResponse;
+import com.linecorp.armeria.server.HttpService;
+import com.linecorp.armeria.server.ServiceRequestContext;
+
+final class UpstreamHttpService implements HttpService {
+
+    private final Upstream upstream;
+
+    UpstreamHttpService(Upstream upstream) {
+        this.upstream = upstream;
+    }
+
+    @Override
+    public HttpResponse serve(ServiceRequestContext ctx, HttpRequest req) throws Exception {
+        return upstream.serve(ctx, req);
+    }
+}

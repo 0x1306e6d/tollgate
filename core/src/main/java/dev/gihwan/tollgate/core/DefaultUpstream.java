@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 Gihwan Kim
+ * Copyright (c) 2020 - 2021 Gihwan Kim
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,43 +22,47 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.core.server;
-
-import static dev.gihwan.tollgate.core.server.AttributeKeys.REQUEST_HEADERS;
-import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+package dev.gihwan.tollgate.core;
 
 import java.net.UnknownHostException;
 import java.util.concurrent.CompletableFuture;
 
+import javax.annotation.Nullable;
+
 import com.linecorp.armeria.client.UnprocessedRequestException;
+import com.linecorp.armeria.client.WebClient;
 import com.linecorp.armeria.common.AggregatedHttpRequest;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
-import com.linecorp.armeria.common.RequestHeaders;
 import com.linecorp.armeria.server.ServiceRequestContext;
 
-import dev.gihwan.tollgate.core.client.UpstreamClient;
+import dev.gihwan.tollgate.core.remapping.RemappingRule;
 
-final class DefaultUpstreamService implements UpstreamService {
+final class DefaultUpstream implements Upstream {
 
-    private final UpstreamClient client;
+    private final WebClient client;
+    @Nullable
+    private final RemappingRule remappingRule;
 
-    DefaultUpstreamService(UpstreamClient client) {
-        this.client = requireNonNull(client, "client");
+    DefaultUpstream(WebClient client, @Nullable RemappingRule remappingRule) {
+        this.client = client;
+        this.remappingRule = remappingRule;
     }
 
     @Override
-    public HttpResponse serve(ServiceRequestContext ctx, HttpRequest req) {
+    public HttpResponse serve(ServiceRequestContext ctx, HttpRequest req) throws Exception {
         return HttpResponse.from(req.aggregate()
                                     .thenApply(aggregated -> duplicateRequest(ctx, aggregated))
                                     .thenApply(this::sendRequest));
     }
 
     private HttpRequest duplicateRequest(ServiceRequestContext ctx, AggregatedHttpRequest req) {
-        final RequestHeaders requestHeaders = defaultIfNull(ctx.attr(REQUEST_HEADERS), req.headers());
-        return HttpRequest.of(requestHeaders, req.content(), req.trailers());
+        if (remappingRule == null) {
+            return HttpRequest.of(req.headers(), req.content(), req.trailers());
+        }
+
+        return remappingRule.remap(ctx, req.toHttpRequest());
     }
 
     private HttpResponse sendRequest(HttpRequest req) {

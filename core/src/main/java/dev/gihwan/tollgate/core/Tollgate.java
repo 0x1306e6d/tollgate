@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 Gihwan Kim
+ * Copyright (c) 2020 - 2021 Gihwan Kim
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,25 +24,10 @@
 
 package dev.gihwan.tollgate.core;
 
-import javax.annotation.Nullable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
-
-import com.linecorp.armeria.server.HttpService;
-import com.linecorp.armeria.server.Route;
 import com.linecorp.armeria.server.Server;
-import com.linecorp.armeria.server.ServerBuilder;
-import com.linecorp.armeria.server.docs.DocService;
-import com.linecorp.armeria.server.healthcheck.HealthCheckService;
-import com.linecorp.armeria.server.healthcheck.HealthChecker;
-import com.linecorp.armeria.server.healthcheck.SettableHealthChecker;
-import com.linecorp.armeria.server.logging.LoggingService;
-
-import dev.gihwan.tollgate.core.server.RemappingRequestHeadersService;
-import dev.gihwan.tollgate.core.server.UpstreamService;
 
 public final class Tollgate {
 
@@ -52,69 +37,19 @@ public final class Tollgate {
         return new TollgateBuilder();
     }
 
-    @Nullable
-    private Server server;
-    private final TollgateConfig config;
-    private final HealthChecker healthChecker;
+    private final Server server;
 
-    Tollgate(TollgateConfig config) {
-        this.config = config;
-        healthChecker = new SettableHealthChecker();
+    Tollgate(Server server) {
+        this.server = server;
     }
 
     public void start() {
-        server = startServer();
+        logger.info("Starting the Tollgate server.");
+        server.start().join();
+        logger.info("Started the Tollgate server at {}.", server.activePort());
     }
 
     public void stop() {
-        stopServer();
-    }
-
-    private Server startServer() {
-        if (server != null) {
-            throw new IllegalStateException("The Tollgate server is already started.");
-        }
-
-        logger.info("Starting the Tollgate server.");
-
-        final ServerBuilder builder = Server.builder();
-
-        builder.http(config.port());
-        builder.serviceUnder("/docs", DocService.builder().build());
-
-        if (!Strings.isNullOrEmpty(config.healthCheckPath())) {
-            builder.service(config.healthCheckPath(), HealthCheckService.of(healthChecker));
-        }
-
-        config.routes().forEach(route -> {
-            logger.info("Registering route {}.", route);
-
-            HttpService upstreamService = UpstreamService.of(route.upstream());
-
-            if (!Strings.isNullOrEmpty(route.path())) {
-                final String pathPattern = route.path();
-                upstreamService = upstreamService.decorate(
-                        RemappingRequestHeadersService.newDecorator(pathPattern));
-            }
-
-            builder.service(Route.builder()
-                                 .methods(route.method())
-                                 .path(route.path())
-                                 .build(),
-                            upstreamService.decorate(LoggingService.newDecorator()));
-        });
-
-        final Server server = builder.build();
-        server.start().join();
-        logger.info("Started the Tollgate server at {}.", server.activePort());
-        return server;
-    }
-
-    private void stopServer() {
-        if (server == null) {
-            return;
-        }
-
         logger.info("Stopping the Tollgate server.");
         server.stop().join();
         logger.info("Stopped the Tollgate server.");
