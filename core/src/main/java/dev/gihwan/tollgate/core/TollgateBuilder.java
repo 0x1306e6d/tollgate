@@ -24,43 +24,42 @@
 
 package dev.gihwan.tollgate.core;
 
-import static java.util.Objects.requireNonNull;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import dev.gihwan.tollgate.core.server.RouteConfig;
+import com.linecorp.armeria.server.Server;
+import com.linecorp.armeria.server.ServerBuilder;
+import com.linecorp.armeria.server.healthcheck.HealthCheckService;
 
 public final class TollgateBuilder {
 
-    private int port = 8080;
-    private String healthCheckPath = "/health";
-    private final List<RouteConfig> routes = new ArrayList<>();
+    private final ServerBuilder serverBuilder = Server.builder();
 
     TollgateBuilder() {}
 
-    public TollgateBuilder port(int port) {
-        this.port = port;
+    /**
+     * @see ServerBuilder#http(int)
+     */
+    public TollgateBuilder http(int port) {
+        serverBuilder.http(port);
         return this;
     }
 
-    public TollgateBuilder healthCheckPath(String healthCheckPath) {
-        requireNonNull(healthCheckPath, "healthCheckPath");
-        this.healthCheckPath = healthCheckPath;
+    public TollgateBuilder healthCheck(String healthCheckPath) {
+        return healthCheck(healthCheckPath, HealthCheckService.of());
+    }
+
+    public TollgateBuilder healthCheck(String healthCheckPath, HealthCheckService healthCheckService) {
+        serverBuilder.service(healthCheckPath, healthCheckService);
         return this;
     }
 
-    public TollgateBuilder route(RouteConfig route) {
-        requireNonNull(route, "route");
-        routes.add(route);
-        return this;
+    public UpstreamBindingBuilder route() {
+        return new UpstreamBindingBuilder(this, serverBuilder.route());
+    }
+
+    public TollgateBuilder upstream(String pathPattern, Upstream upstream) {
+        return route().path(pathPattern).build(upstream);
     }
 
     public Tollgate build() {
-        return new Tollgate(buildConfig());
-    }
-
-    private TollgateConfig buildConfig() {
-        return new TollgateConfig(port, healthCheckPath, routes);
+        return new Tollgate(serverBuilder.build());
     }
 }

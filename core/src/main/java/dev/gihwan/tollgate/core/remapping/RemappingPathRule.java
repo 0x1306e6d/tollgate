@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 Gihwan Kim
+ * Copyright (c) 2020 - 2021 Gihwan Kim
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,59 +22,37 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.core.server;
-
-import static dev.gihwan.tollgate.core.server.AttributeKeys.REQUEST_HEADERS;
-import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+package dev.gihwan.tollgate.core.remapping;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Splitter;
 
 import com.linecorp.armeria.common.HttpRequest;
-import com.linecorp.armeria.common.HttpResponse;
-import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.common.RequestHeaders;
-import com.linecorp.armeria.server.HttpService;
 import com.linecorp.armeria.server.ServiceRequestContext;
-import com.linecorp.armeria.server.SimpleDecoratingHttpService;
 
-public final class RemappingRequestHeadersService extends SimpleDecoratingHttpService {
-
-    private static final Logger logger = LoggerFactory.getLogger(RemappingRequestHeadersService.class);
+final class RemappingPathRule implements RemappingRule {
 
     private static final String PATH_SEPARATOR = "/";
     private static final Splitter PATH_SPLITTER = Splitter.on(PATH_SEPARATOR);
 
-    public static Function<? super HttpService, RemappingRequestHeadersService>
-    newDecorator(String pathPattern) {
-        requireNonNull(pathPattern, "pathPattern");
-        return delegate -> new RemappingRequestHeadersService(delegate, pathPattern);
-    }
-
     private final String pathPattern;
 
-    private RemappingRequestHeadersService(HttpService delegate, String pathPattern) {
-        super(delegate);
+    RemappingPathRule(String pathPattern) {
         this.pathPattern = pathPattern;
     }
 
     @Override
-    public HttpResponse serve(ServiceRequestContext ctx, HttpRequest req) throws Exception {
+    public HttpRequest remap(ServiceRequestContext ctx, HttpRequest req) {
         final List<String> segments = new ArrayList<>();
         for (String segment : PATH_SPLITTER.split(pathPattern)) {
             if (segment.startsWith("{") && segment.endsWith("}")) {
                 final String pathParamName = segment.substring(1, segment.length() - 1);
                 final String pathParamValue = ctx.pathParam(pathParamName);
                 if (pathParamValue == null) {
-                    logger.error("Path parameter {} is not found on path {}.", pathParamName, ctx.path());
-                    return HttpResponse.of(HttpStatus.INTERNAL_SERVER_ERROR);
+                    throw new IllegalStateException("pathParam " + pathParamName + " does not exist");
                 }
                 segments.add(pathParamValue);
             } else {
@@ -83,8 +61,7 @@ public final class RemappingRequestHeadersService extends SimpleDecoratingHttpSe
         }
 
         final String remappedPath = String.join(PATH_SEPARATOR, segments);
-        final RequestHeaders requestHeaders = defaultIfNull(ctx.attr(REQUEST_HEADERS), req.headers());
-        ctx.setAttr(REQUEST_HEADERS, requestHeaders.toBuilder().path(remappedPath).build());
-        return unwrap().serve(ctx, req);
+        final RequestHeaders headers = req.headers().toBuilder().path(remappedPath).build();
+        return req.withHeaders(headers);
     }
 }

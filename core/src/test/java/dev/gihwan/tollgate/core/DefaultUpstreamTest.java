@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 Gihwan Kim
+ * Copyright (c) 2020 - 2021 Gihwan Kim
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.core.server;
+package dev.gihwan.tollgate.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -43,10 +43,7 @@ import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.server.ServerBuilder;
 import com.linecorp.armeria.testing.junit5.server.ServerExtension;
 
-import dev.gihwan.tollgate.core.client.UpstreamClient;
-import dev.gihwan.tollgate.core.client.ServiceConfig;
-
-class DefaultUpstreamServiceTest {
+class DefaultUpstreamTest {
 
     private static final AtomicReference<AggregatedHttpRequest> reqCapture = new AtomicReference<>();
 
@@ -66,10 +63,8 @@ class DefaultUpstreamServiceTest {
     static final ServerExtension tollgateServer = new ServerExtension() {
         @Override
         protected void configure(ServerBuilder sb) {
-            final ServiceConfig serviceConfig = ServiceConfig.of(serviceServer.httpUri().toString());
-            final UpstreamClient client = UpstreamClient.of(serviceConfig);
-
-            sb.service("/foo", new DefaultUpstreamService(client));
+            final Upstream upstream = Upstream.of(serviceServer.httpUri());
+            sb.service("/foo", new UpstreamHttpService(upstream));
         }
     };
 
