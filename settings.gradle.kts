@@ -26,6 +26,7 @@ rootProject.name = "tollgate"
 
 include("core")
 include("standalone")
+include("util")
 
 include(":examples:pokeapi:pokeapi-berry")
 include(":examples:pokeapi:pokeapi-contest")

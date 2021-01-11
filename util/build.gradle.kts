@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 Gihwan Kim
+ * Copyright (c) 2020 - 2021 Gihwan Kim
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,26 +22,28 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.core.annotation;
+import dev.gihwan.tollgate.Dependency
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+plugins {
+    id("java-library")
+}
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.meta.TypeQualifierDefault;
+dependencies {
+    implementation(Dependency.jsr305)
 
-/**
- * Indicates the return values, parameters and fields are non-nullable by default. Annotate a package with
- * this annotation and annotate nullable return values, parameters and fields with {@link Nullable}.
- */
-@Nonnull
-@Documented
-@Target(ElementType.PACKAGE)
-@Retention(RetentionPolicy.RUNTIME)
-@TypeQualifierDefault({ ElementType.METHOD, ElementType.PARAMETER, ElementType.FIELD })
-public @interface NonNullByDefault {
+    testImplementation(Dependency.junitApi)
+    testImplementation(Dependency.assertj)
+    testImplementation(Dependency.awaitility)
+    testImplementation(Dependency.mockito)
+
+    testRuntimeOnly(Dependency.junitEngine)
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+tasks.test {
+    useJUnitPlatform()
 }

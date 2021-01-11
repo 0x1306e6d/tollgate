@@ -22,50 +22,26 @@
  * SOFTWARE.
  */
 
-import dev.gihwan.tollgate.Dependency
+package dev.gihwan.tollgate.util;
 
-plugins {
-    java
-    application
-    id("com.google.cloud.tools.jib")
-}
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-dependencies {
-    implementation(project(":core"))
-    implementation(project(":util"))
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.meta.TypeQualifierDefault;
 
-    implementation(Dependency.config)
-    implementation(Dependency.jsr305)
-    implementation(Dependency.slf4j)
-
-    runtimeOnly(Dependency.logback)
-
-    testImplementation(Dependency.junitApi)
-    testImplementation(Dependency.assertj)
-    testImplementation(Dependency.awaitility)
-    testImplementation(Dependency.mockito)
-    testImplementation(Dependency.armeriaJunit)
-
-    testRuntimeOnly(Dependency.junitEngine)
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
-
-jib {
-    from {
-        image = "openjdk:11-jre-slim"
-    }
-    to {
-        image = "ghkim3221/tollgate-standalone"
-    }
-    container {
-        ports = listOf("8080")
-    }
+/**
+ * Indicates the return values, parameters and fields are non-nullable by default. Annotate a package with
+ * this annotation and annotate nullable return values, parameters and fields with {@link Nullable}.
+ */
+@Nonnull
+@Documented
+@Target(ElementType.PACKAGE)
+@Retention(RetentionPolicy.RUNTIME)
+@TypeQualifierDefault({ ElementType.METHOD, ElementType.PARAMETER, ElementType.FIELD })
+public @interface NonNullByDefault {
 }
