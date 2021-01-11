@@ -25,4 +25,4 @@
 @NonNullByDefault
 package dev.gihwan.tollgate.core.remapping;
 
-import dev.gihwan.tollgate.core.annotation.NonNullByDefault;
+import dev.gihwan.tollgate.util.NonNullByDefault;

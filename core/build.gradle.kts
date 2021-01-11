@@ -29,6 +29,8 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":util"))
+
     api(Dependency.armeria)
     implementation(Dependency.commonsLang3)
     implementation(Dependency.guava)
