@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 Gihwan Kim
+ * Copyright (c) 2020 - 2021 Gihwan Kim
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,21 +22,27 @@
  * SOFTWARE.
  */
 
-rootProject.name = "tollgate"
+import dev.gihwan.tollgate.Dependency
 
-include("core")
-include("standalone")
-include("util")
+plugins {
+    java
+    application
+}
 
-include(":examples:helloworld")
-include(":examples:pokeapi:pokeapi-berry")
-include(":examples:pokeapi:pokeapi-contest")
-include(":examples:pokeapi:pokeapi-encounter")
-include(":examples:pokeapi:pokeapi-evolution")
-include(":examples:pokeapi:pokeapi-game")
-include(":examples:pokeapi:pokeapi-gateway")
-include(":examples:pokeapi:pokeapi-item")
-include(":examples:pokeapi:pokeapi-location")
-include(":examples:pokeapi:pokeapi-machine")
-include(":examples:pokeapi:pokeapi-move")
-include(":examples:pokeapi:pokeapi-pokemon")
+dependencies {
+    implementation(project(":core"))
+    implementation(project(":util"))
+
+    implementation(Dependency.slf4j)
+
+    runtimeOnly(Dependency.logback)
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
