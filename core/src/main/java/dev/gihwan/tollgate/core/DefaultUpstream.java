@@ -24,7 +24,6 @@
 
 package dev.gihwan.tollgate.core;
 
-import java.net.UnknownHostException;
 import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
@@ -82,11 +81,7 @@ final class DefaultUpstream implements Upstream {
 
     private void resolveException(CompletableFuture<HttpResponse> responseFuture, Throwable t) {
         if (t instanceof UnprocessedRequestException) {
-            resolveException(responseFuture, ((UnprocessedRequestException) t).getCause());
-            return;
-        }
-        if (t instanceof UnknownHostException) {
-            responseFuture.complete(HttpResponse.of(HttpStatus.BAD_GATEWAY));
+            responseFuture.complete(HttpResponse.of(HttpStatus.SERVICE_UNAVAILABLE));
             return;
         }
         responseFuture.completeExceptionally(t);

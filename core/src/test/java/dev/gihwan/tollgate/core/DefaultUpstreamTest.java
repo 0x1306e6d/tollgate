@@ -25,8 +25,11 @@
 package dev.gihwan.tollgate.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.awaitility.Awaitility.await;
 
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
@@ -34,6 +37,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import com.linecorp.armeria.client.Endpoint;
 import com.linecorp.armeria.client.WebClient;
 import com.linecorp.armeria.common.AggregatedHttpRequest;
 import com.linecorp.armeria.common.AggregatedHttpResponse;
@@ -63,8 +67,17 @@ class DefaultUpstreamTest {
     static final ServerExtension tollgateServer = new ServerExtension() {
         @Override
         protected void configure(ServerBuilder sb) {
-            final Upstream upstream = Upstream.of(serviceServer.httpUri());
-            sb.service("/foo", new UpstreamHttpService(upstream));
+            final int unusedPort;
+            try (ServerSocket ss = new ServerSocket(0)) {
+                unusedPort = ss.getLocalPort();
+            } catch (IOException e) {
+                fail(e.getMessage());
+                return;
+            }
+
+            sb.service("/foo", new UpstreamHttpService(Upstream.of(serviceServer.httpUri())));
+            sb.service("/refused",
+                       new UpstreamHttpService(Upstream.of("http", Endpoint.of("127.0.0.1", unusedPort))));
         }
     };
 
@@ -97,5 +110,13 @@ class DefaultUpstreamTest {
         assertThat(req.method()).isEqualTo(HttpMethod.POST);
         assertThat(req.path()).isEqualTo("/foo");
         assertThat(req.contentUtf8()).isEqualTo("qux");
+    }
+
+    @Test
+    void respondServiceUnavailableWhenUnProcessedRequestException() {
+        final WebClient webClient = WebClient.builder(tollgateServer.httpUri()).build();
+
+        final AggregatedHttpResponse res = webClient.get("/refused").aggregate().join();
+        assertThat(res.status()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
     }
 }
