@@ -24,10 +24,17 @@
 
 package dev.gihwan.tollgate.core;
 
+import java.net.InetSocketAddress;
+import java.util.Map;
+
+import javax.annotation.Nullable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.linecorp.armeria.common.SessionProtocol;
 import com.linecorp.armeria.server.Server;
+import com.linecorp.armeria.server.ServerPort;
 
 public final class Tollgate {
 
@@ -43,10 +50,47 @@ public final class Tollgate {
         this.server = server;
     }
 
+    /**
+     * @see Server#activePorts()
+     */
+    public Map<InetSocketAddress, ServerPort> activePorts() {
+        return server.activePorts();
+    }
+
+    /**
+     * @see Server#activePort()
+     */
+    @Nullable
+    public ServerPort activePort() {
+        return server.activePort();
+    }
+
+    /**
+     * @see Server#activePort(SessionProtocol)
+     */
+    @Nullable
+    public ServerPort activePort(SessionProtocol protocol) {
+        return server.activePort(protocol);
+    }
+
+    /**
+     * @see Server#activeLocalPort()
+     */
+    public int activeLocalPort() {
+        return server.activeLocalPort();
+    }
+
+    /**
+     * @see Server#activeLocalPort(SessionProtocol)
+     */
+    public int activeLocalPort(SessionProtocol protocol) {
+        return server.activeLocalPort(protocol);
+    }
+
     public void start() {
         logger.info("Starting the Tollgate server.");
         server.start().join();
-        logger.info("Started the Tollgate server at {}.", server.activePort());
+        logger.info("Started the Tollgate server at {}.", activePorts());
     }
 
     public void stop() {
