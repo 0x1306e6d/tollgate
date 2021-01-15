@@ -53,6 +53,6 @@ public final class HelloWorldGateway {
         }));
 
         tollgate.start();
-        logger.info("Started helloworld gateway.");
+        logger.info("Started helloworld gateway at {}.", tollgate.activePort());
     }
 }
