@@ -25,7 +25,6 @@
 import dev.gihwan.tollgate.Dependency
 
 plugins {
-    java
     id("java-library")
 }
 

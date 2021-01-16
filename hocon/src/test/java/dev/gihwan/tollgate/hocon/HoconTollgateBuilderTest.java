@@ -48,10 +48,7 @@ class HoconTollgateBuilderTest {
     static final ServerExtension serviceServer = new ServerExtension() {
         @Override
         protected void configure(ServerBuilder sb) {
-            sb.service("/foo",
-                       (ctx, req) -> HttpResponse.from(req.aggregate().thenApply(aggregated -> {
-                           return HttpResponse.of("bar");
-                       })));
+            sb.service("/foo", (ctx, req) -> HttpResponse.of("bar"));
         }
     };
 
