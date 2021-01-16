@@ -30,12 +30,12 @@ import com.linecorp.armeria.common.HttpMethod;
 import com.linecorp.armeria.common.MediaType;
 import com.linecorp.armeria.server.ServiceBindingBuilder;
 
-public final class UpstreamBindingBuilder {
+public abstract class UpstreamBindingBuilder<T extends TollgateBuilder> {
 
-    private final TollgateBuilder tollgateBuilder;
+    private final T tollgateBuilder;
     private final ServiceBindingBuilder serviceBindingBuilder;
 
-    UpstreamBindingBuilder(TollgateBuilder tollgateBuilder, ServiceBindingBuilder serviceBindingBuilder) {
+    protected UpstreamBindingBuilder(T tollgateBuilder, ServiceBindingBuilder serviceBindingBuilder) {
         this.tollgateBuilder = tollgateBuilder;
         this.serviceBindingBuilder = serviceBindingBuilder;
     }
@@ -43,7 +43,7 @@ public final class UpstreamBindingBuilder {
     /**
      * @see ServiceBindingBuilder#path(String)
      */
-    public UpstreamBindingBuilder path(String pathPattern) {
+    public UpstreamBindingBuilder<T> path(String pathPattern) {
         serviceBindingBuilder.path(pathPattern);
         return this;
     }
@@ -51,7 +51,7 @@ public final class UpstreamBindingBuilder {
     /**
      * @see ServiceBindingBuilder#pathPrefix(String)
      */
-    public UpstreamBindingBuilder pathPrefix(String prefix) {
+    public UpstreamBindingBuilder<T> pathPrefix(String prefix) {
         serviceBindingBuilder.pathPrefix(prefix);
         return this;
     }
@@ -59,7 +59,7 @@ public final class UpstreamBindingBuilder {
     /**
      * @see ServiceBindingBuilder#methods(HttpMethod...)
      */
-    public UpstreamBindingBuilder methods(HttpMethod... methods) {
+    public UpstreamBindingBuilder<T> methods(HttpMethod... methods) {
         serviceBindingBuilder.methods(methods);
         return this;
     }
@@ -67,7 +67,7 @@ public final class UpstreamBindingBuilder {
     /**
      * @see ServiceBindingBuilder#methods(Iterable)
      */
-    public UpstreamBindingBuilder methods(Iterable<HttpMethod> methods) {
+    public UpstreamBindingBuilder<T> methods(Iterable<HttpMethod> methods) {
         serviceBindingBuilder.methods(methods);
         return this;
     }
@@ -75,7 +75,7 @@ public final class UpstreamBindingBuilder {
     /**
      * @see ServiceBindingBuilder#get(String)
      */
-    public UpstreamBindingBuilder get(String pathPattern) {
+    public UpstreamBindingBuilder<T> get(String pathPattern) {
         serviceBindingBuilder.get(pathPattern);
         return this;
     }
@@ -83,7 +83,7 @@ public final class UpstreamBindingBuilder {
     /**
      * @see ServiceBindingBuilder#post(String)
      */
-    public UpstreamBindingBuilder post(String pathPattern) {
+    public UpstreamBindingBuilder<T> post(String pathPattern) {
         serviceBindingBuilder.post(pathPattern);
         return this;
     }
@@ -91,7 +91,7 @@ public final class UpstreamBindingBuilder {
     /**
      * @see ServiceBindingBuilder#put(String)
      */
-    public UpstreamBindingBuilder put(String pathPattern) {
+    public UpstreamBindingBuilder<T> put(String pathPattern) {
         serviceBindingBuilder.put(pathPattern);
         return this;
     }
@@ -99,7 +99,7 @@ public final class UpstreamBindingBuilder {
     /**
      * @see ServiceBindingBuilder#patch(String)
      */
-    public UpstreamBindingBuilder patch(String pathPattern) {
+    public UpstreamBindingBuilder<T> patch(String pathPattern) {
         serviceBindingBuilder.patch(pathPattern);
         return this;
     }
@@ -107,7 +107,7 @@ public final class UpstreamBindingBuilder {
     /**
      * @see ServiceBindingBuilder#delete(String)
      */
-    public UpstreamBindingBuilder delete(String pathPattern) {
+    public UpstreamBindingBuilder<T> delete(String pathPattern) {
         serviceBindingBuilder.delete(pathPattern);
         return this;
     }
@@ -115,7 +115,7 @@ public final class UpstreamBindingBuilder {
     /**
      * @see ServiceBindingBuilder#options(String)
      */
-    public UpstreamBindingBuilder options(String pathPattern) {
+    public UpstreamBindingBuilder<T> options(String pathPattern) {
         serviceBindingBuilder.options(pathPattern);
         return this;
     }
@@ -123,7 +123,7 @@ public final class UpstreamBindingBuilder {
     /**
      * @see ServiceBindingBuilder#head(String)
      */
-    public UpstreamBindingBuilder head(String pathPattern) {
+    public UpstreamBindingBuilder<T> head(String pathPattern) {
         serviceBindingBuilder.head(pathPattern);
         return this;
     }
@@ -131,7 +131,7 @@ public final class UpstreamBindingBuilder {
     /**
      * @see ServiceBindingBuilder#trace(String)
      */
-    public UpstreamBindingBuilder trace(String pathPattern) {
+    public UpstreamBindingBuilder<T> trace(String pathPattern) {
         serviceBindingBuilder.trace(pathPattern);
         return this;
     }
@@ -139,7 +139,7 @@ public final class UpstreamBindingBuilder {
     /**
      * @see ServiceBindingBuilder#connect(String)
      */
-    public UpstreamBindingBuilder connect(String pathPattern) {
+    public UpstreamBindingBuilder<T> connect(String pathPattern) {
         serviceBindingBuilder.connect(pathPattern);
         return this;
     }
@@ -147,7 +147,7 @@ public final class UpstreamBindingBuilder {
     /**
      * @see ServiceBindingBuilder#consumes(MediaType...)
      */
-    public UpstreamBindingBuilder consumes(MediaType... consumeTypes) {
+    public UpstreamBindingBuilder<T> consumes(MediaType... consumeTypes) {
         serviceBindingBuilder.consumes(consumeTypes);
         return this;
     }
@@ -155,7 +155,7 @@ public final class UpstreamBindingBuilder {
     /**
      * @see ServiceBindingBuilder#consumes(Iterable)
      */
-    public UpstreamBindingBuilder consumes(Iterable<MediaType> consumeTypes) {
+    public UpstreamBindingBuilder<T> consumes(Iterable<MediaType> consumeTypes) {
         serviceBindingBuilder.consumes(consumeTypes);
         return this;
     }
@@ -163,7 +163,7 @@ public final class UpstreamBindingBuilder {
     /**
      * @see ServiceBindingBuilder#produces(MediaType...)
      */
-    public UpstreamBindingBuilder produces(MediaType... produceTypes) {
+    public UpstreamBindingBuilder<T> produces(MediaType... produceTypes) {
         serviceBindingBuilder.produces(produceTypes);
         return this;
     }
@@ -171,7 +171,7 @@ public final class UpstreamBindingBuilder {
     /**
      * @see ServiceBindingBuilder#produces(Iterable)
      */
-    public UpstreamBindingBuilder produces(Iterable<MediaType> produceTypes) {
+    public UpstreamBindingBuilder<T> produces(Iterable<MediaType> produceTypes) {
         serviceBindingBuilder.produces(produceTypes);
         return this;
     }
@@ -179,7 +179,7 @@ public final class UpstreamBindingBuilder {
     /**
      * @see ServiceBindingBuilder#matchesParams(String...)
      */
-    public UpstreamBindingBuilder matchesParams(String... paramPredicates) {
+    public UpstreamBindingBuilder<T> matchesParams(String... paramPredicates) {
         serviceBindingBuilder.matchesParams(paramPredicates);
         return this;
     }
@@ -187,7 +187,7 @@ public final class UpstreamBindingBuilder {
     /**
      * @see ServiceBindingBuilder#matchesParams(Iterable)
      */
-    public UpstreamBindingBuilder matchesParams(Iterable<String> paramPredicates) {
+    public UpstreamBindingBuilder<T> matchesParams(Iterable<String> paramPredicates) {
         serviceBindingBuilder.matchesParams(paramPredicates);
         return this;
     }
@@ -195,7 +195,8 @@ public final class UpstreamBindingBuilder {
     /**
      * @see ServiceBindingBuilder#matchesParams(String, Predicate)
      */
-    public UpstreamBindingBuilder matchesParams(String paramName, Predicate<? super String> valuePredicate) {
+    public UpstreamBindingBuilder<T> matchesParams(String paramName,
+                                                   Predicate<? super String> valuePredicate) {
         serviceBindingBuilder.matchesParams(paramName, valuePredicate);
         return this;
     }
@@ -203,7 +204,7 @@ public final class UpstreamBindingBuilder {
     /**
      * @see ServiceBindingBuilder#matchesHeaders(String...)
      */
-    public UpstreamBindingBuilder matchesHeaders(String... headerPredicates) {
+    public UpstreamBindingBuilder<T> matchesHeaders(String... headerPredicates) {
         serviceBindingBuilder.matchesHeaders(headerPredicates);
         return this;
     }
@@ -211,7 +212,7 @@ public final class UpstreamBindingBuilder {
     /**
      * @see ServiceBindingBuilder#matchesHeaders(Iterable)
      */
-    public UpstreamBindingBuilder matchesHeaders(Iterable<String> headerPredicates) {
+    public UpstreamBindingBuilder<T> matchesHeaders(Iterable<String> headerPredicates) {
         serviceBindingBuilder.matchesHeaders(headerPredicates);
         return this;
     }
@@ -219,13 +220,13 @@ public final class UpstreamBindingBuilder {
     /**
      * @see ServiceBindingBuilder#matchesHeaders(CharSequence, Predicate)
      */
-    public UpstreamBindingBuilder matchesHeaders(CharSequence headerName,
-                                                 Predicate<? super String> valuePredicate) {
+    public UpstreamBindingBuilder<T> matchesHeaders(CharSequence headerName,
+                                                    Predicate<? super String> valuePredicate) {
         serviceBindingBuilder.matchesHeaders(headerName, valuePredicate);
         return this;
     }
 
-    public TollgateBuilder build(Upstream upstream) {
+    public final T build(Upstream upstream) {
         serviceBindingBuilder.build(new UpstreamHttpService(upstream));
         return tollgateBuilder;
     }

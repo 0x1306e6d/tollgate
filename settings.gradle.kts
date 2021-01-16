@@ -25,6 +25,7 @@
 rootProject.name = "tollgate"
 
 include("core")
+include("hocon")
 include("standalone")
 include("util")
 

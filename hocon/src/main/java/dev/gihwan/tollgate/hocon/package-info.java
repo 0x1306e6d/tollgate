@@ -22,50 +22,7 @@
  * SOFTWARE.
  */
 
-import dev.gihwan.tollgate.Dependency
+@NonNullByDefault
+package dev.gihwan.tollgate.hocon;
 
-plugins {
-    java
-    application
-    id("com.google.cloud.tools.jib")
-}
-
-dependencies {
-    implementation(project(":util"))
-    implementation(project(":core"))
-    implementation(project(":hocon"))
-
-    implementation(Dependency.jsr305)
-    implementation(Dependency.slf4j)
-
-    runtimeOnly(Dependency.logback)
-
-    testImplementation(Dependency.junitApi)
-    testImplementation(Dependency.assertj)
-    testImplementation(Dependency.awaitility)
-    testImplementation(Dependency.mockito)
-    testImplementation(Dependency.armeriaJunit)
-
-    testRuntimeOnly(Dependency.junitEngine)
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
-
-jib {
-    from {
-        image = "openjdk:11-jre-slim"
-    }
-    to {
-        image = "ghkim3221/tollgate-standalone"
-    }
-    container {
-        ports = listOf("8080")
-    }
-}
+import dev.gihwan.tollgate.util.NonNullByDefault;

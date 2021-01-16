@@ -40,8 +40,8 @@ public final class Tollgate {
 
     private static final Logger logger = LoggerFactory.getLogger(Tollgate.class);
 
-    public static TollgateBuilder builder() {
-        return new TollgateBuilder();
+    public static DefaultTollgateBuilder builder() {
+        return new DefaultTollgateBuilder();
     }
 
     private final Server server;

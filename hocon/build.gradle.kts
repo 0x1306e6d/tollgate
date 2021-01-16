@@ -26,19 +26,15 @@ import dev.gihwan.tollgate.Dependency
 
 plugins {
     java
-    application
-    id("com.google.cloud.tools.jib")
+    id("java-library")
 }
 
 dependencies {
+    api(project(":core"))
     implementation(project(":util"))
-    implementation(project(":core"))
-    implementation(project(":hocon"))
 
-    implementation(Dependency.jsr305)
-    implementation(Dependency.slf4j)
-
-    runtimeOnly(Dependency.logback)
+    api(Dependency.config)
+    implementation(Dependency.guava)
 
     testImplementation(Dependency.junitApi)
     testImplementation(Dependency.assertj)
@@ -56,16 +52,4 @@ java {
 
 tasks.test {
     useJUnitPlatform()
-}
-
-jib {
-    from {
-        image = "openjdk:11-jre-slim"
-    }
-    to {
-        image = "ghkim3221/tollgate-standalone"
-    }
-    container {
-        ports = listOf("8080")
-    }
 }
