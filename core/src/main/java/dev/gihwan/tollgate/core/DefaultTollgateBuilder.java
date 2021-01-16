@@ -22,50 +22,36 @@
  * SOFTWARE.
  */
 
-import dev.gihwan.tollgate.Dependency
+package dev.gihwan.tollgate.core;
 
-plugins {
-    java
-    application
-    id("com.google.cloud.tools.jib")
-}
+import com.linecorp.armeria.server.healthcheck.HealthCheckService;
 
-dependencies {
-    implementation(project(":util"))
-    implementation(project(":core"))
-    implementation(project(":hocon"))
+public final class DefaultTollgateBuilder extends TollgateBuilder {
 
-    implementation(Dependency.jsr305)
-    implementation(Dependency.slf4j)
+    DefaultTollgateBuilder() {}
 
-    runtimeOnly(Dependency.logback)
-
-    testImplementation(Dependency.junitApi)
-    testImplementation(Dependency.assertj)
-    testImplementation(Dependency.awaitility)
-    testImplementation(Dependency.mockito)
-    testImplementation(Dependency.armeriaJunit)
-
-    testRuntimeOnly(Dependency.junitEngine)
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
-
-jib {
-    from {
-        image = "openjdk:11-jre-slim"
+    @Override
+    public DefaultTollgateBuilder http(int port) {
+        return (DefaultTollgateBuilder) super.http(port);
     }
-    to {
-        image = "ghkim3221/tollgate-standalone"
+
+    @Override
+    public DefaultTollgateBuilder healthCheck(String healthCheckPath) {
+        return (DefaultTollgateBuilder) super.healthCheck(healthCheckPath);
     }
-    container {
-        ports = listOf("8080")
+
+    @Override
+    public DefaultTollgateBuilder healthCheck(String healthCheckPath, HealthCheckService healthCheckService) {
+        return (DefaultTollgateBuilder) super.healthCheck(healthCheckPath, healthCheckService);
+    }
+
+    @Override
+    public DefaultUpstreamBindingBuilder route() {
+        return new DefaultUpstreamBindingBuilder(this, serverRoute());
+    }
+
+    @Override
+    public DefaultTollgateBuilder upstream(String pathPattern, Upstream upstream) {
+        return (DefaultTollgateBuilder) super.upstream(pathPattern, upstream);
     }
 }
