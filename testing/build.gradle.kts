@@ -29,22 +29,15 @@ plugins {
 }
 
 dependencies {
+    api(project(":core"))
+    api(Dependency.jsr305)
     implementation(project(":util"))
-
-    api(Dependency.armeria)
-    implementation(Dependency.commonsLang3)
     implementation(Dependency.guava)
-    implementation(Dependency.jsr305)
-    implementation(Dependency.slf4j)
 
-    testImplementation(project(":junit5"))
+    testImplementation(Dependency.junitApi)
     testImplementation(Dependency.assertj)
-    testImplementation(Dependency.awaitility)
-    testImplementation(Dependency.mockito)
-    testImplementation(Dependency.armeriaJunit)
 
     testRuntimeOnly(Dependency.junitEngine)
-    testRuntimeOnly(Dependency.logback)
 }
 
 java {

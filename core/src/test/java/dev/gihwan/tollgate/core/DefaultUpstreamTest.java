@@ -24,6 +24,7 @@
 
 package dev.gihwan.tollgate.core;
 
+import static dev.gihwan.tollgate.testing.TestingTollgate.withTestingTollgate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.awaitility.Awaitility.await;
@@ -47,6 +48,9 @@ import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.server.ServerBuilder;
 import com.linecorp.armeria.testing.junit5.server.ServerExtension;
 
+import dev.gihwan.tollgate.junit5.TollgateExtension;
+import dev.gihwan.tollgate.testing.TestingTollgate;
+
 class DefaultUpstreamTest {
 
     private static final AtomicReference<AggregatedHttpRequest> reqCapture = new AtomicReference<>();
@@ -64,26 +68,16 @@ class DefaultUpstreamTest {
     };
 
     @RegisterExtension
-    static final ServerExtension tollgateServer = new ServerExtension() {
+    static final TollgateExtension tollgate = new TollgateExtension() {
         @Override
-        protected void configure(ServerBuilder sb) {
-            final int unusedPort;
-            try (ServerSocket ss = new ServerSocket(0)) {
-                unusedPort = ss.getLocalPort();
-            } catch (IOException e) {
-                fail(e.getMessage());
-                return;
-            }
-
-            sb.service("/foo", new UpstreamHttpService(Upstream.of(serviceServer.httpUri())));
-            sb.service("/refused",
-                       new UpstreamHttpService(Upstream.of("http", Endpoint.of("127.0.0.1", unusedPort))));
+        protected void configure(TollgateBuilder builder) {
+            builder.upstream("/foo", Upstream.of(serviceServer.httpUri()));
         }
     };
 
     @Test
     void proxy() {
-        final WebClient webClient = WebClient.builder(tollgateServer.httpUri()).build();
+        final WebClient webClient = WebClient.builder(tollgate.httpUri()).build();
 
         final CompletableFuture<AggregatedHttpResponse> future = webClient.get("/foo").aggregate();
         await().atMost(Duration.ofSeconds(1)).until(future::isDone);
@@ -98,7 +92,7 @@ class DefaultUpstreamTest {
 
     @Test
     void proxyWithBody() {
-        final WebClient webClient = WebClient.builder(tollgateServer.httpUri()).build();
+        final WebClient webClient = WebClient.builder(tollgate.httpUri()).build();
 
         final CompletableFuture<AggregatedHttpResponse> future = webClient.post("/foo", "qux").aggregate();
         await().atMost(Duration.ofSeconds(1)).until(future::isDone);
@@ -114,9 +108,21 @@ class DefaultUpstreamTest {
 
     @Test
     void respondServiceUnavailableWhenUnProcessedRequestException() {
-        final WebClient webClient = WebClient.builder(tollgateServer.httpUri()).build();
+        try (TestingTollgate tollgate = withTestingTollgate(builder -> {
+            final int unusedPort;
+            try (ServerSocket ss = new ServerSocket(0)) {
+                unusedPort = ss.getLocalPort();
+            } catch (IOException e) {
+                fail(e.getMessage());
+                return;
+            }
 
-        final AggregatedHttpResponse res = webClient.get("/refused").aggregate().join();
-        assertThat(res.status()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+            builder.upstream("/refused", Upstream.of("http", Endpoint.of("127.0.0.1", unusedPort)));
+        })) {
+            final WebClient webClient = WebClient.builder(tollgate.httpUri()).build();
+
+            final AggregatedHttpResponse res = webClient.get("/refused").aggregate().join();
+            assertThat(res.status()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+        }
     }
 }
