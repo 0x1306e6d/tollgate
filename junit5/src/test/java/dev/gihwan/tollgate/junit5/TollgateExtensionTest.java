@@ -22,36 +22,43 @@
  * SOFTWARE.
  */
 
-import dev.gihwan.tollgate.Dependency
+package dev.gihwan.tollgate.junit5;
 
-plugins {
-    id("java-library")
-}
+import static org.assertj.core.api.Assertions.assertThat;
 
-dependencies {
-    implementation(project(":util"))
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-    api(Dependency.armeria)
-    implementation(Dependency.commonsLang3)
-    implementation(Dependency.guava)
-    implementation(Dependency.jsr305)
-    implementation(Dependency.slf4j)
+import com.linecorp.armeria.client.WebClient;
+import com.linecorp.armeria.common.AggregatedHttpResponse;
+import com.linecorp.armeria.common.HttpStatus;
 
-    testImplementation(project(":junit5"))
-    testImplementation(Dependency.assertj)
-    testImplementation(Dependency.awaitility)
-    testImplementation(Dependency.mockito)
-    testImplementation(Dependency.armeriaJunit)
+import dev.gihwan.tollgate.core.TollgateBuilder;
 
-    testRuntimeOnly(Dependency.junitEngine)
-    testRuntimeOnly(Dependency.logback)
-}
+class TollgateExtensionTest {
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
+    @RegisterExtension
+    static TollgateExtension tollgate = new TollgateExtension() {
+        @Override
+        public void configure(TollgateBuilder builder) {
+            builder.healthCheck("/health");
+        }
+    };
 
-tasks.test {
-    useJUnitPlatform()
+    @Test
+    void port() {
+        assertThat(tollgate.httpPort()).isPositive();
+    }
+
+    @Test
+    void uri() {
+        assertThat(tollgate.httpUri()).isNotNull();
+    }
+
+    @Test
+    void healthCheck() {
+        final WebClient webClient = WebClient.of(tollgate.httpUri());
+        final AggregatedHttpResponse res = webClient.get("/health").aggregate().join();
+        assertThat(res.status()).isEqualTo(HttpStatus.OK);
+    }
 }

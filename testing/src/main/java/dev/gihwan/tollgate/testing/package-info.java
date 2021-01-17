@@ -22,36 +22,7 @@
  * SOFTWARE.
  */
 
-import dev.gihwan.tollgate.Dependency
+@NonNullByDefault
+package dev.gihwan.tollgate.testing;
 
-plugins {
-    id("java-library")
-}
-
-dependencies {
-    implementation(project(":util"))
-
-    api(Dependency.armeria)
-    implementation(Dependency.commonsLang3)
-    implementation(Dependency.guava)
-    implementation(Dependency.jsr305)
-    implementation(Dependency.slf4j)
-
-    testImplementation(project(":junit5"))
-    testImplementation(Dependency.assertj)
-    testImplementation(Dependency.awaitility)
-    testImplementation(Dependency.mockito)
-    testImplementation(Dependency.armeriaJunit)
-
-    testRuntimeOnly(Dependency.junitEngine)
-    testRuntimeOnly(Dependency.logback)
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
+import dev.gihwan.tollgate.util.NonNullByDefault;
