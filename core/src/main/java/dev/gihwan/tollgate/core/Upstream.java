@@ -83,8 +83,7 @@ public interface Upstream extends Service<HttpRequest, HttpResponse> {
     @CheckReturnValue
     HttpResponse serve(ServiceRequestContext ctx, HttpRequest req) throws Exception;
 
-    default <T extends Service<Req, Res>, Req extends HttpRequest, Res extends HttpResponse> T decorate(
-            Function<? super Upstream, T> decorator) {
+    default <T extends Upstream> T decorate(Function<? super Upstream, T> decorator) {
         final T newUpstream = decorator.apply(this);
 
         if (newUpstream == null) {
