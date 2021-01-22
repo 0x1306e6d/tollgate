@@ -30,7 +30,7 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":core"))
+    implementation(project(":gateway"))
     implementation(project(":util"))
 
     implementation(Dependency.slf4j)

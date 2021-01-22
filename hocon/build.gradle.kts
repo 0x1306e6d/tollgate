@@ -29,7 +29,7 @@ plugins {
 }
 
 dependencies {
-    api(project(":core"))
+    api(project(":gateway"))
     implementation(project(":util"))
 
     api(Dependency.config)
