@@ -30,11 +30,11 @@ import com.linecorp.armeria.common.HttpMethod;
 import com.linecorp.armeria.common.MediaType;
 import com.linecorp.armeria.server.ServiceBindingBuilder;
 
-import dev.gihwan.tollgate.core.UpstreamBindingBuilder;
+import dev.gihwan.tollgate.gateway.UpstreamBindingBuilder;
 
-public final class HoconUpstreamBindingBuilder extends UpstreamBindingBuilder<HoconTollgateBuilder> {
+public final class HoconUpstreamBindingBuilder extends UpstreamBindingBuilder<HoconGatewayBuilder> {
 
-    HoconUpstreamBindingBuilder(HoconTollgateBuilder tollgateBuilder,
+    HoconUpstreamBindingBuilder(HoconGatewayBuilder tollgateBuilder,
                                 ServiceBindingBuilder serviceBindingBuilder) {
         super(tollgateBuilder, serviceBindingBuilder);
     }

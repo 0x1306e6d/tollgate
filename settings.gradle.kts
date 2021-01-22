@@ -24,7 +24,8 @@
 
 rootProject.name = "tollgate"
 
-include("core")
+include("gateway")
+
 include("hocon")
 include("junit5")
 include("standalone")

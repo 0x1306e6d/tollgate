@@ -22,29 +22,36 @@
  * SOFTWARE.
  */
 
-import dev.gihwan.tollgate.Dependency
+package dev.gihwan.tollgate.gateway;
 
-plugins {
-    id("java-library")
-}
+import com.linecorp.armeria.server.healthcheck.HealthCheckService;
 
-dependencies {
-    api(project(":gateway"))
-    api(Dependency.jsr305)
-    implementation(project(":util"))
-    implementation(Dependency.guava)
+public final class DefaultGatewayBuilder extends GatewayBuilder {
 
-    testImplementation(Dependency.junitApi)
-    testImplementation(Dependency.assertj)
+    DefaultGatewayBuilder() {}
 
-    testRuntimeOnly(Dependency.junitEngine)
-}
+    @Override
+    public DefaultGatewayBuilder http(int port) {
+        return (DefaultGatewayBuilder) super.http(port);
+    }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
+    @Override
+    public DefaultGatewayBuilder healthCheck(String healthCheckPath) {
+        return (DefaultGatewayBuilder) super.healthCheck(healthCheckPath);
+    }
 
-tasks.test {
-    useJUnitPlatform()
+    @Override
+    public DefaultGatewayBuilder healthCheck(String healthCheckPath, HealthCheckService healthCheckService) {
+        return (DefaultGatewayBuilder) super.healthCheck(healthCheckPath, healthCheckService);
+    }
+
+    @Override
+    public DefaultUpstreamBindingBuilder route() {
+        return new DefaultUpstreamBindingBuilder(this, serverRoute());
+    }
+
+    @Override
+    public DefaultGatewayBuilder upstream(String pathPattern, Upstream upstream) {
+        return (DefaultGatewayBuilder) super.upstream(pathPattern, upstream);
+    }
 }

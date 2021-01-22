@@ -35,15 +35,15 @@ import org.slf4j.LoggerFactory;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
-import dev.gihwan.tollgate.core.Tollgate;
-import dev.gihwan.tollgate.hocon.HoconTollgateBuilder;
+import dev.gihwan.tollgate.gateway.Gateway;
+import dev.gihwan.tollgate.hocon.HoconGatewayBuilder;
 
 public final class Main {
 
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     @Nullable
-    private Tollgate tollgate;
+    private Gateway gateway;
     @Nullable
     private Instant startAt;
 
@@ -54,8 +54,8 @@ public final class Main {
         final Config config = ConfigFactory.load();
         logger.debug("Loaded configuration: {}", config);
 
-        tollgate = HoconTollgateBuilder.of(config).build();
-        tollgate.start();
+        gateway = HoconGatewayBuilder.of(config).build();
+        gateway.start();
 
         assert startAt != null;
         logger.info("The Tollgate standalone is started. ({} used to start)",
@@ -66,8 +66,8 @@ public final class Main {
         final Instant stopAt = Instant.now();
         logger.info("Stopping the Tollgate standalone at {}.", stopAt);
 
-        if (tollgate != null) {
-            tollgate.stop();
+        if (gateway != null) {
+            gateway.stop();
         }
 
         assert startAt != null;

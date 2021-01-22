@@ -32,7 +32,7 @@ plugins {
 
 dependencies {
     implementation(project(":util"))
-    implementation(project(":core"))
+    implementation(project(":gateway"))
     implementation(project(":hocon"))
 
     implementation(Dependency.jsr305)

@@ -27,8 +27,8 @@ package dev.gihwan.tollgate.example.helloworld;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import dev.gihwan.tollgate.core.Tollgate;
-import dev.gihwan.tollgate.core.Upstream;
+import dev.gihwan.tollgate.gateway.Gateway;
+import dev.gihwan.tollgate.gateway.Upstream;
 
 /**
  * Represents a microservice.
@@ -42,17 +42,17 @@ public final class HelloWorldGateway {
     private static final Logger logger = LoggerFactory.getLogger(HelloWorldGateway.class);
 
     public static void main(String[] args) {
-        final Tollgate tollgate = Tollgate.builder()
-                                          .http(8080)
-                                          .upstream("/helloworld", Upstream.of("http://localhost:9090"))
-                                          .build();
+        final Gateway gateway = Gateway.builder()
+                                       .http(8080)
+                                       .upstream("/helloworld", Upstream.of("http://localhost:9090"))
+                                       .build();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            tollgate.stop();
+            gateway.stop();
             logger.info("Stopped helloworld gateway.");
         }));
 
-        tollgate.start();
-        logger.info("Started helloworld gateway at {}.", tollgate.activePort());
+        gateway.start();
+        logger.info("Started helloworld gateway at {}.", gateway.activePort());
     }
 }

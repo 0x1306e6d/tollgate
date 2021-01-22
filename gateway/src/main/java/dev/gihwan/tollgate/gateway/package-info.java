@@ -22,29 +22,7 @@
  * SOFTWARE.
  */
 
-import dev.gihwan.tollgate.Dependency
+@NonNullByDefault
+package dev.gihwan.tollgate.gateway;
 
-plugins {
-    id("java-library")
-}
-
-dependencies {
-    api(project(":gateway"))
-    api(Dependency.jsr305)
-    implementation(project(":util"))
-    implementation(Dependency.guava)
-
-    testImplementation(Dependency.junitApi)
-    testImplementation(Dependency.assertj)
-
-    testRuntimeOnly(Dependency.junitEngine)
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
+import dev.gihwan.tollgate.util.NonNullByDefault;
