@@ -37,13 +37,14 @@ import com.linecorp.armeria.client.Endpoint;
 import com.linecorp.armeria.client.endpoint.EndpointGroup;
 import com.linecorp.armeria.common.HttpMethod;
 
+import dev.gihwan.tollgate.gateway.GatewayBuilder;
 import dev.gihwan.tollgate.gateway.Upstream;
 import dev.gihwan.tollgate.gateway.UpstreamBuilder;
 import dev.gihwan.tollgate.gateway.remapping.RemappingRule;
 
 final class HoconTollgateConfigurators {
 
-    static void configureWithHoconConfig(HoconGatewayBuilder builder, Config config) {
+    static void configureWithHoconConfig(GatewayBuilder builder, Config config) {
         if (config.hasPath("tollgate.port")) {
             builder.http(config.getInt("tollgate.port"));
         }
@@ -59,7 +60,7 @@ final class HoconTollgateConfigurators {
         }
     }
 
-    private static void configureWithHoconRouteConfig(HoconGatewayBuilder builder, Config routeConfig) {
+    private static void configureWithHoconRouteConfig(GatewayBuilder builder, Config routeConfig) {
         checkArgument(routeConfig.hasPath("method"), "Route config must have method.");
         checkArgument(routeConfig.hasPath("path"), "Route config must have path.");
         checkArgument(routeConfig.hasPath("upstream"), "Route config must have upstream.");

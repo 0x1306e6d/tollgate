@@ -29,44 +29,27 @@ import static java.util.Objects.requireNonNull;
 
 import com.typesafe.config.Config;
 
-import com.linecorp.armeria.server.healthcheck.HealthCheckService;
-
+import dev.gihwan.tollgate.gateway.Gateway;
 import dev.gihwan.tollgate.gateway.GatewayBuilder;
-import dev.gihwan.tollgate.gateway.Upstream;
 
-public final class HoconGatewayBuilder extends GatewayBuilder {
+public final class HoconGatewayBuilder {
 
-    public static HoconGatewayBuilder of(Config config) {
-        return new HoconGatewayBuilder(requireNonNull(config, "config"));
+    public static HoconGatewayBuilder of() {
+        return new HoconGatewayBuilder(Gateway.builder());
     }
 
-    HoconGatewayBuilder(Config config) {
-        super();
-        configureWithHoconConfig(this, config);
+    public static HoconGatewayBuilder of(GatewayBuilder delegate) {
+        return new HoconGatewayBuilder(requireNonNull(delegate, "delegate"));
     }
 
-    @Override
-    public HoconGatewayBuilder http(int port) {
-        return (HoconGatewayBuilder) super.http(port);
+    private final GatewayBuilder delegate;
+
+    HoconGatewayBuilder(GatewayBuilder delegate) {
+        this.delegate = delegate;
     }
 
-    @Override
-    public HoconGatewayBuilder healthCheck(String healthCheckPath) {
-        return (HoconGatewayBuilder) super.healthCheck(healthCheckPath);
-    }
-
-    @Override
-    public HoconGatewayBuilder healthCheck(String healthCheckPath, HealthCheckService healthCheckService) {
-        return (HoconGatewayBuilder) super.healthCheck(healthCheckPath, healthCheckService);
-    }
-
-    @Override
-    public HoconUpstreamBindingBuilder route() {
-        return new HoconUpstreamBindingBuilder(this, serverRoute());
-    }
-
-    @Override
-    public HoconGatewayBuilder upstream(String pathPattern, Upstream upstream) {
-        return (HoconGatewayBuilder) super.upstream(pathPattern, upstream);
+    public Gateway build(Config config) {
+        configureWithHoconConfig(delegate, requireNonNull(config, "config"));
+        return delegate.build();
     }
 }
