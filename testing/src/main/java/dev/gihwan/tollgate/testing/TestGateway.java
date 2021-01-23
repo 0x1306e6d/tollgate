@@ -36,7 +36,6 @@ import javax.annotation.Nullable;
 import com.linecorp.armeria.common.SessionProtocol;
 import com.linecorp.armeria.common.util.SafeCloseable;
 
-import dev.gihwan.tollgate.gateway.DefaultGatewayBuilder;
 import dev.gihwan.tollgate.gateway.Gateway;
 import dev.gihwan.tollgate.gateway.GatewayBuilder;
 
@@ -83,7 +82,7 @@ public abstract class TestGateway implements SafeCloseable {
      * Starts the {@link Gateway}.
      */
     public void start() {
-        final DefaultGatewayBuilder builder = Gateway.builder();
+        final GatewayBuilder builder = Gateway.builder();
         configure(builder);
 
         delegate = builder.build();

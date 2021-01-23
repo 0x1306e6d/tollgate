@@ -54,7 +54,7 @@ public final class Main {
         final Config config = ConfigFactory.load();
         logger.debug("Loaded configuration: {}", config);
 
-        gateway = HoconGatewayBuilder.of(config).build();
+        gateway = HoconGatewayBuilder.of().build(config);
         gateway.start();
 
         assert startAt != null;

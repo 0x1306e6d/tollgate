@@ -40,8 +40,8 @@ public final class Gateway {
 
     private static final Logger logger = LoggerFactory.getLogger(Gateway.class);
 
-    public static DefaultGatewayBuilder builder() {
-        return new DefaultGatewayBuilder();
+    public static GatewayBuilder builder() {
+        return new GatewayBuilder();
     }
 
     private final Server server;

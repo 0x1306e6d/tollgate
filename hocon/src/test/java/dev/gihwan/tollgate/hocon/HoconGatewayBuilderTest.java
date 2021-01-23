@@ -59,7 +59,7 @@ class HoconGatewayBuilderTest {
                              .withValue("tollgate.routing.foo.upstream.uri",
                                         ConfigValueFactory.fromAnyRef(serviceServer.httpUri().toString()));
 
-        final Gateway gateway = HoconGatewayBuilder.of(config).build();
+        final Gateway gateway = HoconGatewayBuilder.of().build(config);
         try {
             gateway.start();
             assertThat(gateway.activeLocalPort()).isPositive();

@@ -26,16 +26,13 @@ package dev.gihwan.tollgate.gateway;
 
 import com.linecorp.armeria.server.Server;
 import com.linecorp.armeria.server.ServerBuilder;
-import com.linecorp.armeria.server.ServiceBindingBuilder;
 import com.linecorp.armeria.server.healthcheck.HealthCheckService;
 
-public abstract class GatewayBuilder {
+public final class GatewayBuilder {
 
     private final ServerBuilder serverBuilder = Server.builder();
 
     protected GatewayBuilder() {}
-
-    public abstract UpstreamBindingBuilder<? extends GatewayBuilder> route();
 
     /**
      * @see ServerBuilder#http(int)
@@ -54,15 +51,15 @@ public abstract class GatewayBuilder {
         return this;
     }
 
+    public UpstreamBindingBuilder route() {
+        return new UpstreamBindingBuilder(this, serverBuilder.route());
+    }
+
     public GatewayBuilder upstream(String pathPattern, Upstream upstream) {
         return route().path(pathPattern).build(upstream);
     }
 
     public final Gateway build() {
         return new Gateway(serverBuilder.build());
-    }
-
-    protected final ServiceBindingBuilder serverRoute() {
-        return serverBuilder.route();
     }
 }
