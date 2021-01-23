@@ -35,10 +35,10 @@ import com.linecorp.armeria.client.endpoint.EndpointGroup;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.SessionProtocol;
-import com.linecorp.armeria.server.Service;
+import com.linecorp.armeria.common.util.Unwrappable;
 import com.linecorp.armeria.server.ServiceRequestContext;
 
-public interface Upstream extends Service<HttpRequest, HttpResponse> {
+public interface Upstream extends Unwrappable {
 
     static Upstream of(String uri) {
         return builder(uri).build();
@@ -81,7 +81,18 @@ public interface Upstream extends Service<HttpRequest, HttpResponse> {
     }
 
     @CheckReturnValue
-    HttpResponse serve(ServiceRequestContext ctx, HttpRequest req) throws Exception;
+    HttpResponse forward(ServiceRequestContext ctx, HttpRequest req) throws Exception;
+
+    @Override
+    default <T> T as(Class<T> type) {
+        requireNonNull(type, "type");
+        return Unwrappable.super.as(type);
+    }
+
+    @Override
+    default Upstream unwrap() {
+        return (Upstream) Unwrappable.super.unwrap();
+    }
 
     default <T extends Upstream> T decorate(Function<? super Upstream, T> decorator) {
         final T newUpstream = decorator.apply(this);

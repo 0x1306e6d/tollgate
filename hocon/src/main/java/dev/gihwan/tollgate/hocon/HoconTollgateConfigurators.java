@@ -40,7 +40,8 @@ import com.linecorp.armeria.common.HttpMethod;
 import dev.gihwan.tollgate.gateway.GatewayBuilder;
 import dev.gihwan.tollgate.gateway.Upstream;
 import dev.gihwan.tollgate.gateway.UpstreamBuilder;
-import dev.gihwan.tollgate.gateway.remapping.RemappingRule;
+import dev.gihwan.tollgate.remapping.RemappingRequestUpstream;
+import dev.gihwan.tollgate.remapping.RemappingRequestUpstreamBuilder;
 
 final class HoconTollgateConfigurators {
 
@@ -95,9 +96,11 @@ final class HoconTollgateConfigurators {
 
         if (upstreamConfig.hasPath("remapping")) {
             final Config remappingConfig = upstreamConfig.getObject("remapping").toConfig();
+            final RemappingRequestUpstreamBuilder remappingBuilder = RemappingRequestUpstream.builder();
             if (remappingConfig.hasPath("path")) {
-                builder.remapping(RemappingRule.path(remappingConfig.getString("path")));
+                remappingBuilder.path(remappingConfig.getString("path"));
             }
+            builder.decorator(remappingBuilder.newDecorator());
         }
 
         return builder.build();

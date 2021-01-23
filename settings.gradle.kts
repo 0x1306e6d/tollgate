@@ -28,6 +28,7 @@ include("gateway")
 
 include("hocon")
 include("junit5")
+include("remapping")
 include("standalone")
 include("testing")
 include("util")

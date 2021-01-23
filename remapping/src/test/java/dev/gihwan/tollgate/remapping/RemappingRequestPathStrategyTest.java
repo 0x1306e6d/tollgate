@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.gateway.remapping;
+package dev.gihwan.tollgate.remapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,33 +33,33 @@ import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.server.RoutingResult;
 import com.linecorp.armeria.server.ServiceRequestContext;
 
-class RemappingPathRuleTest {
+class RemappingRequestPathStrategyTest {
 
     @Test
-    void remappingPath() {
-        final RemappingPathRule rule = new RemappingPathRule("/foo/bar");
+    void remapPath() {
+        final RemappingRequestPathStrategy strategy = new RemappingRequestPathStrategy("/foo/bar");
 
         final HttpRequest req = HttpRequest.of(HttpMethod.GET, "/baz/qux/quux");
         final ServiceRequestContext ctx = ServiceRequestContext.of(req);
 
-        final HttpRequest remappedReq = rule.remap(ctx, req);
+        final HttpRequest remappedReq = strategy.remap(ctx, req);
         assertThat(remappedReq.path()).isEqualTo("/foo/bar");
     }
 
     @Test
-    void remappingPathParam() {
-        final RemappingPathRule rule = new RemappingPathRule("/foo/{bar}");
+    void remapPathParam() {
+        final RemappingRequestPathStrategy strategy = new RemappingRequestPathStrategy("/foo/{bar}");
 
-        final HttpRequest req = HttpRequest.of(HttpMethod.GET, "/foo/baz/qux");
+        final HttpRequest req = HttpRequest.of(HttpMethod.GET, "/baz/qux/quux");
         final ServiceRequestContext ctx =
                 ServiceRequestContext.builder(req)
                                      .routingResult(RoutingResult.builder()
                                                                  .path(req.path())
-                                                                 .decodedParam("bar", "qux")
+                                                                 .decodedParam("bar", "quux")
                                                                  .build())
                                      .build();
 
-        final HttpRequest remappedReq = rule.remap(ctx, req);
-        assertThat(remappedReq.path()).isEqualTo("/foo/qux");
+        final HttpRequest remappedReq = strategy.remap(ctx, req);
+        assertThat(remappedReq.path()).isEqualTo("/foo/quux");
     }
 }

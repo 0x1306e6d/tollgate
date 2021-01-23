@@ -22,13 +22,12 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.gateway.remapping;
+package dev.gihwan.tollgate.remapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Test;
 
@@ -36,62 +35,33 @@ import com.linecorp.armeria.common.HttpMethod;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.server.ServiceRequestContext;
 
-class RemappingRuleTest {
-
-    @Test
-    void of() {
-        final Queue<String> queue = new ArrayDeque<>();
-
-        final AtomicReference<HttpRequest> rule1Capture = new AtomicReference<>();
-        final RemappingRule rule1 = (ctx, req) -> {
-            queue.add("rule1");
-            rule1Capture.set(req);
-            return req;
-        };
-
-        final AtomicReference<HttpRequest> rule2Capture = new AtomicReference<>();
-        final RemappingRule rule2 = (ctx, req) -> {
-            queue.add("rule2");
-            rule2Capture.set(req);
-            return req;
-        };
-
-        final HttpRequest req = HttpRequest.of(HttpMethod.GET, "/foo");
-        final ServiceRequestContext ctx = ServiceRequestContext.of(req);
-
-        final RemappingRule rule = RemappingRule.of(rule1, rule2);
-        final HttpRequest remapped = rule.remap(ctx, req);
-        assertThat(remapped).isEqualTo(req);
-        assertThat(rule1Capture).hasValue(req);
-        assertThat(rule2Capture).hasValue(req);
-        assertThat(queue).containsExactly("rule1", "rule2");
-    }
+class RemappingRequestStrategyTest {
 
     @Test
     void andThen() {
         final Queue<String> queue = new ArrayDeque<>();
 
-        final RemappingRule rule1 = (ctx, req) -> {
-            queue.add("rule1");
+        final RemappingRequestStrategy strategy1 = (ctx, req) -> {
+            queue.add("strategy1");
             return req;
         };
-        final RemappingRule rule2 = (ctx, req) -> {
-            queue.add("rule2");
+        final RemappingRequestStrategy strategy2 = (ctx, req) -> {
+            queue.add("strategy2");
             return req;
         };
 
         final HttpRequest req = HttpRequest.of(HttpMethod.GET, "/foo");
         final ServiceRequestContext ctx = ServiceRequestContext.of(req);
 
-        final RemappingRule rule1AndRule2 = rule1.andThen(rule2);
-        HttpRequest remapped = rule1AndRule2.remap(ctx, req);
+        final RemappingRequestStrategy strategy1AndRule2 = strategy1.andThen(strategy2);
+        HttpRequest remapped = strategy1AndRule2.remap(ctx, req);
         assertThat(remapped).isEqualTo(req);
-        assertThat(queue).containsExactly("rule1", "rule2");
+        assertThat(queue).containsExactly("strategy1", "strategy2");
 
         queue.clear();
-        final RemappingRule rule2AndRule1 = rule2.andThen(rule1);
-        remapped = rule2AndRule1.remap(ctx, req);
+        final RemappingRequestStrategy strategy2AndRule1 = strategy2.andThen(strategy1);
+        remapped = strategy2AndRule1.remap(ctx, req);
         assertThat(remapped).isEqualTo(req);
-        assertThat(queue).containsExactly("rule2", "rule1");
+        assertThat(queue).containsExactly("strategy2", "strategy1");
     }
 }

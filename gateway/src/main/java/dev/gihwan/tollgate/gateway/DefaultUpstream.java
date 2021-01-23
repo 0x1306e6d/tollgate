@@ -26,60 +26,38 @@ package dev.gihwan.tollgate.gateway;
 
 import java.util.concurrent.CompletableFuture;
 
-import javax.annotation.Nullable;
-
 import com.linecorp.armeria.client.UnprocessedRequestException;
 import com.linecorp.armeria.client.WebClient;
-import com.linecorp.armeria.common.AggregatedHttpRequest;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.server.ServiceRequestContext;
 
-import dev.gihwan.tollgate.gateway.remapping.RemappingRule;
-
 final class DefaultUpstream implements Upstream {
 
     private final WebClient client;
-    @Nullable
-    private final RemappingRule remappingRule;
 
-    DefaultUpstream(WebClient client, @Nullable RemappingRule remappingRule) {
+    DefaultUpstream(WebClient client) {
         this.client = client;
-        this.remappingRule = remappingRule;
     }
 
     @Override
-    public HttpResponse serve(ServiceRequestContext ctx, HttpRequest req) throws Exception {
-        return HttpResponse.from(req.aggregate()
-                                    .thenApply(aggregated -> duplicateRequest(ctx, aggregated))
-                                    .thenApply(this::sendRequest));
-    }
-
-    private HttpRequest duplicateRequest(ServiceRequestContext ctx, AggregatedHttpRequest req) {
-        if (remappingRule == null) {
-            return HttpRequest.of(req.headers(), req.content(), req.trailers());
-        }
-
-        return remappingRule.remap(ctx, req.toHttpRequest());
-    }
-
-    private HttpResponse sendRequest(HttpRequest req) {
-        final CompletableFuture<HttpResponse> responseFuture = new CompletableFuture<>();
-        final HttpResponse res = HttpResponse.from(responseFuture);
-        client.execute(req).aggregate().handle((aggregated, t) -> {
-            if (t != null) {
-                resolveException(responseFuture, t);
+    public HttpResponse forward(ServiceRequestContext ctx, HttpRequest req) throws Exception {
+        final CompletableFuture<HttpResponse> resFuture = new CompletableFuture<>();
+        final HttpResponse res = HttpResponse.from(resFuture);
+        client.execute(req).aggregate().handle((aggregated, cause) -> {
+            if (cause != null) {
+                resolveException(resFuture, cause);
                 return null;
             }
 
-            responseFuture.complete(aggregated.toHttpResponse());
+            resFuture.complete(aggregated.toHttpResponse());
             return null;
         });
         return res;
     }
 
-    private void resolveException(CompletableFuture<HttpResponse> responseFuture, Throwable t) {
+    private static void resolveException(CompletableFuture<HttpResponse> responseFuture, Throwable t) {
         if (t instanceof UnprocessedRequestException) {
             responseFuture.complete(HttpResponse.of(HttpStatus.SERVICE_UNAVAILABLE));
             return;

@@ -22,45 +22,37 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.gateway.remapping;
+package dev.gihwan.tollgate.remapping;
 
-import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
-
-import java.util.List;
-
-import com.google.common.collect.ImmutableList;
 
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.server.ServiceRequestContext;
 
+/**
+ * A strategy for remapping {@link HttpRequest}.
+ */
 @FunctionalInterface
-public interface RemappingRule {
+public interface RemappingRequestStrategy {
 
-    static RemappingRule path(String pathPattern) {
-        return new RemappingPathRule(requireNonNull(pathPattern, "pathPattern"));
+    /**
+     * Returns a new {@link RemappingRequestStrategy} that remaps {@link HttpRequest} path with the given
+     * {@code pathPattern}.
+     */
+    static RemappingRequestStrategy path(String pathPattern) {
+        return new RemappingRequestPathStrategy(requireNonNull(pathPattern, "pathPattern"));
     }
 
-    static RemappingRule of(RemappingRule... remappingRules) {
-        return of(ImmutableList.copyOf(requireNonNull(remappingRules, "remappingRules")));
-    }
-
-    static RemappingRule of(Iterable<? extends RemappingRule> remappingRules) {
-        requireNonNull(remappingRules, "remappingRules");
-
-        final List<RemappingRule> cast = ImmutableList.copyOf(remappingRules);
-        checkState(!cast.isEmpty(), "should have at least one remapping rule");
-
-        if (cast.size() == 1) {
-            return cast.get(0);
-        } else {
-            return cast.stream().reduce(RemappingRule::andThen).get();
-        }
-    }
-
+    /**
+     * Remaps the given {@link HttpRequest}.
+     */
     HttpRequest remap(ServiceRequestContext ctx, HttpRequest req);
 
-    default RemappingRule andThen(RemappingRule after) {
+    /**
+     * Returns a new composed {@link RemappingRequestStrategy} that first applies this strategy to its
+     * {@link HttpRequest}, and then applies the {@code after} strategy to the result.
+     */
+    default RemappingRequestStrategy andThen(RemappingRequestStrategy after) {
         requireNonNull(after, "after");
         return (ctx, req) -> after.remap(ctx, remap(ctx, req));
     }

@@ -23,6 +23,6 @@
  */
 
 @NonNullByDefault
-package dev.gihwan.tollgate.gateway.remapping;
+package dev.gihwan.tollgate.remapping;
 
 import dev.gihwan.tollgate.util.NonNullByDefault;

@@ -24,21 +24,14 @@
 
 package dev.gihwan.tollgate.gateway;
 
-import com.linecorp.armeria.common.HttpRequest;
-import com.linecorp.armeria.common.HttpResponse;
-import com.linecorp.armeria.server.HttpService;
-import com.linecorp.armeria.server.ServiceRequestContext;
+import com.linecorp.armeria.common.util.AbstractUnwrappable;
 
-final class UpstreamHttpService implements HttpService {
+/**
+ * A {@link Upstream} which decorates another {@link Upstream}.
+ */
+public abstract class DecoratingUpstream extends AbstractUnwrappable<Upstream> implements Upstream {
 
-    private final Upstream upstream;
-
-    UpstreamHttpService(Upstream upstream) {
-        this.upstream = upstream;
-    }
-
-    @Override
-    public HttpResponse serve(ServiceRequestContext ctx, HttpRequest req) throws Exception {
-        return upstream.forward(ctx, req);
+    protected DecoratingUpstream(Upstream delegate) {
+        super(delegate);
     }
 }
