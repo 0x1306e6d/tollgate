@@ -22,23 +22,49 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.gateway;
+package dev.gihwan.tollgate.remapping;
+
+import static java.util.Objects.requireNonNull;
+
+import java.util.function.Function;
 
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
-import com.linecorp.armeria.server.HttpService;
 import com.linecorp.armeria.server.ServiceRequestContext;
 
-final class UpstreamHttpService implements HttpService {
+import dev.gihwan.tollgate.gateway.DecoratingUpstream;
+import dev.gihwan.tollgate.gateway.Upstream;
 
-    private final Upstream upstream;
+/**
+ * A {@link Upstream} decorator for remapping {@link HttpRequest}s.
+ */
+public final class RemappingRequestUpstream extends DecoratingUpstream {
 
-    UpstreamHttpService(Upstream upstream) {
-        this.upstream = upstream;
+    /**
+     * Returns a new {@link Upstream} decorator which remaps the {@link HttpRequest} using the given
+     * {@link RemappingRequestStrategy}.
+     */
+    public static Function<? super Upstream, RemappingRequestUpstream> newDecorator(
+            RemappingRequestStrategy strategy) {
+        return builder().strategy(requireNonNull(strategy, "strategy")).newDecorator();
+    }
+
+    /**
+     * Returns a new {@link RemappingRequestUpstreamBuilder}.
+     */
+    public static RemappingRequestUpstreamBuilder builder() {
+        return new RemappingRequestUpstreamBuilder();
+    }
+
+    private final RemappingRequestStrategy strategy;
+
+    RemappingRequestUpstream(Upstream delegate, RemappingRequestStrategy strategy) {
+        super(delegate);
+        this.strategy = strategy;
     }
 
     @Override
-    public HttpResponse serve(ServiceRequestContext ctx, HttpRequest req) throws Exception {
-        return upstream.forward(ctx, req);
+    public final HttpResponse forward(ServiceRequestContext ctx, HttpRequest req) throws Exception {
+        return unwrap().forward(ctx, strategy.remap(ctx, req));
     }
 }

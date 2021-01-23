@@ -22,23 +22,31 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.gateway;
+import dev.gihwan.tollgate.Dependency
 
-import com.linecorp.armeria.common.HttpRequest;
-import com.linecorp.armeria.common.HttpResponse;
-import com.linecorp.armeria.server.HttpService;
-import com.linecorp.armeria.server.ServiceRequestContext;
+plugins {
+    id("java-library")
+}
 
-final class UpstreamHttpService implements HttpService {
+dependencies {
+    implementation(project(":util"))
+    implementation(project(":gateway"))
 
-    private final Upstream upstream;
+    implementation(Dependency.guava)
+    implementation(Dependency.slf4j)
 
-    UpstreamHttpService(Upstream upstream) {
-        this.upstream = upstream;
-    }
+    testImplementation(project(":junit5"))
+    testImplementation(Dependency.assertj)
+    implementation(Dependency.armeriaJunit)
 
-    @Override
-    public HttpResponse serve(ServiceRequestContext ctx, HttpRequest req) throws Exception {
-        return upstream.forward(ctx, req);
-    }
+    testRuntimeOnly(Dependency.junitEngine)
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+tasks.test {
+    useJUnitPlatform()
 }

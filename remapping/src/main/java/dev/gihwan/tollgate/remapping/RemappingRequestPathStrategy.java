@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.gateway.remapping;
+package dev.gihwan.tollgate.remapping;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,14 +33,14 @@ import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.RequestHeaders;
 import com.linecorp.armeria.server.ServiceRequestContext;
 
-final class RemappingPathRule implements RemappingRule {
+class RemappingRequestPathStrategy implements RemappingRequestStrategy {
 
     private static final String PATH_SEPARATOR = "/";
     private static final Splitter PATH_SPLITTER = Splitter.on(PATH_SEPARATOR);
 
     private final String pathPattern;
 
-    RemappingPathRule(String pathPattern) {
+    RemappingRequestPathStrategy(String pathPattern) {
         this.pathPattern = pathPattern;
     }
 

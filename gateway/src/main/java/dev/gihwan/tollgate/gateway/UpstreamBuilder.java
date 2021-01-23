@@ -31,21 +31,15 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-import com.google.common.collect.ImmutableList;
-
 import com.linecorp.armeria.client.WebClient;
 import com.linecorp.armeria.client.WebClientBuilder;
 import com.linecorp.armeria.client.endpoint.EndpointGroup;
 import com.linecorp.armeria.common.SessionProtocol;
 
-import dev.gihwan.tollgate.gateway.remapping.RemappingRule;
-
 public final class UpstreamBuilder {
 
     @Nullable
     private Function<? super Upstream, ? extends Upstream> decorator;
-    @Nullable
-    private RemappingRule remappingRule;
 
     private final WebClientBuilder clientBuilder;
 
@@ -61,19 +55,6 @@ public final class UpstreamBuilder {
         clientBuilder = WebClient.builder(protocol, endpointGroup, path);
     }
 
-    public UpstreamBuilder remapping(RemappingRule... remappingRules) {
-        return remapping(ImmutableList.copyOf(requireNonNull(remappingRules, "remappingRules")));
-    }
-
-    public UpstreamBuilder remapping(Iterable<? extends RemappingRule> remappingRules) {
-        if (remappingRule == null) {
-            remappingRule = RemappingRule.of(remappingRules);
-        } else {
-            remappingRule = remappingRule.andThen(RemappingRule.of(remappingRules));
-        }
-        return this;
-    }
-
     public UpstreamBuilder decorator(Function<? super Upstream, ? extends Upstream> decorator) {
         requireNonNull(decorator, "decorator");
         if (this.decorator == null) {
@@ -85,7 +66,7 @@ public final class UpstreamBuilder {
     }
 
     public Upstream build() {
-        Upstream upstream = new DefaultUpstream(clientBuilder.build(), remappingRule);
+        Upstream upstream = new DefaultUpstream(clientBuilder.build());
         if (decorator != null) {
             upstream = upstream.decorate(decorator);
         }
