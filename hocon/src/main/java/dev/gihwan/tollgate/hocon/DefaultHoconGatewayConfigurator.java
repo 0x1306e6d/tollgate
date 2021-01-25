@@ -43,9 +43,12 @@ import dev.gihwan.tollgate.gateway.UpstreamBuilder;
 import dev.gihwan.tollgate.remapping.RemappingRequestUpstream;
 import dev.gihwan.tollgate.remapping.RemappingRequestUpstreamBuilder;
 
-final class HoconTollgateConfigurators {
+enum DefaultHoconGatewayConfigurator implements HoconGatewayConfigurator {
 
-    static void configureWithHoconConfig(GatewayBuilder builder, Config config) {
+    INSTANCE;
+
+    @Override
+    public void configure(GatewayBuilder builder, Config config) {
         if (config.hasPath("tollgate.port")) {
             builder.http(config.getInt("tollgate.port"));
         }
@@ -57,11 +60,11 @@ final class HoconTollgateConfigurators {
             routes.stream()
                   .map(route -> config.getObject("tollgate.routing." + route))
                   .map(ConfigObject::toConfig)
-                  .forEach(routeConfig -> configureWithHoconRouteConfig(builder, routeConfig));
+                  .forEach(routeConfig -> configureRouteConfig(builder, routeConfig));
         }
     }
 
-    private static void configureWithHoconRouteConfig(GatewayBuilder builder, Config routeConfig) {
+    private static void configureRouteConfig(GatewayBuilder builder, Config routeConfig) {
         checkArgument(routeConfig.hasPath("method"), "Route config must have method.");
         checkArgument(routeConfig.hasPath("path"), "Route config must have path.");
         checkArgument(routeConfig.hasPath("upstream"), "Route config must have upstream.");
@@ -69,10 +72,10 @@ final class HoconTollgateConfigurators {
         builder.route()
                .methods(routeConfig.getEnum(HttpMethod.class, "method"))
                .path(routeConfig.getString("path"))
-               .build(configureWithHoconUpstreamConfig(routeConfig.getObject("upstream").toConfig()));
+               .build(configureUpstreamConfig(routeConfig.getObject("upstream").toConfig()));
     }
 
-    private static Upstream configureWithHoconUpstreamConfig(Config upstreamConfig) {
+    private static Upstream configureUpstreamConfig(Config upstreamConfig) {
         final UpstreamBuilder builder;
         if (upstreamConfig.hasPath("uri")) {
             builder = Upstream.builder(upstreamConfig.getString("uri"));
@@ -105,6 +108,4 @@ final class HoconTollgateConfigurators {
 
         return builder.build();
     }
-
-    private HoconTollgateConfigurators() {}
 }
