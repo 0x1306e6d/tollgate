@@ -24,6 +24,7 @@
 
 package dev.gihwan.tollgate.remapping;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
@@ -80,7 +81,7 @@ public final class RemappingRequestUpstreamBuilder {
      * Builds a new {@link RemappingRequestUpstream} based on the properties of this builder.
      */
     public RemappingRequestUpstream build(Upstream delegate) {
-        checkState(strategy != null, "Must set at lease one remapping strategy");
+        checkArgument(strategy != null, "Must set at lease one remapping strategy");
         return new RemappingRequestUpstream(delegate, strategy);
     }
 }
