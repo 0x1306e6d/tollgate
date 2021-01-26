@@ -25,7 +25,6 @@
 package dev.gihwan.tollgate.remapping;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 import java.util.function.Function;
