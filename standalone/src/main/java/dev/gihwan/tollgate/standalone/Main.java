@@ -55,7 +55,7 @@ public final class Main {
         logger.debug("Loaded configuration: {}", config);
 
         gateway = HoconGatewayBuilder.of().build(config);
-        gateway.start();
+        gateway.start().join();
 
         assert startAt != null;
         logger.info("The Tollgate standalone is started. ({} used to start)",
@@ -67,7 +67,7 @@ public final class Main {
         logger.info("Stopping the Tollgate standalone at {}.", stopAt);
 
         if (gateway != null) {
-            gateway.stop();
+            gateway.stop().join();
         }
 
         assert startAt != null;

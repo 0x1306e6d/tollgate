@@ -61,7 +61,7 @@ class HoconGatewayBuilderTest {
 
         final Gateway gateway = HoconGatewayBuilder.of().build(config);
         try {
-            gateway.start();
+            gateway.start().join();
             assertThat(gateway.activeLocalPort()).isPositive();
 
             final WebClient client = WebClient.of("http://127.0.0.1:" + gateway.activeLocalPort());
@@ -73,7 +73,7 @@ class HoconGatewayBuilderTest {
             assertThat(res.status()).isEqualTo(HttpStatus.OK);
             assertThat(res.contentUtf8()).isEqualTo("bar");
         } finally {
-            gateway.stop();
+            gateway.stop().join();
         }
     }
 }

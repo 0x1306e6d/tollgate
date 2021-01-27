@@ -54,12 +54,12 @@ public abstract class GatewayExtension extends AbstractAllOrEachExtension {
 
     @Override
     public final void before(ExtensionContext context) throws Exception {
-        delegate.start();
+        delegate.start().join();
     }
 
     @Override
     public final void after(ExtensionContext context) throws Exception {
-        delegate.stop();
+        delegate.stop().join();
     }
 
     /**

@@ -48,11 +48,11 @@ public final class HelloWorldGateway {
                                        .build();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            gateway.stop();
+            gateway.stop().join();
             logger.info("Stopped helloworld gateway.");
         }));
 
-        gateway.start();
+        gateway.start().join();
         logger.info("Started helloworld gateway at {}.", gateway.activePort());
     }
 }
