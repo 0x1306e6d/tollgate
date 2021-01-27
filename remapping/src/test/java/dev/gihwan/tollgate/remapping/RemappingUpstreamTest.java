@@ -40,7 +40,7 @@ import com.linecorp.armeria.testing.junit5.server.ServerExtension;
 import dev.gihwan.tollgate.gateway.Upstream;
 import dev.gihwan.tollgate.testing.TestGateway;
 
-class RemappingRequestUpstreamTest {
+class RemappingUpstreamTest {
 
     @RegisterExtension
     static final ServerExtension serviceServer = new ServerExtension() {
@@ -51,12 +51,12 @@ class RemappingRequestUpstreamTest {
     };
 
     @Test
-    void remapPath() {
+    void remapRequestPath() {
         try (TestGateway gateway = withTestGateway(builder -> {
             builder.upstream("/bar", Upstream.builder(serviceServer.httpUri())
-                                             .decorator(RemappingRequestUpstream.builder()
-                                                                                .path("/foo")
-                                                                                .newDecorator())
+                                             .decorator(RemappingUpstream.builder()
+                                                                         .requestPath("/foo")
+                                                                         .newDecorator())
                                              .build());
         })) {
             final WebClient client = WebClient.of(gateway.httpUri());
