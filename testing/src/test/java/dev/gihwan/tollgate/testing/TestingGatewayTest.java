@@ -39,28 +39,28 @@ class TestingGatewayTest {
 
     @Test
     void port() {
-        try (TestGateway tollgate = withTestGateway(builder -> {
+        try (TestGateway gateway = withTestGateway(builder -> {
             builder.upstream("/foo", Upstream.of("http://127.0.0.1"));
         })) {
-            assertThat(tollgate.httpPort()).isPositive();
+            assertThat(gateway.httpPort()).isPositive();
         }
     }
 
     @Test
     void uri() {
-        try (TestGateway tollgate = withTestGateway(builder -> {
+        try (TestGateway gateway = withTestGateway(builder -> {
             builder.upstream("/foo", Upstream.of("http://127.0.0.1"));
         })) {
-            assertThat(tollgate.httpUri()).isNotNull();
+            assertThat(gateway.httpUri()).isNotNull();
         }
     }
 
     @Test
     void healthCheck() {
-        try (TestGateway tollgate = withTestGateway(builder -> {
+        try (TestGateway gateway = withTestGateway(builder -> {
             builder.healthCheck("/health");
         })) {
-            final WebClient webClient = WebClient.of(tollgate.httpUri());
+            final WebClient webClient = WebClient.of(gateway.httpUri());
             final AggregatedHttpResponse res = webClient.get("/health").aggregate().join();
             assertThat(res.status()).isEqualTo(HttpStatus.OK);
         }

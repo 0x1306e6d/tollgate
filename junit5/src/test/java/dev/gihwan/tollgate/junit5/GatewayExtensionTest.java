@@ -38,7 +38,7 @@ import dev.gihwan.tollgate.gateway.GatewayBuilder;
 class GatewayExtensionTest {
 
     @RegisterExtension
-    static GatewayExtension tollgate = new GatewayExtension() {
+    static GatewayExtension gateway = new GatewayExtension() {
         @Override
         public void configure(GatewayBuilder builder) {
             builder.healthCheck("/health");
@@ -47,17 +47,17 @@ class GatewayExtensionTest {
 
     @Test
     void port() {
-        assertThat(tollgate.httpPort()).isPositive();
+        assertThat(gateway.httpPort()).isPositive();
     }
 
     @Test
     void uri() {
-        assertThat(tollgate.httpUri()).isNotNull();
+        assertThat(gateway.httpUri()).isNotNull();
     }
 
     @Test
     void healthCheck() {
-        final WebClient webClient = WebClient.of(tollgate.httpUri());
+        final WebClient webClient = WebClient.of(gateway.httpUri());
         final AggregatedHttpResponse res = webClient.get("/health").aggregate().join();
         assertThat(res.status()).isEqualTo(HttpStatus.OK);
     }
