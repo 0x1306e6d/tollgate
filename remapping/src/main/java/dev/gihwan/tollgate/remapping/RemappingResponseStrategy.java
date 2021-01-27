@@ -26,45 +26,26 @@ package dev.gihwan.tollgate.remapping;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.function.Function;
-
-import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.server.ServiceRequestContext;
 
-import dev.gihwan.tollgate.gateway.DecoratingUpstream;
-import dev.gihwan.tollgate.gateway.Upstream;
-
 /**
- * A {@link Upstream} decorator for remapping {@link HttpRequest}s.
+ * A strategy for remapping {@link HttpResponse}
  */
-public final class RemappingRequestUpstream extends DecoratingUpstream {
+@FunctionalInterface
+public interface RemappingResponseStrategy {
 
     /**
-     * Returns a new {@link Upstream} decorator which remaps the {@link HttpRequest} using the given
-     * {@link RemappingRequestStrategy}.
+     * Remaps the given {@link HttpResponse}.
      */
-    public static Function<? super Upstream, RemappingRequestUpstream> newDecorator(
-            RemappingRequestStrategy strategy) {
-        return builder().strategy(requireNonNull(strategy, "strategy")).newDecorator();
-    }
+    HttpResponse remap(ServiceRequestContext ctx, HttpResponse res);
 
     /**
-     * Returns a new {@link RemappingRequestUpstreamBuilder}.
+     * Returns a new composed {@link RemappingResponseStrategy} that first applies this strategy to its
+     * {@link HttpResponse}, and then applies the {@code after} strategy to the result.
      */
-    public static RemappingRequestUpstreamBuilder builder() {
-        return new RemappingRequestUpstreamBuilder();
-    }
-
-    private final RemappingRequestStrategy strategy;
-
-    RemappingRequestUpstream(Upstream delegate, RemappingRequestStrategy strategy) {
-        super(delegate);
-        this.strategy = strategy;
-    }
-
-    @Override
-    public final HttpResponse forward(ServiceRequestContext ctx, HttpRequest req) throws Exception {
-        return unwrap().forward(ctx, strategy.remap(ctx, req));
+    default RemappingResponseStrategy andThen(RemappingResponseStrategy after) {
+        requireNonNull(after, "after");
+        return (ctx, res) -> after.remap(ctx, remap(ctx, res));
     }
 }

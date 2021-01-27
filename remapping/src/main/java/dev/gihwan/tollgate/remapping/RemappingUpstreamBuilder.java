@@ -36,51 +36,67 @@ import com.linecorp.armeria.common.HttpRequest;
 import dev.gihwan.tollgate.gateway.Upstream;
 
 /**
- * A builder for {@link RemappingRequestUpstream}.
+ * A builder for {@link RemappingUpstream}.
  */
-public final class RemappingRequestUpstreamBuilder {
+public final class RemappingUpstreamBuilder {
 
     @Nullable
-    private RemappingRequestStrategy strategy;
+    private RemappingRequestStrategy requestStrategy;
+    @Nullable
+    private RemappingResponseStrategy responseStrategy;
 
-    RemappingRequestUpstreamBuilder() {}
+    RemappingUpstreamBuilder() {}
 
     /**
      * Adds a new {@link RemappingRequestStrategy} that remaps {@link HttpRequest} path with the given
      * {@code pathPattern}.
      *
      * @see RemappingRequestPathStrategy#path(String)
-     * @see RemappingRequestUpstreamBuilder#strategy(RemappingRequestStrategy)
+     * @see RemappingUpstreamBuilder#requestStrategy(RemappingRequestStrategy)
      */
-    public RemappingRequestUpstreamBuilder path(String pathPattern) {
-        return strategy(RemappingRequestStrategy.path(pathPattern));
+    public RemappingUpstreamBuilder requestPath(String pathPattern) {
+        return requestStrategy(RemappingRequestStrategy.path(pathPattern));
     }
 
     /**
      * Adds the given {@link RemappingRequestStrategy}.
      */
-    public RemappingRequestUpstreamBuilder strategy(RemappingRequestStrategy strategy) {
-        requireNonNull(strategy, "strategy");
-        if (this.strategy == null) {
-            this.strategy = strategy;
+    public RemappingUpstreamBuilder requestStrategy(RemappingRequestStrategy requestStrategy) {
+        requireNonNull(requestStrategy, "requestStrategy");
+        if (this.requestStrategy == null) {
+            this.requestStrategy = requestStrategy;
         } else {
-            this.strategy = this.strategy.andThen(strategy);
+            this.requestStrategy = this.requestStrategy.andThen(requestStrategy);
         }
         return this;
     }
 
     /**
-     * Builds a new {@link RemappingRequestUpstream} decorator based on the properties of this builder.
+     * Adds the given {@link RemappingResponseStrategy}.
      */
-    public Function<? super Upstream, RemappingRequestUpstream> newDecorator() {
+    public RemappingUpstreamBuilder responseStrategy(RemappingResponseStrategy responseStrategy) {
+        requireNonNull(responseStrategy, "responseStrategy");
+        if (this.responseStrategy == null) {
+            this.responseStrategy = responseStrategy;
+        } else {
+            this.responseStrategy = this.responseStrategy.andThen(responseStrategy);
+        }
+        return this;
+    }
+
+    /**
+     * Builds a new {@link RemappingUpstream} decorator based on the properties of this builder.
+     */
+    public Function<? super Upstream, RemappingUpstream> newDecorator() {
         return this::build;
     }
 
     /**
-     * Builds a new {@link RemappingRequestUpstream} based on the properties of this builder.
+     * Builds a new {@link RemappingUpstream} based on the properties of this builder.
      */
-    public RemappingRequestUpstream build(Upstream delegate) {
-        checkArgument(strategy != null, "Must set at lease one remapping strategy");
-        return new RemappingRequestUpstream(delegate, strategy);
+    public RemappingUpstream build(Upstream delegate) {
+        checkArgument(requestStrategy != null || responseStrategy != null,
+                      "Must set at lease one request or response strategy");
+        return new RemappingUpstream(delegate, requestStrategy, responseStrategy);
     }
 }
