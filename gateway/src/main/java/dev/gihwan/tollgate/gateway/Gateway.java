@@ -26,6 +26,7 @@ package dev.gihwan.tollgate.gateway;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
 
@@ -87,15 +88,33 @@ public final class Gateway {
         return server.activeLocalPort(protocol);
     }
 
-    public void start() {
+    public CompletableFuture<Void> start() {
+        final CompletableFuture<Void> startFuture = new CompletableFuture<>();
         logger.info("Starting the Tollgate server.");
-        server.start().join();
-        logger.info("Started the Tollgate server at {}.", activePorts());
+        server.start().handle((unused, cause) -> {
+            if (cause != null) {
+                startFuture.completeExceptionally(cause);
+            } else {
+                logger.info("Started the Tollgate server at {}.", activePorts());
+                startFuture.complete(null);
+            }
+            return null;
+        });
+        return startFuture;
     }
 
-    public void stop() {
+    public CompletableFuture<Void> stop() {
+        final CompletableFuture<Void> stopFuture = new CompletableFuture<>();
         logger.info("Stopping the Tollgate server.");
-        server.stop().join();
-        logger.info("Stopped the Tollgate server.");
+        server.stop().handle((aVoid, cause) -> {
+            if (cause != null) {
+                stopFuture.completeExceptionally(cause);
+            } else {
+                logger.info("Stopped the Tollgate server.");
+                stopFuture.complete(null);
+            }
+            return null;
+        });
+        return stopFuture;
     }
 }

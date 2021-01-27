@@ -28,6 +28,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import javax.annotation.CheckReturnValue;
@@ -51,7 +52,7 @@ public abstract class TestGateway implements SafeCloseable {
     @CheckReturnValue
     public static TestGateway withTestGateway(Consumer<? super GatewayBuilder> builderConsumer) {
         final TestGateway testGateway = of(builderConsumer);
-        testGateway.start();
+        testGateway.start().join();
         return testGateway;
     }
 
@@ -81,20 +82,20 @@ public abstract class TestGateway implements SafeCloseable {
     /**
      * Starts the {@link Gateway}.
      */
-    public void start() {
+    public CompletableFuture<Void> start() {
         final GatewayBuilder builder = Gateway.builder();
         configure(builder);
 
         delegate = builder.build();
-        delegate.start();
+        return delegate.start();
     }
 
     /**
      * Stops the {@link Gateway}.
      */
-    public void stop() {
+    public CompletableFuture<Void> stop() {
         checkState(delegate != null, "gateway did not start.");
-        delegate.stop();
+        return delegate.stop();
     }
 
     /**
@@ -102,7 +103,7 @@ public abstract class TestGateway implements SafeCloseable {
      */
     @Override
     public void close() {
-        stop();
+        stop().join();
     }
 
     /**
