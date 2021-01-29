@@ -17,10 +17,10 @@ some customizing. Then register your decorator and use it in settings.
 
 **TBW**
 
-## Extensions
+## Modules
 
 - [HOCON](/hocon)
-    - to build `Gateway` using a HOCON (Human-Optimized Config Object Notation) configuration.
+    - An extension to build `Gateway` using a HOCON (Human-Optimized Config Object Notation) configuration.
 
 ## How to Build
 
