@@ -3,28 +3,29 @@
 ![Build master](https://github.com/ghkim3221/tollgate/workflows/Build%20master/badge.svg)
 ![Build pull request](https://github.com/ghkim3221/tollgate/workflows/Build%20pull%20request/badge.svg)
 
-Tollgate is an application-level API gateway for your microservice. You can expose your microservice to the
-world by just deploying and configuring. We can do other basic thing like logging and will do authentication,
-authorization, monitoring, reconstructing request (response) body and sanitizing response status code.
-
-The primary goal of Tollgate is to minimize coding and replace it with settings. To do it, we support file-based
-configuration and will support dynamic configurations via CentralDogma or something else.
-
-Tollgate is running based on the [Armeria](https://armeria.dev). You can use the Armeria's decorator when need
-some customizing. Then register your decorator and use it in settings.
+Tollgate is an application-level API gateway for your microservice.
 
 ## Getting Started
 
-**TBW**
+```java
+final Gateway gateway = Gateway.builder()
+                               .http(8080)
+                               .upstream("/foo", Upstream.of("http://10.0.1.1"))
+                               .upstream("/bar", Upstream.of("http://10.0.1.2"))
+                               .build();
+gateway.start().join();
+```
 
-## Modules
+- `Gateway` is listening on HTTP 8080.
+- All requests routing to `/foo` will be forwarded to `http://10.0.1.1`.
+- All requests routing to `/bar` will be forwarded to `http://10.0.1.2`.
+
+## Features
 
 - [HOCON](/hocon)
-    - An extension to build `Gateway` using a HOCON (Human-Optimized Config Object Notation) configuration.
-
-## How to Build
-
-**TBW**
+    - Builds `Gateway` using a HOCON (Human-Optimized Config Object Notation) configuration.
+- [remapping](/remapping)
+    - Remaps `HttpRequest` or `HttpResponse`.
 
 ## License
 
