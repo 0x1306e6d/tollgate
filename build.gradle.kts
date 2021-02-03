@@ -29,7 +29,7 @@ plugins {
 allprojects {
     apply(plugin = "idea")
 
-    group = "dev.gihwan"
+    group = "dev.gihwan.tollgate"
     version = "0.1.0-SNAPSHOT"
 
     repositories {
