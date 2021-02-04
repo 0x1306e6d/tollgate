@@ -1,8 +1,9 @@
-name: Build master
+name: Build and publish
 
 on:
   push:
     branches: [ master ]
+    tags: [ '*' ]
 
 jobs:
   build:
@@ -16,3 +17,8 @@ jobs:
           java-version: 11
       - name: Build using Gradle
         run: gradle build
+      - name: Publish to GitHub Packages
+        run: gradle publish
+        env:
+          USERNAME: ${{ github.actor }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
