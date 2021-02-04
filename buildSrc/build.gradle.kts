@@ -24,8 +24,18 @@
 
 plugins {
     `kotlin-dsl`
+    id("org.gradle.java-gradle-plugin")
 }
 
 repositories {
     jcenter()
+}
+
+gradlePlugin {
+    plugins {
+        register("publishPlugin") {
+            id = "dev.gihwan.tollgate.publish"
+            implementationClass = "dev.gihwan.tollgate.PublishPlugin"
+        }
+    }
 }

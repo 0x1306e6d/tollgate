@@ -26,6 +26,7 @@ import dev.gihwan.tollgate.Dependency
 
 plugins {
     id("java-library")
+    id("dev.gihwan.tollgate.publish")
 }
 
 dependencies {
