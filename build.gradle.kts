@@ -30,7 +30,7 @@ allprojects {
     apply(plugin = "idea")
 
     group = "dev.gihwan.tollgate"
-    version = "0.1.0-SNAPSHOT"
+    version = "0.1.0"
 
     repositories {
         mavenCentral()
