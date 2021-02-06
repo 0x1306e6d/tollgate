@@ -25,7 +25,7 @@
 package dev.gihwan.tollgate
 
 object Version {
-    const val armeria = "1.3.0"
+    const val armeria = "1.4.0"
 
     const val commonsLang3 = "3.11"
     const val config = "1.4.1"
@@ -34,8 +34,8 @@ object Version {
     const val logback = "1.2.3"
     const val slf4j = "1.7.30"
 
-    const val assertj = "3.18.1"
+    const val assertj = "3.19.0"
     const val awaitility = "4.0.3"
-    const val junit = "5.7.0"
-    const val mockito = "3.7.0"
+    const val junit = "5.7.1"
+    const val mockito = "3.7.7"
 }
