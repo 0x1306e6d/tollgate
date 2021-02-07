@@ -33,7 +33,7 @@ import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.RequestHeaders;
 import com.linecorp.armeria.server.ServiceRequestContext;
 
-class RemappingRequestPathStrategy implements RemappingRequestStrategy {
+final class RemappingRequestPathStrategy implements RemappingRequestStrategy {
 
     private static final String PATH_SEPARATOR = "/";
     private static final Splitter PATH_SPLITTER = Splitter.on(PATH_SEPARATOR);
