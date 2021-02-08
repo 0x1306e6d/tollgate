@@ -32,6 +32,8 @@ import java.util.function.Function;
 import javax.annotation.Nullable;
 
 import com.linecorp.armeria.common.HttpRequest;
+import com.linecorp.armeria.common.HttpResponse;
+import com.linecorp.armeria.common.HttpStatus;
 
 import dev.gihwan.tollgate.gateway.Upstream;
 
@@ -69,6 +71,17 @@ public final class RemappingUpstreamBuilder {
             this.requestStrategy = this.requestStrategy.andThen(requestStrategy);
         }
         return this;
+    }
+
+    /**
+     * Adds a new {@link RemappingResponseStrategy} remaps {@link HttpStatus} of {@link HttpResponse} with the
+     * given {@link HttpStatusFunction}.
+     *
+     * @see RemappingResponseStrategy#status(HttpStatusFunction)
+     * @see RemappingUpstreamBuilder#responseStrategy(RemappingResponseStrategy)
+     */
+    public RemappingUpstreamBuilder responseStatus(HttpStatusFunction statusFunction) {
+        return responseStrategy(RemappingResponseStrategy.status(statusFunction));
     }
 
     /**
