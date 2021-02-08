@@ -22,34 +22,29 @@
  * SOFTWARE.
  */
 
-import dev.gihwan.tollgate.Dependency
+package dev.gihwan.tollgate.remapping;
 
-plugins {
-    id("java-library")
-    id("dev.gihwan.tollgate.publish")
-}
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
-dependencies {
-    implementation(project(":util"))
-    implementation(project(":gateway"))
+import org.junit.jupiter.api.Test;
 
-    implementation(Dependency.guava)
-    implementation(Dependency.slf4j)
+import com.linecorp.armeria.common.AggregatedHttpResponse;
+import com.linecorp.armeria.common.HttpResponse;
+import com.linecorp.armeria.common.HttpStatus;
+import com.linecorp.armeria.server.ServiceRequestContext;
 
-    testImplementation(project(":junit5"))
-    testImplementation(Dependency.assertj)
-    testImplementation(Dependency.mockito)
-    implementation(Dependency.armeriaJunit)
+class RemappingResponseStatusStrategyTest {
 
-    testRuntimeOnly(Dependency.junitEngine)
-    testRuntimeOnly(Dependency.logback)
-}
+    @Test
+    void remapStatus() {
+        final HttpStatusFunction alwaysOk = status -> HttpStatus.OK;
+        final RemappingResponseStatusStrategy strategy = new RemappingResponseStatusStrategy(alwaysOk);
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
+        final ServiceRequestContext ctx = mock(ServiceRequestContext.class);
+        final HttpResponse res = HttpResponse.of(HttpStatus.INTERNAL_SERVER_ERROR);
 
-tasks.test {
-    useJUnitPlatform()
+        final AggregatedHttpResponse remappedRes = strategy.remap(ctx, res).aggregate().join();
+        assertThat(remappedRes.status()).isEqualTo(HttpStatus.OK);
+    }
 }

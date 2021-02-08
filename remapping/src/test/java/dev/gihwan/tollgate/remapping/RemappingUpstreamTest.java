@@ -34,6 +34,7 @@ import com.linecorp.armeria.client.WebClient;
 import com.linecorp.armeria.common.AggregatedHttpResponse;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
+import com.linecorp.armeria.common.MediaType;
 import com.linecorp.armeria.server.ServerBuilder;
 import com.linecorp.armeria.testing.junit5.server.ServerExtension;
 
@@ -47,6 +48,9 @@ class RemappingUpstreamTest {
         @Override
         protected void configure(ServerBuilder sb) {
             sb.service("/foo", (ctx, req) -> HttpResponse.of("Hello, World!"));
+            sb.service("/error", (ctx, req) -> HttpResponse.of(HttpStatus.INTERNAL_SERVER_ERROR,
+                                                               MediaType.PLAIN_TEXT,
+                                                               "Hello, World!"));
         }
     };
 
@@ -67,6 +71,24 @@ class RemappingUpstreamTest {
 
             res = client.get("/foo").aggregate().join();
             assertThat(res.status()).isEqualTo(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @Test
+    void remapResponseStatus() {
+        final HttpStatusFunction alwaysOk = status -> HttpStatus.OK;
+        try (TestGateway gateway = withTestGateway(builder -> {
+            builder.upstream("/error", Upstream.builder(serviceServer.httpUri())
+                                               .decorator(RemappingUpstream.builder()
+                                                                           .responseStatus(alwaysOk)
+                                                                           .newDecorator())
+                                               .build());
+        })) {
+            final WebClient client = WebClient.of(gateway.httpUri());
+
+            final AggregatedHttpResponse res = client.get("/error").aggregate().join();
+            assertThat(res.status()).isEqualTo(HttpStatus.OK);
+            assertThat(res.contentUtf8()).isEqualTo("Hello, World!");
         }
     }
 }

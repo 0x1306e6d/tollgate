@@ -24,37 +24,34 @@
 
 package dev.gihwan.tollgate.remapping;
 
-import static java.util.Objects.requireNonNull;
-
+import com.linecorp.armeria.common.FilteredHttpResponse;
+import com.linecorp.armeria.common.HttpObject;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
+import com.linecorp.armeria.common.ResponseHeaders;
 import com.linecorp.armeria.server.ServiceRequestContext;
 
-/**
- * A strategy for remapping {@link HttpResponse}
- */
-@FunctionalInterface
-public interface RemappingResponseStrategy {
+final class RemappingResponseStatusStrategy implements RemappingResponseStrategy {
 
-    /**
-     * Returns a new {@link RemappingResponseStrategy} that remaps {@link HttpStatus} of {@link HttpResponse}
-     * with the given {@link HttpStatusFunction}.
-     */
-    static RemappingResponseStrategy status(HttpStatusFunction statusFunction) {
-        return new RemappingResponseStatusStrategy(requireNonNull(statusFunction, "statusFunction"));
+    private final HttpStatusFunction statusFunction;
+
+    RemappingResponseStatusStrategy(HttpStatusFunction statusFunction) {
+        this.statusFunction = statusFunction;
     }
 
-    /**
-     * Remaps the given {@link HttpResponse}.
-     */
-    HttpResponse remap(ServiceRequestContext ctx, HttpResponse res);
+    @Override
+    public HttpResponse remap(ServiceRequestContext ctx, HttpResponse res) {
+        return new FilteredHttpResponse(res) {
+            @Override
+            protected HttpObject filter(HttpObject obj) {
+                if (!(obj instanceof ResponseHeaders)) {
+                    return obj;
+                }
 
-    /**
-     * Returns a new composed {@link RemappingResponseStrategy} that first applies this strategy to its
-     * {@link HttpResponse}, and then applies the {@code after} strategy to the result.
-     */
-    default RemappingResponseStrategy andThen(RemappingResponseStrategy after) {
-        requireNonNull(after, "after");
-        return (ctx, res) -> after.remap(ctx, remap(ctx, res));
+                final ResponseHeaders headers = (ResponseHeaders) obj;
+                final HttpStatus remappedStatus = statusFunction.apply(headers.status());
+                return headers.toBuilder().status(remappedStatus).build();
+            }
+        };
     }
 }

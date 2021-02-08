@@ -22,34 +22,21 @@
  * SOFTWARE.
  */
 
-import dev.gihwan.tollgate.Dependency
+package dev.gihwan.tollgate.remapping;
 
-plugins {
-    id("java-library")
-    id("dev.gihwan.tollgate.publish")
-}
+import java.util.function.Function;
 
-dependencies {
-    implementation(project(":util"))
-    implementation(project(":gateway"))
+import com.linecorp.armeria.common.HttpStatus;
 
-    implementation(Dependency.guava)
-    implementation(Dependency.slf4j)
+/**
+ * A {@link FunctionalInterface} for mapping a {@link HttpStatus} to another {@link HttpStatus}.
+ */
+@FunctionalInterface
+public interface HttpStatusFunction extends Function<HttpStatus, HttpStatus> {
 
-    testImplementation(project(":junit5"))
-    testImplementation(Dependency.assertj)
-    testImplementation(Dependency.mockito)
-    implementation(Dependency.armeriaJunit)
-
-    testRuntimeOnly(Dependency.junitEngine)
-    testRuntimeOnly(Dependency.logback)
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-
-tasks.test {
-    useJUnitPlatform()
+    /**
+     * Maps the given {@link HttpStatus} to another {@link HttpStatus}.
+     */
+    @Override
+    HttpStatus apply(HttpStatus status);
 }
