@@ -39,7 +39,7 @@ dependencies {
     testImplementation(project(":junit5"))
     testImplementation(Dependency.assertj)
     testImplementation(Dependency.mockito)
-    implementation(Dependency.armeriaJunit)
+    testImplementation(Dependency.armeriaJunit)
 
     testRuntimeOnly(Dependency.junitEngine)
     testRuntimeOnly(Dependency.logback)
