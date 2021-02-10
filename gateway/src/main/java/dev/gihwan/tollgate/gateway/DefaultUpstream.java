@@ -45,7 +45,7 @@ final class DefaultUpstream implements Upstream {
     public HttpResponse forward(ServiceRequestContext ctx, HttpRequest req) throws Exception {
         final CompletableFuture<HttpResponse> resFuture = new CompletableFuture<>();
         final HttpResponse res = HttpResponse.from(resFuture);
-        client.execute(req).aggregate().handle((aggregated, cause) -> {
+        client.execute(req).aggregate().handleAsync((aggregated, cause) -> {
             if (cause != null) {
                 resolveException(resFuture, cause);
                 return null;
@@ -53,7 +53,7 @@ final class DefaultUpstream implements Upstream {
 
             resFuture.complete(aggregated.toHttpResponse());
             return null;
-        });
+        }, ctx.eventLoop());
         return res;
     }
 
