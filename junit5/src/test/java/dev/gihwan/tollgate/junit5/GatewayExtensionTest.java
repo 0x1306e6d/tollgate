@@ -41,6 +41,8 @@ class GatewayExtensionTest {
     static GatewayExtension gateway = new GatewayExtension() {
         @Override
         public void configure(GatewayBuilder builder) {
+            builder.http(0);
+            builder.https(0).tlsSelfSigned();
             builder.healthCheck("/health");
         }
     };
@@ -48,11 +50,13 @@ class GatewayExtensionTest {
     @Test
     void port() {
         assertThat(gateway.httpPort()).isPositive();
+        assertThat(gateway.httpsPort()).isPositive();
     }
 
     @Test
     void uri() {
         assertThat(gateway.httpUri()).isNotNull();
+        assertThat(gateway.httpsUri()).isNotNull();
     }
 
     @Test

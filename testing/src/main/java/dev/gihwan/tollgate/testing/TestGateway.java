@@ -114,6 +114,13 @@ public abstract class TestGateway implements SafeCloseable {
     }
 
     /**
+     * Returns the local port which the {@link Gateway} serves HTTPS.
+     */
+    public int httpsPort() {
+        return port(SessionProtocol.HTTPS);
+    }
+
+    /**
      * Returns the local port which the {@link Gateway} serves the given {@code protocol}.
      */
     public int port(SessionProtocol protocol) {
@@ -126,5 +133,12 @@ public abstract class TestGateway implements SafeCloseable {
      */
     public URI httpUri() {
         return URI.create("http://127.0.0.1:" + httpPort());
+    }
+
+    /**
+     * Returns the {@link URI} which the {@link Gateway} serves HTTPS.
+     */
+    public URI httpsUri() {
+        return URI.create("http://127.0.0.1:" + httpsPort());
     }
 }
