@@ -192,6 +192,9 @@ public final class GatewayBuilder {
         return new UpstreamBindingBuilder(this, serverBuilder.route());
     }
 
+    /**
+     * Binds the given {@link Upstream} at the given {@code pathPattern}.
+     */
     public GatewayBuilder upstream(String pathPattern, Upstream upstream) {
         return route().path(pathPattern).build(upstream);
     }
