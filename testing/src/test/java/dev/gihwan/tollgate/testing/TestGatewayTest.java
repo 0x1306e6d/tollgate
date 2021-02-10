@@ -35,23 +35,29 @@ import com.linecorp.armeria.common.HttpStatus;
 
 import dev.gihwan.tollgate.gateway.Upstream;
 
-class TestingGatewayTest {
+class TestGatewayTest {
 
     @Test
     void port() {
         try (TestGateway gateway = withTestGateway(builder -> {
+            builder.http(0);
+            builder.https(0).tlsSelfSigned();
             builder.upstream("/foo", Upstream.of("http://127.0.0.1"));
         })) {
             assertThat(gateway.httpPort()).isPositive();
+            assertThat(gateway.httpsPort()).isPositive();
         }
     }
 
     @Test
     void uri() {
         try (TestGateway gateway = withTestGateway(builder -> {
+            builder.http(0);
+            builder.https(0).tlsSelfSigned();
             builder.upstream("/foo", Upstream.of("http://127.0.0.1"));
         })) {
             assertThat(gateway.httpUri()).isNotNull();
+            assertThat(gateway.httpsUri()).isNotNull();
         }
     }
 

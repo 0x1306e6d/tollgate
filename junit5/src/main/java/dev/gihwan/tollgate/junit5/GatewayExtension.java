@@ -70,6 +70,13 @@ public abstract class GatewayExtension extends AbstractAllOrEachExtension {
     }
 
     /**
+     * @see TestGateway#httpsPort()
+     */
+    public int httpsPort() {
+        return delegate.httpsPort();
+    }
+
+    /**
      * @see TestGateway#port(SessionProtocol)
      */
     public int port(SessionProtocol protocol) {
@@ -81,5 +88,12 @@ public abstract class GatewayExtension extends AbstractAllOrEachExtension {
      */
     public URI httpUri() {
         return delegate.httpUri();
+    }
+
+    /**
+     * @see TestGateway#httpsUri()
+     */
+    public URI httpsUri() {
+        return delegate.httpsUri();
     }
 }
