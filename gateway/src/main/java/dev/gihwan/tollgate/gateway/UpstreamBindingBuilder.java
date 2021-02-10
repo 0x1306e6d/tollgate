@@ -24,13 +24,24 @@
 
 package dev.gihwan.tollgate.gateway;
 
+import static java.util.Objects.requireNonNull;
+
+import java.util.function.Function;
 import java.util.function.Predicate;
+
+import javax.annotation.Nullable;
+
+import com.google.common.collect.ImmutableList;
 
 import com.linecorp.armeria.common.HttpMethod;
 import com.linecorp.armeria.common.MediaType;
+import com.linecorp.armeria.server.HttpService;
 import com.linecorp.armeria.server.ServiceBindingBuilder;
 
 public final class UpstreamBindingBuilder {
+
+    @Nullable
+    private Function<? super Upstream, ? extends Upstream> decorator;
 
     private final GatewayBuilder gatewayBuilder;
     private final ServiceBindingBuilder serviceBindingBuilder;
@@ -226,8 +237,74 @@ public final class UpstreamBindingBuilder {
         return this;
     }
 
+    /**
+     * Decorates a {@link Upstream} with the given {@code decorator}.
+     */
+    public UpstreamBindingBuilder decorator(Function<? super Upstream, ? extends Upstream> decorator) {
+        requireNonNull(decorator, "decorator");
+        if (this.decorator == null) {
+            this.decorator = decorator;
+        } else {
+            this.decorator = this.decorator.andThen(decorator);
+        }
+        return this;
+    }
+
+    /**
+     * Decorates a {@link Upstream} with the given {@code decorators}, in the order of iteration.
+     */
+    @SafeVarargs
+    public final UpstreamBindingBuilder decorators(
+            Function<? super Upstream, ? extends Upstream>... decorators) {
+        return decorators(ImmutableList.copyOf(requireNonNull(decorators, "decorators")));
+    }
+
+    /**
+     * Decorates a {@link Upstream} with the given {@code decorators}, in the order of iteration.
+     */
+    public UpstreamBindingBuilder decorators(
+            Iterable<Function<? super Upstream, ? extends Upstream>> decorators) {
+        requireNonNull(decorators, "decorators");
+        for (Function<? super Upstream, ? extends Upstream> decorator : decorators) {
+            this.decorator(requireNonNull(decorator, "decorator"));
+        }
+        return this;
+    }
+
+    /**
+     * @see ServiceBindingBuilder#decorator(Function)
+     */
+    public UpstreamBindingBuilder armeriaDecorator(
+            Function<? super HttpService, ? extends HttpService> armeriaDecorator) {
+        serviceBindingBuilder.decorator(armeriaDecorator);
+        return this;
+    }
+
+    /**
+     * @see ServiceBindingBuilder#decorators(Function[])
+     */
+    @SafeVarargs
+    public final UpstreamBindingBuilder armeriaDecorators(
+            Function<? super HttpService, ? extends HttpService>... armeriaDecorators) {
+        serviceBindingBuilder.decorators(armeriaDecorators);
+        return this;
+    }
+
+    /**
+     * @see ServiceBindingBuilder#decorators(Iterable)
+     */
+    public UpstreamBindingBuilder armeriaDecorators(
+            Iterable<? extends Function<? super HttpService, ? extends HttpService>> armeriaDecorators) {
+        serviceBindingBuilder.decorators(armeriaDecorators);
+        return this;
+    }
+
     public final GatewayBuilder build(Upstream upstream) {
-        serviceBindingBuilder.build(new UpstreamHttpService(upstream));
+        Upstream decoratedUpstream = upstream;
+        if (decorator != null) {
+            decoratedUpstream = upstream.decorate(decorator);
+        }
+        serviceBindingBuilder.build(new UpstreamHttpService(decoratedUpstream));
         return gatewayBuilder;
     }
 }
