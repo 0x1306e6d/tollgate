@@ -25,7 +25,7 @@
 package dev.gihwan.tollgate
 
 object Version {
-    const val armeria = "1.4.0"
+    const val armeria = "1.5.0"
 
     const val commonsLang3 = "3.11"
     const val config = "1.4.1"
