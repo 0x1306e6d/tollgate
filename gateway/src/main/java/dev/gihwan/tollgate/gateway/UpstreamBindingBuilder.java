@@ -300,7 +300,7 @@ public final class UpstreamBindingBuilder {
     }
 
     public final GatewayBuilder build(Upstream upstream) {
-        Upstream decoratedUpstream = upstream;
+        Upstream decoratedUpstream = requireNonNull(upstream, "upstream");
         if (decorator != null) {
             decoratedUpstream = upstream.decorate(decorator);
         }
