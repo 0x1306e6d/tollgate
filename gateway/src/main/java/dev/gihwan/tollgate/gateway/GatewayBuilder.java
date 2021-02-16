@@ -24,16 +24,22 @@
 
 package dev.gihwan.tollgate.gateway;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.File;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.annotation.Nullable;
 import javax.net.ssl.KeyManagerFactory;
 
+import com.google.common.collect.ImmutableList;
+
+import com.linecorp.armeria.server.HttpService;
 import com.linecorp.armeria.server.Server;
 import com.linecorp.armeria.server.ServerBuilder;
 import com.linecorp.armeria.server.healthcheck.HealthCheckService;
@@ -197,6 +203,26 @@ public final class GatewayBuilder {
      */
     public GatewayBuilder upstream(String pathPattern, Upstream upstream) {
         return route().path(pathPattern).build(upstream);
+    }
+
+    /**
+     * Binds the given {@link Upstream} with the given {@code decorators} at the given {@code pathPattern}.
+     */
+    @SafeVarargs
+    public final GatewayBuilder upstream(String pathPattern,
+                                         Upstream upstream,
+                                         Function<? super HttpService, ? extends HttpService>... decorators) {
+        return upstream(pathPattern, upstream, ImmutableList.copyOf(requireNonNull(decorators, "decorators")));
+    }
+
+    /**
+     * Binds the given {@link Upstream} with the given {@code decorators} at the given {@code pathPattern}.
+     */
+    public GatewayBuilder upstream(
+            String pathPattern,
+            Upstream upstream,
+            Iterable<? extends Function<? super HttpService, ? extends HttpService>> decorators) {
+        return route().path(pathPattern).armeriaDecorators(decorators).build(upstream);
     }
 
     public final Gateway build() {
