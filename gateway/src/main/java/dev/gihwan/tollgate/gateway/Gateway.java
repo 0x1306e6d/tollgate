@@ -24,6 +24,8 @@
 
 package dev.gihwan.tollgate.gateway;
 
+import static java.util.Objects.requireNonNull;
+
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -71,7 +73,7 @@ public final class Gateway {
      */
     @Nullable
     public ServerPort activePort(SessionProtocol protocol) {
-        return server.activePort(protocol);
+        return server.activePort(requireNonNull(protocol, "protocol"));
     }
 
     /**
@@ -85,7 +87,7 @@ public final class Gateway {
      * @see Server#activeLocalPort(SessionProtocol)
      */
     public int activeLocalPort(SessionProtocol protocol) {
-        return server.activeLocalPort(protocol);
+        return server.activeLocalPort(requireNonNull(protocol, "protocol"));
     }
 
     public CompletableFuture<Void> start() {

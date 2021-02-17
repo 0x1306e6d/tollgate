@@ -64,7 +64,7 @@ public final class GatewayBuilder {
      * @see ServerBuilder#http(InetSocketAddress)
      */
     public GatewayBuilder http(InetSocketAddress localAddress) {
-        serverBuilder.http(localAddress);
+        serverBuilder.http(requireNonNull(localAddress, "localAddress"));
         return this;
     }
 
@@ -80,7 +80,7 @@ public final class GatewayBuilder {
      * @see ServerBuilder#https(InetSocketAddress)
      */
     public GatewayBuilder https(InetSocketAddress localAddress) {
-        serverBuilder.https(localAddress);
+        serverBuilder.https(requireNonNull(localAddress, "localAddress"));
         return this;
     }
 
@@ -88,7 +88,8 @@ public final class GatewayBuilder {
      * @see ServerBuilder#tls(File, File)
      */
     public GatewayBuilder tls(File keyCertChainFile, File keyFile) {
-        serverBuilder.tls(keyCertChainFile, keyFile);
+        serverBuilder.tls(requireNonNull(keyCertChainFile, "keyCertChainFile"),
+                          requireNonNull(keyFile, "keyFile"));
         return this;
     }
 
@@ -96,7 +97,9 @@ public final class GatewayBuilder {
      * @see ServerBuilder#tls(File, File, String)
      */
     public GatewayBuilder tls(File keyCertChainFile, File keyFile, @Nullable String keyPassword) {
-        serverBuilder.tls(keyCertChainFile, keyFile, keyPassword);
+        serverBuilder.tls(requireNonNull(keyCertChainFile, "keyCertChainFile"),
+                          requireNonNull(keyFile, "keyFile"),
+                          keyPassword);
         return this;
     }
 
@@ -104,7 +107,8 @@ public final class GatewayBuilder {
      * @see ServerBuilder#tls(InputStream, InputStream)
      */
     public GatewayBuilder tls(InputStream keyCertChainInputStream, InputStream keyInputStream) {
-        serverBuilder.tls(keyCertChainInputStream, keyInputStream);
+        serverBuilder.tls(requireNonNull(keyCertChainInputStream, "keyCertChainInputStream"),
+                          requireNonNull(keyInputStream, "keyInputStream"));
         return this;
     }
 
@@ -114,7 +118,9 @@ public final class GatewayBuilder {
     public GatewayBuilder tls(InputStream keyCertChainInputStream,
                               InputStream keyInputStream,
                               @Nullable String keyPassword) {
-        serverBuilder.tls(keyCertChainInputStream, keyInputStream, keyPassword);
+        serverBuilder.tls(requireNonNull(keyCertChainInputStream, "keyCertChainInputStream"),
+                          requireNonNull(keyInputStream, "keyInputStream"),
+                          keyPassword);
         return this;
     }
 
@@ -122,7 +128,7 @@ public final class GatewayBuilder {
      * @see ServerBuilder#tls(PrivateKey, X509Certificate...)
      */
     public GatewayBuilder tls(PrivateKey key, X509Certificate... keyCertChain) {
-        serverBuilder.tls(key, keyCertChain);
+        serverBuilder.tls(requireNonNull(key, "key"), requireNonNull(keyCertChain, "keyCertChain"));
         return this;
     }
 
@@ -130,7 +136,7 @@ public final class GatewayBuilder {
      * @see ServerBuilder#tls(PrivateKey, Iterable)
      */
     public GatewayBuilder tls(PrivateKey key, Iterable<? extends X509Certificate> keyCertChain) {
-        serverBuilder.tls(key, keyCertChain);
+        serverBuilder.tls(requireNonNull(key, "key"), requireNonNull(keyCertChain, "keyCertChain"));
         return this;
     }
 
@@ -138,7 +144,9 @@ public final class GatewayBuilder {
      * @see ServerBuilder#tls(PrivateKey, String, X509Certificate...)
      */
     public GatewayBuilder tls(PrivateKey key, @Nullable String keyPassword, X509Certificate... keyCertChain) {
-        serverBuilder.tls(key, keyPassword, keyCertChain);
+        serverBuilder.tls(requireNonNull(key, "key"),
+                          keyPassword,
+                          requireNonNull(keyCertChain, "keyCertChain"));
         return this;
     }
 
@@ -149,7 +157,9 @@ public final class GatewayBuilder {
     public GatewayBuilder tls(PrivateKey key,
                               @Nullable String keyPassword,
                               Iterable<? extends X509Certificate> keyCertChain) {
-        serverBuilder.tls(key, keyPassword, keyCertChain);
+        serverBuilder.tls(requireNonNull(key, "key"),
+                          keyPassword,
+                          requireNonNull(keyCertChain, "keyCertChain"));
         return this;
     }
 
@@ -157,7 +167,7 @@ public final class GatewayBuilder {
      * @see ServerBuilder#tls(KeyManagerFactory)
      */
     public GatewayBuilder tls(KeyManagerFactory keyManagerFactory) {
-        serverBuilder.tls(keyManagerFactory);
+        serverBuilder.tls(requireNonNull(keyManagerFactory, "keyManagerFactory"));
         return this;
     }
 
@@ -181,7 +191,7 @@ public final class GatewayBuilder {
      * @see ServerBuilder#tlsCustomizer(Consumer)
      */
     public GatewayBuilder tlsCustomizer(Consumer<? super SslContextBuilder> tlsCustomizer) {
-        serverBuilder.tlsCustomizer(tlsCustomizer);
+        serverBuilder.tlsCustomizer(requireNonNull(tlsCustomizer, "tlsCustomizer"));
         return this;
     }
 
@@ -190,7 +200,8 @@ public final class GatewayBuilder {
     }
 
     public GatewayBuilder healthCheck(String healthCheckPath, HealthCheckService healthCheckService) {
-        serverBuilder.service(healthCheckPath, healthCheckService);
+        serverBuilder.service(requireNonNull(healthCheckPath, "healthCheckPath"),
+                              requireNonNull(healthCheckService, "healthCheckService"));
         return this;
     }
 

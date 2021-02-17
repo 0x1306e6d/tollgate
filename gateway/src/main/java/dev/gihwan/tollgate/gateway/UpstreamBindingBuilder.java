@@ -55,7 +55,7 @@ public final class UpstreamBindingBuilder {
      * @see ServiceBindingBuilder#path(String)
      */
     public UpstreamBindingBuilder path(String pathPattern) {
-        serviceBindingBuilder.path(pathPattern);
+        serviceBindingBuilder.path(requireNonNull(pathPattern, "pathPattern"));
         return this;
     }
 
@@ -63,7 +63,7 @@ public final class UpstreamBindingBuilder {
      * @see ServiceBindingBuilder#pathPrefix(String)
      */
     public UpstreamBindingBuilder pathPrefix(String prefix) {
-        serviceBindingBuilder.pathPrefix(prefix);
+        serviceBindingBuilder.pathPrefix(requireNonNull(prefix, "prefix"));
         return this;
     }
 
@@ -71,7 +71,7 @@ public final class UpstreamBindingBuilder {
      * @see ServiceBindingBuilder#methods(HttpMethod...)
      */
     public UpstreamBindingBuilder methods(HttpMethod... methods) {
-        serviceBindingBuilder.methods(methods);
+        serviceBindingBuilder.methods(requireNonNull(methods, "methods"));
         return this;
     }
 
@@ -79,7 +79,7 @@ public final class UpstreamBindingBuilder {
      * @see ServiceBindingBuilder#methods(Iterable)
      */
     public UpstreamBindingBuilder methods(Iterable<HttpMethod> methods) {
-        serviceBindingBuilder.methods(methods);
+        serviceBindingBuilder.methods(requireNonNull(methods, "methods"));
         return this;
     }
 
@@ -87,7 +87,7 @@ public final class UpstreamBindingBuilder {
      * @see ServiceBindingBuilder#get(String)
      */
     public UpstreamBindingBuilder get(String pathPattern) {
-        serviceBindingBuilder.get(pathPattern);
+        serviceBindingBuilder.get(requireNonNull(pathPattern, "pathPattern"));
         return this;
     }
 
@@ -95,7 +95,7 @@ public final class UpstreamBindingBuilder {
      * @see ServiceBindingBuilder#post(String)
      */
     public UpstreamBindingBuilder post(String pathPattern) {
-        serviceBindingBuilder.post(pathPattern);
+        serviceBindingBuilder.post(requireNonNull(pathPattern, "pathPattern"));
         return this;
     }
 
@@ -103,7 +103,7 @@ public final class UpstreamBindingBuilder {
      * @see ServiceBindingBuilder#put(String)
      */
     public UpstreamBindingBuilder put(String pathPattern) {
-        serviceBindingBuilder.put(pathPattern);
+        serviceBindingBuilder.put(requireNonNull(pathPattern, "pathPattern"));
         return this;
     }
 
@@ -111,7 +111,7 @@ public final class UpstreamBindingBuilder {
      * @see ServiceBindingBuilder#patch(String)
      */
     public UpstreamBindingBuilder patch(String pathPattern) {
-        serviceBindingBuilder.patch(pathPattern);
+        serviceBindingBuilder.patch(requireNonNull(pathPattern, "pathPattern"));
         return this;
     }
 
@@ -119,7 +119,7 @@ public final class UpstreamBindingBuilder {
      * @see ServiceBindingBuilder#delete(String)
      */
     public UpstreamBindingBuilder delete(String pathPattern) {
-        serviceBindingBuilder.delete(pathPattern);
+        serviceBindingBuilder.delete(requireNonNull(pathPattern, "pathPattern"));
         return this;
     }
 
@@ -127,7 +127,7 @@ public final class UpstreamBindingBuilder {
      * @see ServiceBindingBuilder#options(String)
      */
     public UpstreamBindingBuilder options(String pathPattern) {
-        serviceBindingBuilder.options(pathPattern);
+        serviceBindingBuilder.options(requireNonNull(pathPattern, "pathPattern"));
         return this;
     }
 
@@ -135,7 +135,7 @@ public final class UpstreamBindingBuilder {
      * @see ServiceBindingBuilder#head(String)
      */
     public UpstreamBindingBuilder head(String pathPattern) {
-        serviceBindingBuilder.head(pathPattern);
+        serviceBindingBuilder.head(requireNonNull(pathPattern, "pathPattern"));
         return this;
     }
 
@@ -143,7 +143,7 @@ public final class UpstreamBindingBuilder {
      * @see ServiceBindingBuilder#trace(String)
      */
     public UpstreamBindingBuilder trace(String pathPattern) {
-        serviceBindingBuilder.trace(pathPattern);
+        serviceBindingBuilder.trace(requireNonNull(pathPattern, "pathPattern"));
         return this;
     }
 
@@ -151,7 +151,7 @@ public final class UpstreamBindingBuilder {
      * @see ServiceBindingBuilder#connect(String)
      */
     public UpstreamBindingBuilder connect(String pathPattern) {
-        serviceBindingBuilder.connect(pathPattern);
+        serviceBindingBuilder.connect(requireNonNull(pathPattern, "pathPattern"));
         return this;
     }
 
@@ -159,7 +159,7 @@ public final class UpstreamBindingBuilder {
      * @see ServiceBindingBuilder#consumes(MediaType...)
      */
     public UpstreamBindingBuilder consumes(MediaType... consumeTypes) {
-        serviceBindingBuilder.consumes(consumeTypes);
+        serviceBindingBuilder.consumes(requireNonNull(consumeTypes, "consumeTypes"));
         return this;
     }
 
@@ -167,7 +167,7 @@ public final class UpstreamBindingBuilder {
      * @see ServiceBindingBuilder#consumes(Iterable)
      */
     public UpstreamBindingBuilder consumes(Iterable<MediaType> consumeTypes) {
-        serviceBindingBuilder.consumes(consumeTypes);
+        serviceBindingBuilder.consumes(requireNonNull(consumeTypes, "consumeTypes"));
         return this;
     }
 
@@ -175,7 +175,7 @@ public final class UpstreamBindingBuilder {
      * @see ServiceBindingBuilder#produces(MediaType...)
      */
     public UpstreamBindingBuilder produces(MediaType... produceTypes) {
-        serviceBindingBuilder.produces(produceTypes);
+        serviceBindingBuilder.produces(requireNonNull(produceTypes, "produceTypes"));
         return this;
     }
 
@@ -183,7 +183,7 @@ public final class UpstreamBindingBuilder {
      * @see ServiceBindingBuilder#produces(Iterable)
      */
     public UpstreamBindingBuilder produces(Iterable<MediaType> produceTypes) {
-        serviceBindingBuilder.produces(produceTypes);
+        serviceBindingBuilder.produces(requireNonNull(produceTypes, "produceTypes"));
         return this;
     }
 
@@ -191,7 +191,7 @@ public final class UpstreamBindingBuilder {
      * @see ServiceBindingBuilder#matchesParams(String...)
      */
     public UpstreamBindingBuilder matchesParams(String... paramPredicates) {
-        serviceBindingBuilder.matchesParams(paramPredicates);
+        serviceBindingBuilder.matchesParams(requireNonNull(paramPredicates, "paramPredicates"));
         return this;
     }
 
@@ -199,7 +199,7 @@ public final class UpstreamBindingBuilder {
      * @see ServiceBindingBuilder#matchesParams(Iterable)
      */
     public UpstreamBindingBuilder matchesParams(Iterable<String> paramPredicates) {
-        serviceBindingBuilder.matchesParams(paramPredicates);
+        serviceBindingBuilder.matchesParams(requireNonNull(paramPredicates, "paramPredicates"));
         return this;
     }
 
@@ -208,7 +208,8 @@ public final class UpstreamBindingBuilder {
      */
     public UpstreamBindingBuilder matchesParams(String paramName,
                                                 Predicate<? super String> valuePredicate) {
-        serviceBindingBuilder.matchesParams(paramName, valuePredicate);
+        serviceBindingBuilder.matchesParams(requireNonNull(paramName, "paramName"),
+                                            requireNonNull(valuePredicate, "valuePredicate"));
         return this;
     }
 
@@ -216,7 +217,7 @@ public final class UpstreamBindingBuilder {
      * @see ServiceBindingBuilder#matchesHeaders(String...)
      */
     public UpstreamBindingBuilder matchesHeaders(String... headerPredicates) {
-        serviceBindingBuilder.matchesHeaders(headerPredicates);
+        serviceBindingBuilder.matchesHeaders(requireNonNull(headerPredicates, "headerPredicates"));
         return this;
     }
 
@@ -224,7 +225,7 @@ public final class UpstreamBindingBuilder {
      * @see ServiceBindingBuilder#matchesHeaders(Iterable)
      */
     public UpstreamBindingBuilder matchesHeaders(Iterable<String> headerPredicates) {
-        serviceBindingBuilder.matchesHeaders(headerPredicates);
+        serviceBindingBuilder.matchesHeaders(requireNonNull(headerPredicates, "headerPredicates"));
         return this;
     }
 
@@ -233,7 +234,8 @@ public final class UpstreamBindingBuilder {
      */
     public UpstreamBindingBuilder matchesHeaders(CharSequence headerName,
                                                  Predicate<? super String> valuePredicate) {
-        serviceBindingBuilder.matchesHeaders(headerName, valuePredicate);
+        serviceBindingBuilder.matchesHeaders(requireNonNull(headerName, "headerName"),
+                                             requireNonNull(valuePredicate, "valuePredicate"));
         return this;
     }
 
@@ -276,7 +278,7 @@ public final class UpstreamBindingBuilder {
      */
     public UpstreamBindingBuilder armeriaDecorator(
             Function<? super HttpService, ? extends HttpService> armeriaDecorator) {
-        serviceBindingBuilder.decorator(armeriaDecorator);
+        serviceBindingBuilder.decorator(requireNonNull(armeriaDecorator, "armeriaDecorator"));
         return this;
     }
 
@@ -286,7 +288,7 @@ public final class UpstreamBindingBuilder {
     @SafeVarargs
     public final UpstreamBindingBuilder armeriaDecorators(
             Function<? super HttpService, ? extends HttpService>... armeriaDecorators) {
-        serviceBindingBuilder.decorators(armeriaDecorators);
+        serviceBindingBuilder.decorators(requireNonNull(armeriaDecorators, "armeriaDecorators"));
         return this;
     }
 
@@ -295,7 +297,7 @@ public final class UpstreamBindingBuilder {
      */
     public UpstreamBindingBuilder armeriaDecorators(
             Iterable<? extends Function<? super HttpService, ? extends HttpService>> armeriaDecorators) {
-        serviceBindingBuilder.decorators(armeriaDecorators);
+        serviceBindingBuilder.decorators(requireNonNull(armeriaDecorators, "armeriaDecorators"));
         return this;
     }
 

@@ -24,6 +24,8 @@
 
 package dev.gihwan.tollgate.gateway;
 
+import static java.util.Objects.requireNonNull;
+
 import com.linecorp.armeria.common.util.AbstractUnwrappable;
 
 /**
@@ -32,6 +34,6 @@ import com.linecorp.armeria.common.util.AbstractUnwrappable;
 public abstract class DecoratingUpstream extends AbstractUnwrappable<Upstream> implements Upstream {
 
     protected DecoratingUpstream(Upstream delegate) {
-        super(delegate);
+        super(requireNonNull(delegate, "delegate"));
     }
 }

@@ -85,8 +85,7 @@ public interface Upstream extends Unwrappable {
 
     @Override
     default <T> T as(Class<T> type) {
-        requireNonNull(type, "type");
-        return Unwrappable.super.as(type);
+        return Unwrappable.super.as(requireNonNull(type, "type"));
     }
 
     @Override
@@ -95,6 +94,8 @@ public interface Upstream extends Unwrappable {
     }
 
     default <T extends Upstream> T decorate(Function<? super Upstream, T> decorator) {
+        requireNonNull(decorator, "decorator");
+
         final T newUpstream = decorator.apply(this);
 
         if (newUpstream == null) {
