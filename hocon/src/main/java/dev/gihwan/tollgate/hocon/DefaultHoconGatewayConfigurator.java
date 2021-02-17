@@ -25,6 +25,7 @@
 package dev.gihwan.tollgate.hocon;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
 
 import java.util.List;
 import java.util.Set;
@@ -49,6 +50,9 @@ enum DefaultHoconGatewayConfigurator implements HoconGatewayConfigurator {
 
     @Override
     public void configure(GatewayBuilder builder, Config config) {
+        requireNonNull(builder, "builder");
+        requireNonNull(config, "config");
+
         if (config.hasPath("tollgate.port")) {
             builder.http(config.getInt("tollgate.port"));
         }

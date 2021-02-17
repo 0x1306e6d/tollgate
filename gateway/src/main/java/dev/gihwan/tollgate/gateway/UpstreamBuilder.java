@@ -44,15 +44,18 @@ public final class UpstreamBuilder {
     private final WebClientBuilder clientBuilder;
 
     UpstreamBuilder(URI uri) {
-        clientBuilder = WebClient.builder(uri);
+        clientBuilder = WebClient.builder(requireNonNull(uri, "uri"));
     }
 
     UpstreamBuilder(SessionProtocol protocol, EndpointGroup endpointGroup) {
-        clientBuilder = WebClient.builder(protocol, endpointGroup);
+        clientBuilder = WebClient.builder(requireNonNull(protocol, "protocol"),
+                                          requireNonNull(endpointGroup, "endpointGroup"));
     }
 
     UpstreamBuilder(SessionProtocol protocol, EndpointGroup endpointGroup, String path) {
-        clientBuilder = WebClient.builder(protocol, endpointGroup, path);
+        clientBuilder = WebClient.builder(requireNonNull(protocol, "protocol"),
+                                          requireNonNull(endpointGroup, "endpointGroup"),
+                                          requireNonNull(path, "path"));
     }
 
     public UpstreamBuilder decorator(Function<? super Upstream, ? extends Upstream> decorator) {

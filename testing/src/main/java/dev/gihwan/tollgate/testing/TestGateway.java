@@ -125,7 +125,7 @@ public abstract class TestGateway implements SafeCloseable {
      */
     public int port(SessionProtocol protocol) {
         checkState(delegate != null, "gateway did not start.");
-        return delegate.activeLocalPort(protocol);
+        return delegate.activeLocalPort(requireNonNull(protocol, "protocol"));
     }
 
     /**
