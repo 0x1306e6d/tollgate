@@ -36,36 +36,34 @@ import com.linecorp.armeria.client.SimpleDecoratingHttpClient;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 
-import dev.gihwan.tollgate.gateway.Upstream;
-
 /**
  * A {@link HttpClient} decorator for remapping {@link HttpRequest} and {@link HttpResponse}.
  */
-public final class RemappingUpstream extends SimpleDecoratingHttpClient {
+public final class RemappingClient extends SimpleDecoratingHttpClient {
 
     /**
-     * Returns a new {@link Upstream} decorator which remaps {@link HttpRequest} using the given
+     * Returns a new {@link HttpClient} decorator which remaps {@link HttpRequest} using the given
      * {@link RemappingRequestStrategy}.
      */
-    public static Function<? super HttpClient, RemappingUpstream> newDecorator(
+    public static Function<? super HttpClient, RemappingClient> newDecorator(
             RemappingRequestStrategy requestStrategy) {
         return builder().requestStrategy(requireNonNull(requestStrategy, "requestStrategy")).newDecorator();
     }
 
     /**
-     * Returns a new {@link Upstream} decorator which remaps {@link HttpResponse} using the given
+     * Returns a new {@link HttpClient} decorator which remaps {@link HttpResponse} using the given
      * {@link RemappingResponseStrategy}.
      */
-    public static Function<? super HttpClient, RemappingUpstream> newDecorator(
+    public static Function<? super HttpClient, RemappingClient> newDecorator(
             RemappingResponseStrategy responseStrategy) {
         return builder().responseStrategy(requireNonNull(responseStrategy, "responseStrategy")).newDecorator();
     }
 
     /**
-     * Returns a new {@link Upstream} decorator which remaps {@link HttpRequest} and {@link HttpResponse} using
+     * Returns a new {@link HttpClient} decorator which remaps {@link HttpRequest} and {@link HttpResponse} using
      * the given {@link RemappingRequestStrategy} and {@link RemappingResponseStrategy} respectively.
      */
-    public static Function<? super HttpClient, RemappingUpstream> newDecorator(
+    public static Function<? super HttpClient, RemappingClient> newDecorator(
             RemappingRequestStrategy requestStrategy, RemappingResponseStrategy responseStrategy) {
         return builder().requestStrategy(requireNonNull(requestStrategy, "requestStrategy"))
                         .responseStrategy(requireNonNull(responseStrategy, "responseStrategy"))
@@ -73,10 +71,10 @@ public final class RemappingUpstream extends SimpleDecoratingHttpClient {
     }
 
     /**
-     * Returns a new {@link RemappingUpstreamBuilder}.
+     * Returns a new {@link RemappingClientBuilder}.
      */
-    public static RemappingUpstreamBuilder builder() {
-        return new RemappingUpstreamBuilder();
+    public static RemappingClientBuilder builder() {
+        return new RemappingClientBuilder();
     }
 
     @Nullable
@@ -84,9 +82,9 @@ public final class RemappingUpstream extends SimpleDecoratingHttpClient {
     @Nullable
     private final RemappingResponseStrategy responseStrategy;
 
-    RemappingUpstream(HttpClient delegate,
-                      @Nullable RemappingRequestStrategy requestStrategy,
-                      @Nullable RemappingResponseStrategy responseStrategy) {
+    RemappingClient(HttpClient delegate,
+                    @Nullable RemappingRequestStrategy requestStrategy,
+                    @Nullable RemappingResponseStrategy responseStrategy) {
         super(delegate);
         this.requestStrategy = requestStrategy;
         this.responseStrategy = responseStrategy;
