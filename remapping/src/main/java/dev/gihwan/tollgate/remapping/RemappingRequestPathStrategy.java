@@ -24,11 +24,14 @@
 
 package dev.gihwan.tollgate.remapping;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.base.Splitter;
 
+import com.linecorp.armeria.client.ClientRequestContext;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.RequestHeaders;
 import com.linecorp.armeria.server.ServiceRequestContext;
@@ -45,12 +48,16 @@ final class RemappingRequestPathStrategy implements RemappingRequestStrategy {
     }
 
     @Override
-    public HttpRequest remap(ServiceRequestContext ctx, HttpRequest req) {
+    public HttpRequest remap(ClientRequestContext ctx, HttpRequest req) {
         final List<String> segments = new ArrayList<>();
         for (String segment : PATH_SPLITTER.split(pathPattern)) {
             if (segment.startsWith("{") && segment.endsWith("}")) {
+                final ServiceRequestContext serviceCtx = ctx.root();
+                checkState(serviceCtx != null,
+                           "remapping request path param should be in the context of a server request");
+
                 final String pathParamName = segment.substring(1, segment.length() - 1);
-                final String pathParamValue = ctx.pathParam(pathParamName);
+                final String pathParamValue = serviceCtx.pathParam(pathParamName);
                 if (pathParamValue == null) {
                     throw new IllegalStateException("pathParam " + pathParamName + " does not exist");
                 }

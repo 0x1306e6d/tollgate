@@ -26,9 +26,9 @@ package dev.gihwan.tollgate.remapping;
 
 import static java.util.Objects.requireNonNull;
 
+import com.linecorp.armeria.client.ClientRequestContext;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
-import com.linecorp.armeria.server.ServiceRequestContext;
 
 /**
  * A strategy for remapping {@link HttpResponse}
@@ -47,7 +47,7 @@ public interface RemappingResponseStrategy {
     /**
      * Remaps the given {@link HttpResponse}.
      */
-    HttpResponse remap(ServiceRequestContext ctx, HttpResponse res);
+    HttpResponse remap(ClientRequestContext ctx, HttpResponse res);
 
     /**
      * Returns a new composed {@link RemappingResponseStrategy} that first applies this strategy to its

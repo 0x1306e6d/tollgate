@@ -29,17 +29,13 @@ import static java.util.Objects.requireNonNull;
 import java.net.URI;
 import java.util.function.Function;
 
-import javax.annotation.Nullable;
-
+import com.linecorp.armeria.client.HttpClient;
 import com.linecorp.armeria.client.WebClient;
 import com.linecorp.armeria.client.WebClientBuilder;
 import com.linecorp.armeria.client.endpoint.EndpointGroup;
 import com.linecorp.armeria.common.SessionProtocol;
 
 public final class UpstreamBuilder {
-
-    @Nullable
-    private Function<? super Upstream, ? extends Upstream> decorator;
 
     private final WebClientBuilder clientBuilder;
 
@@ -58,21 +54,12 @@ public final class UpstreamBuilder {
                                           requireNonNull(path, "path"));
     }
 
-    public UpstreamBuilder decorator(Function<? super Upstream, ? extends Upstream> decorator) {
-        requireNonNull(decorator, "decorator");
-        if (this.decorator == null) {
-            this.decorator = decorator;
-        } else {
-            this.decorator = this.decorator.andThen(decorator);
-        }
+    public UpstreamBuilder decorator(Function<? super HttpClient, ? extends HttpClient> decorator) {
+        clientBuilder.decorator(requireNonNull(decorator, "decorator"));
         return this;
     }
 
     public Upstream build() {
-        Upstream upstream = new DefaultUpstream(clientBuilder.build());
-        if (decorator != null) {
-            upstream = upstream.decorate(decorator);
-        }
-        return upstream;
+        return new DefaultUpstream(clientBuilder.build());
     }
 }

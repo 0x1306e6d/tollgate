@@ -31,10 +31,10 @@ import java.util.Queue;
 
 import org.junit.jupiter.api.Test;
 
+import com.linecorp.armeria.client.ClientRequestContext;
 import com.linecorp.armeria.common.HttpMethod;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
-import com.linecorp.armeria.server.ServiceRequestContext;
 
 class RemappingResponseStrategyTest {
 
@@ -52,7 +52,7 @@ class RemappingResponseStrategyTest {
         };
 
         final HttpRequest req = HttpRequest.of(HttpMethod.GET, "/foo");
-        final ServiceRequestContext ctx = ServiceRequestContext.of(req);
+        final ClientRequestContext ctx = ClientRequestContext.of(req);
         final HttpResponse res = HttpResponse.of("Hello, World!");
 
         final RemappingResponseStrategy strategy1AndRule2 = strategy1.andThen(strategy2);

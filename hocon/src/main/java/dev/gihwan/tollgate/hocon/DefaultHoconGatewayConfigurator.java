@@ -41,8 +41,8 @@ import com.linecorp.armeria.common.HttpMethod;
 import dev.gihwan.tollgate.gateway.GatewayBuilder;
 import dev.gihwan.tollgate.gateway.Upstream;
 import dev.gihwan.tollgate.gateway.UpstreamBuilder;
-import dev.gihwan.tollgate.remapping.RemappingUpstream;
-import dev.gihwan.tollgate.remapping.RemappingUpstreamBuilder;
+import dev.gihwan.tollgate.remapping.RemappingClient;
+import dev.gihwan.tollgate.remapping.RemappingClientBuilder;
 
 enum DefaultHoconGatewayConfigurator implements HoconGatewayConfigurator {
 
@@ -103,7 +103,7 @@ enum DefaultHoconGatewayConfigurator implements HoconGatewayConfigurator {
 
         if (upstreamConfig.hasPath("remapping")) {
             final Config remappingConfig = upstreamConfig.getObject("remapping").toConfig();
-            final RemappingUpstreamBuilder remappingBuilder = RemappingUpstream.builder();
+            final RemappingClientBuilder remappingBuilder = RemappingClient.builder();
             if (remappingConfig.hasPath("path")) {
                 remappingBuilder.requestPath(remappingConfig.getString("path"));
             }

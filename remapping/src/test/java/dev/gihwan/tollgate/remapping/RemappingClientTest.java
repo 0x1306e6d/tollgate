@@ -41,7 +41,7 @@ import com.linecorp.armeria.testing.junit5.server.ServerExtension;
 import dev.gihwan.tollgate.gateway.Upstream;
 import dev.gihwan.tollgate.testing.TestGateway;
 
-class RemappingUpstreamTest {
+class RemappingClientTest {
 
     @RegisterExtension
     static final ServerExtension serviceServer = new ServerExtension() {
@@ -58,9 +58,9 @@ class RemappingUpstreamTest {
     void remapRequestPath() {
         try (TestGateway gateway = withTestGateway(builder -> {
             builder.upstream("/bar", Upstream.builder(serviceServer.httpUri())
-                                             .decorator(RemappingUpstream.builder()
-                                                                         .requestPath("/foo")
-                                                                         .newDecorator())
+                                             .decorator(RemappingClient.builder()
+                                                                       .requestPath("/foo")
+                                                                       .newDecorator())
                                              .build());
         })) {
             final WebClient client = WebClient.of(gateway.httpUri());
@@ -79,9 +79,9 @@ class RemappingUpstreamTest {
         final HttpStatusFunction alwaysOk = status -> HttpStatus.OK;
         try (TestGateway gateway = withTestGateway(builder -> {
             builder.upstream("/error", Upstream.builder(serviceServer.httpUri())
-                                               .decorator(RemappingUpstream.builder()
-                                                                           .responseStatus(alwaysOk)
-                                                                           .newDecorator())
+                                               .decorator(RemappingClient.builder()
+                                                                         .responseStatus(alwaysOk)
+                                                                         .newDecorator())
                                                .build());
         })) {
             final WebClient client = WebClient.of(gateway.httpUri());

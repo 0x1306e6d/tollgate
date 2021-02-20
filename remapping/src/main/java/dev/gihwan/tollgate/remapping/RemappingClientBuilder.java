@@ -31,39 +31,38 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
+import com.linecorp.armeria.client.HttpClient;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
 
-import dev.gihwan.tollgate.gateway.Upstream;
-
 /**
- * A builder for {@link RemappingUpstream}.
+ * A builder for {@link RemappingClient}.
  */
-public final class RemappingUpstreamBuilder {
+public final class RemappingClientBuilder {
 
     @Nullable
     private RemappingRequestStrategy requestStrategy;
     @Nullable
     private RemappingResponseStrategy responseStrategy;
 
-    RemappingUpstreamBuilder() {}
+    RemappingClientBuilder() {}
 
     /**
      * Adds a new {@link RemappingRequestStrategy} that remaps {@link HttpRequest} path with the given
      * {@code pathPattern}.
      *
      * @see RemappingRequestPathStrategy#path(String)
-     * @see RemappingUpstreamBuilder#requestStrategy(RemappingRequestStrategy)
+     * @see RemappingClientBuilder#requestStrategy(RemappingRequestStrategy)
      */
-    public RemappingUpstreamBuilder requestPath(String pathPattern) {
+    public RemappingClientBuilder requestPath(String pathPattern) {
         return requestStrategy(RemappingRequestStrategy.path(pathPattern));
     }
 
     /**
      * Adds the given {@link RemappingRequestStrategy}.
      */
-    public RemappingUpstreamBuilder requestStrategy(RemappingRequestStrategy requestStrategy) {
+    public RemappingClientBuilder requestStrategy(RemappingRequestStrategy requestStrategy) {
         requireNonNull(requestStrategy, "requestStrategy");
         if (this.requestStrategy == null) {
             this.requestStrategy = requestStrategy;
@@ -78,16 +77,16 @@ public final class RemappingUpstreamBuilder {
      * given {@link HttpStatusFunction}.
      *
      * @see RemappingResponseStrategy#status(HttpStatusFunction)
-     * @see RemappingUpstreamBuilder#responseStrategy(RemappingResponseStrategy)
+     * @see RemappingClientBuilder#responseStrategy(RemappingResponseStrategy)
      */
-    public RemappingUpstreamBuilder responseStatus(HttpStatusFunction statusFunction) {
+    public RemappingClientBuilder responseStatus(HttpStatusFunction statusFunction) {
         return responseStrategy(RemappingResponseStrategy.status(statusFunction));
     }
 
     /**
      * Adds the given {@link RemappingResponseStrategy}.
      */
-    public RemappingUpstreamBuilder responseStrategy(RemappingResponseStrategy responseStrategy) {
+    public RemappingClientBuilder responseStrategy(RemappingResponseStrategy responseStrategy) {
         requireNonNull(responseStrategy, "responseStrategy");
         if (this.responseStrategy == null) {
             this.responseStrategy = responseStrategy;
@@ -98,18 +97,18 @@ public final class RemappingUpstreamBuilder {
     }
 
     /**
-     * Builds a new {@link RemappingUpstream} decorator based on the properties of this builder.
+     * Builds a new {@link RemappingClient} decorator based on the properties of this builder.
      */
-    public Function<? super Upstream, RemappingUpstream> newDecorator() {
+    public Function<? super HttpClient, RemappingClient> newDecorator() {
         return this::build;
     }
 
     /**
-     * Builds a new {@link RemappingUpstream} based on the properties of this builder.
+     * Builds a new {@link RemappingClient} based on the properties of this builder.
      */
-    public RemappingUpstream build(Upstream delegate) {
+    public RemappingClient build(HttpClient delegate) {
         checkArgument(requestStrategy != null || responseStrategy != null,
                       "Must set at lease one request or response strategy");
-        return new RemappingUpstream(delegate, requestStrategy, responseStrategy);
+        return new RemappingClient(delegate, requestStrategy, responseStrategy);
     }
 }
