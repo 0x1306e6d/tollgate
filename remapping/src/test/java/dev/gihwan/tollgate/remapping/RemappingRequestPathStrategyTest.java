@@ -25,11 +25,14 @@
 package dev.gihwan.tollgate.remapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
 
+import com.linecorp.armeria.client.ClientRequestContext;
 import com.linecorp.armeria.common.HttpMethod;
 import com.linecorp.armeria.common.HttpRequest;
+import com.linecorp.armeria.common.util.SafeCloseable;
 import com.linecorp.armeria.server.RoutingResult;
 import com.linecorp.armeria.server.ServiceRequestContext;
 
@@ -40,7 +43,7 @@ class RemappingRequestPathStrategyTest {
         final RemappingRequestPathStrategy strategy = new RemappingRequestPathStrategy("/foo/bar");
 
         final HttpRequest req = HttpRequest.of(HttpMethod.GET, "/baz/qux/quux");
-        final ServiceRequestContext ctx = ServiceRequestContext.of(req);
+        final ClientRequestContext ctx = ClientRequestContext.of(req);
 
         final HttpRequest remappedReq = strategy.remap(ctx, req);
         assertThat(remappedReq.path()).isEqualTo("/foo/bar");
@@ -51,7 +54,7 @@ class RemappingRequestPathStrategyTest {
         final RemappingRequestPathStrategy strategy = new RemappingRequestPathStrategy("/foo/{bar}");
 
         final HttpRequest req = HttpRequest.of(HttpMethod.GET, "/baz/qux/quux");
-        final ServiceRequestContext ctx =
+        final ServiceRequestContext serviceCtx =
                 ServiceRequestContext.builder(req)
                                      .routingResult(RoutingResult.builder()
                                                                  .path(req.path())
@@ -59,7 +62,20 @@ class RemappingRequestPathStrategyTest {
                                                                  .build())
                                      .build();
 
-        final HttpRequest remappedReq = strategy.remap(ctx, req);
-        assertThat(remappedReq.path()).isEqualTo("/foo/quux");
+        try (SafeCloseable ignored = serviceCtx.push()) {
+            final ClientRequestContext ctx = ClientRequestContext.of(req);
+            final HttpRequest remappedReq = strategy.remap(ctx, req);
+            assertThat(remappedReq.path()).isEqualTo("/foo/quux");
+        }
+    }
+
+    @Test
+    void remapPathParamNotInServiceContext() {
+        final RemappingRequestPathStrategy strategy = new RemappingRequestPathStrategy("/foo/{bar}");
+
+        final HttpRequest req = HttpRequest.of(HttpMethod.GET, "/baz/qux/quux");
+        final ClientRequestContext ctx = ClientRequestContext.of(req);
+        assertThatThrownBy(() -> strategy.remap(ctx, req))
+                .isInstanceOf(IllegalStateException.class);
     }
 }

@@ -31,11 +31,10 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
+import com.linecorp.armeria.client.HttpClient;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
-
-import dev.gihwan.tollgate.gateway.Upstream;
 
 /**
  * A builder for {@link RemappingUpstream}.
@@ -100,14 +99,14 @@ public final class RemappingUpstreamBuilder {
     /**
      * Builds a new {@link RemappingUpstream} decorator based on the properties of this builder.
      */
-    public Function<? super Upstream, RemappingUpstream> newDecorator() {
+    public Function<? super HttpClient, RemappingUpstream> newDecorator() {
         return this::build;
     }
 
     /**
      * Builds a new {@link RemappingUpstream} based on the properties of this builder.
      */
-    public RemappingUpstream build(Upstream delegate) {
+    public RemappingUpstream build(HttpClient delegate) {
         checkArgument(requestStrategy != null || responseStrategy != null,
                       "Must set at lease one request or response strategy");
         return new RemappingUpstream(delegate, requestStrategy, responseStrategy);

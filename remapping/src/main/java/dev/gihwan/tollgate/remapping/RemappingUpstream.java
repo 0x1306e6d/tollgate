@@ -30,23 +30,24 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
+import com.linecorp.armeria.client.ClientRequestContext;
+import com.linecorp.armeria.client.HttpClient;
+import com.linecorp.armeria.client.SimpleDecoratingHttpClient;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
-import com.linecorp.armeria.server.ServiceRequestContext;
 
-import dev.gihwan.tollgate.gateway.DecoratingUpstream;
 import dev.gihwan.tollgate.gateway.Upstream;
 
 /**
- * A {@link Upstream} decorator for remapping {@link HttpRequest}s.
+ * A {@link HttpClient} decorator for remapping {@link HttpRequest} and {@link HttpResponse}.
  */
-public final class RemappingUpstream extends DecoratingUpstream {
+public final class RemappingUpstream extends SimpleDecoratingHttpClient {
 
     /**
      * Returns a new {@link Upstream} decorator which remaps {@link HttpRequest} using the given
      * {@link RemappingRequestStrategy}.
      */
-    public static Function<? super Upstream, RemappingUpstream> newDecorator(
+    public static Function<? super HttpClient, RemappingUpstream> newDecorator(
             RemappingRequestStrategy requestStrategy) {
         return builder().requestStrategy(requireNonNull(requestStrategy, "requestStrategy")).newDecorator();
     }
@@ -55,7 +56,7 @@ public final class RemappingUpstream extends DecoratingUpstream {
      * Returns a new {@link Upstream} decorator which remaps {@link HttpResponse} using the given
      * {@link RemappingResponseStrategy}.
      */
-    public static Function<? super Upstream, RemappingUpstream> newDecorator(
+    public static Function<? super HttpClient, RemappingUpstream> newDecorator(
             RemappingResponseStrategy responseStrategy) {
         return builder().responseStrategy(requireNonNull(responseStrategy, "responseStrategy")).newDecorator();
     }
@@ -64,7 +65,7 @@ public final class RemappingUpstream extends DecoratingUpstream {
      * Returns a new {@link Upstream} decorator which remaps {@link HttpRequest} and {@link HttpResponse} using
      * the given {@link RemappingRequestStrategy} and {@link RemappingResponseStrategy} respectively.
      */
-    public static Function<? super Upstream, RemappingUpstream> newDecorator(
+    public static Function<? super HttpClient, RemappingUpstream> newDecorator(
             RemappingRequestStrategy requestStrategy, RemappingResponseStrategy responseStrategy) {
         return builder().requestStrategy(requireNonNull(requestStrategy, "requestStrategy"))
                         .responseStrategy(requireNonNull(responseStrategy, "responseStrategy"))
@@ -83,7 +84,7 @@ public final class RemappingUpstream extends DecoratingUpstream {
     @Nullable
     private final RemappingResponseStrategy responseStrategy;
 
-    RemappingUpstream(Upstream delegate,
+    RemappingUpstream(HttpClient delegate,
                       @Nullable RemappingRequestStrategy requestStrategy,
                       @Nullable RemappingResponseStrategy responseStrategy) {
         super(delegate);
@@ -92,18 +93,18 @@ public final class RemappingUpstream extends DecoratingUpstream {
     }
 
     @Override
-    public final HttpResponse forward(ServiceRequestContext ctx, HttpRequest req) throws Exception {
-        return remapRes(ctx, unwrap().forward(ctx, remapReq(ctx, req)));
+    public HttpResponse execute(ClientRequestContext ctx, HttpRequest req) throws Exception {
+        return remapRes(ctx, unwrap().execute(ctx, remapReq(ctx, req)));
     }
 
-    private HttpRequest remapReq(ServiceRequestContext ctx, HttpRequest req) {
+    private HttpRequest remapReq(ClientRequestContext ctx, HttpRequest req) {
         if (requestStrategy == null) {
             return req;
         }
         return requestStrategy.remap(ctx, req);
     }
 
-    private HttpResponse remapRes(ServiceRequestContext ctx, HttpResponse res) {
+    private HttpResponse remapRes(ClientRequestContext ctx, HttpResponse res) {
         if (responseStrategy == null) {
             return res;
         }

@@ -31,9 +31,9 @@ import java.util.Queue;
 
 import org.junit.jupiter.api.Test;
 
+import com.linecorp.armeria.client.ClientRequestContext;
 import com.linecorp.armeria.common.HttpMethod;
 import com.linecorp.armeria.common.HttpRequest;
-import com.linecorp.armeria.server.ServiceRequestContext;
 
 class RemappingRequestStrategyTest {
 
@@ -51,7 +51,7 @@ class RemappingRequestStrategyTest {
         };
 
         final HttpRequest req = HttpRequest.of(HttpMethod.GET, "/foo");
-        final ServiceRequestContext ctx = ServiceRequestContext.of(req);
+        final ClientRequestContext ctx = ClientRequestContext.of(req);
 
         final RemappingRequestStrategy strategy1AndRule2 = strategy1.andThen(strategy2);
         HttpRequest remapped = strategy1AndRule2.remap(ctx, req);

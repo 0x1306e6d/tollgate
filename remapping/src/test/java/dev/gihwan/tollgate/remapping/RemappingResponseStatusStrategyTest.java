@@ -29,10 +29,10 @@ import static org.mockito.Mockito.mock;
 
 import org.junit.jupiter.api.Test;
 
+import com.linecorp.armeria.client.ClientRequestContext;
 import com.linecorp.armeria.common.AggregatedHttpResponse;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
-import com.linecorp.armeria.server.ServiceRequestContext;
 
 class RemappingResponseStatusStrategyTest {
 
@@ -41,7 +41,7 @@ class RemappingResponseStatusStrategyTest {
         final HttpStatusFunction alwaysOk = status -> HttpStatus.OK;
         final RemappingResponseStatusStrategy strategy = new RemappingResponseStatusStrategy(alwaysOk);
 
-        final ServiceRequestContext ctx = mock(ServiceRequestContext.class);
+        final ClientRequestContext ctx = mock(ClientRequestContext.class);
         final HttpResponse res = HttpResponse.of(HttpStatus.INTERNAL_SERVER_ERROR);
 
         final AggregatedHttpResponse remappedRes = strategy.remap(ctx, res).aggregate().join();

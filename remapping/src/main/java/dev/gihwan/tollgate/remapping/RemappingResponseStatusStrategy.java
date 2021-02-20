@@ -24,12 +24,12 @@
 
 package dev.gihwan.tollgate.remapping;
 
+import com.linecorp.armeria.client.ClientRequestContext;
 import com.linecorp.armeria.common.FilteredHttpResponse;
 import com.linecorp.armeria.common.HttpObject;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.common.ResponseHeaders;
-import com.linecorp.armeria.server.ServiceRequestContext;
 
 final class RemappingResponseStatusStrategy implements RemappingResponseStrategy {
 
@@ -40,7 +40,7 @@ final class RemappingResponseStatusStrategy implements RemappingResponseStrategy
     }
 
     @Override
-    public HttpResponse remap(ServiceRequestContext ctx, HttpResponse res) {
+    public HttpResponse remap(ClientRequestContext ctx, HttpResponse res) {
         return new FilteredHttpResponse(res) {
             @Override
             protected HttpObject filter(HttpObject obj) {
