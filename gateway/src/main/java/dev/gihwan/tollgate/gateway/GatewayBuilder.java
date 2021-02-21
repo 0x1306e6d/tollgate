@@ -233,7 +233,7 @@ public final class GatewayBuilder {
             String pathPattern,
             Upstream upstream,
             Iterable<? extends Function<? super HttpService, ? extends HttpService>> decorators) {
-        return route().path(pathPattern).armeriaDecorators(decorators).build(upstream);
+        return route().path(pathPattern).decorators(decorators).build(upstream);
     }
 
     public final Gateway build() {

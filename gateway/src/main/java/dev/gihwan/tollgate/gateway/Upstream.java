@@ -27,7 +27,6 @@ package dev.gihwan.tollgate.gateway;
 import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
-import java.util.function.Function;
 
 import javax.annotation.CheckReturnValue;
 
@@ -35,10 +34,9 @@ import com.linecorp.armeria.client.endpoint.EndpointGroup;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.SessionProtocol;
-import com.linecorp.armeria.common.util.Unwrappable;
 import com.linecorp.armeria.server.ServiceRequestContext;
 
-public interface Upstream extends Unwrappable {
+public interface Upstream {
 
     static Upstream of(String uri) {
         return builder(uri).build();
@@ -82,26 +80,4 @@ public interface Upstream extends Unwrappable {
 
     @CheckReturnValue
     HttpResponse forward(ServiceRequestContext ctx, HttpRequest req) throws Exception;
-
-    @Override
-    default <T> T as(Class<T> type) {
-        return Unwrappable.super.as(requireNonNull(type, "type"));
-    }
-
-    @Override
-    default Upstream unwrap() {
-        return (Upstream) Unwrappable.super.unwrap();
-    }
-
-    default <T extends Upstream> T decorate(Function<? super Upstream, T> decorator) {
-        requireNonNull(decorator, "decorator");
-
-        final T newUpstream = decorator.apply(this);
-
-        if (newUpstream == null) {
-            throw new NullPointerException("decorator.apply() returned null: " + decorator);
-        }
-
-        return newUpstream;
-    }
 }
