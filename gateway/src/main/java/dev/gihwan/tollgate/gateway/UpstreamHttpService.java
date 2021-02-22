@@ -24,11 +24,18 @@
 
 package dev.gihwan.tollgate.gateway;
 
+import java.util.concurrent.CompletableFuture;
+
+import com.linecorp.armeria.client.UnprocessedRequestException;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
+import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.server.HttpService;
 import com.linecorp.armeria.server.ServiceRequestContext;
 
+/**
+ * A {@link HttpService} which forwards {@link HttpRequest}s to the specified {@link Upstream}.
+ */
 final class UpstreamHttpService implements HttpService {
 
     private final Upstream upstream;
@@ -39,6 +46,25 @@ final class UpstreamHttpService implements HttpService {
 
     @Override
     public HttpResponse serve(ServiceRequestContext ctx, HttpRequest req) throws Exception {
-        return upstream.forward(ctx, req);
+        final CompletableFuture<HttpResponse> resFuture = new CompletableFuture<>();
+        final HttpResponse res = HttpResponse.from(resFuture);
+        upstream.client().execute(req).aggregate().handleAsync((aggregated, cause) -> {
+            if (cause != null) {
+                resolveException(resFuture, cause);
+                return null;
+            }
+
+            resFuture.complete(aggregated.toHttpResponse());
+            return null;
+        }, ctx.eventLoop());
+        return res;
+    }
+
+    private static void resolveException(CompletableFuture<HttpResponse> responseFuture, Throwable t) {
+        if (t instanceof UnprocessedRequestException) {
+            responseFuture.complete(HttpResponse.of(HttpStatus.SERVICE_UNAVAILABLE));
+            return;
+        }
+        responseFuture.completeExceptionally(t);
     }
 }

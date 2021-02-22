@@ -28,56 +28,94 @@ import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
 
-import javax.annotation.CheckReturnValue;
-
+import com.linecorp.armeria.client.WebClient;
 import com.linecorp.armeria.client.endpoint.EndpointGroup;
 import com.linecorp.armeria.common.HttpRequest;
-import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.SessionProtocol;
-import com.linecorp.armeria.server.ServiceRequestContext;
 
+/**
+ * A upstream which forwards {@link HttpRequest}s from client to the specified destination.
+ */
 public interface Upstream {
 
+    /**
+     * Returns a new {@link Upstream} which forwards to the given {@code uri}.
+     */
     static Upstream of(String uri) {
         return builder(uri).build();
     }
 
+    /**
+     * Returns a new {@link Upstream} which forward to the given {@link URI}.
+     */
     static Upstream of(URI uri) {
         return builder(uri).build();
     }
 
+    /**
+     * Returns a new {@link Upstream} which forwards to the given {@link EndpointGroup} with the given
+     * {@code protocol}.
+     */
     static Upstream of(String protocol, EndpointGroup endpointGroup) {
         return builder(protocol, endpointGroup).build();
     }
 
+    /**
+     * Returns a new {@link Upstream} which forwards to the given {@link EndpointGroup}  with the given
+     * {@code protocol} and {@code path}.
+     */
     static Upstream of(String protocol, EndpointGroup endpointGroup, String path) {
         return builder(protocol, endpointGroup, path).build();
     }
 
+    /**
+     * Returns a new {@link UpstreamBuilder} based on the given {@code uri}.
+     */
     static UpstreamBuilder builder(String uri) {
         return builder(URI.create(requireNonNull(uri, "uri")));
     }
 
+    /**
+     * Returns a new {@link UpstreamBuilder} based on the given {@link URI}.
+     */
     static UpstreamBuilder builder(URI uri) {
         return new UpstreamBuilder(requireNonNull(uri, "uri"));
     }
 
+    /**
+     * Returns a new {@link UpstreamBuilder} based on the given {@link EndpointGroup} with the given
+     * {@code protocol}.
+     */
     static UpstreamBuilder builder(String protocol, EndpointGroup endpointGroup) {
         return builder(SessionProtocol.of(requireNonNull(protocol, "protocol")), endpointGroup);
     }
 
+    /**
+     * Returns a new {@link UpstreamBuilder} based on the given {@link EndpointGroup} with the given
+     * {@link SessionProtocol}.
+     */
     static UpstreamBuilder builder(SessionProtocol protocol, EndpointGroup endpointGroup) {
         return new UpstreamBuilder(protocol, endpointGroup);
     }
 
+    /**
+     * Returns a new {@link UpstreamBuilder} based on the given {@link EndpointGroup} with the given
+     * {@code protocol} and {@code path}.
+     */
     static UpstreamBuilder builder(String protocol, EndpointGroup endpointGroup, String path) {
         return builder(SessionProtocol.of(requireNonNull(protocol, "protocol")), endpointGroup, path);
     }
 
+    /**
+     * Returns a new {@link UpstreamBuilder} based on the given {@link EndpointGroup} with the given
+     * {@link SessionProtocol} and {@code path}.
+     */
     static UpstreamBuilder builder(SessionProtocol protocol, EndpointGroup endpointGroup, String path) {
         return new UpstreamBuilder(protocol, endpointGroup, path);
     }
 
-    @CheckReturnValue
-    HttpResponse forward(ServiceRequestContext ctx, HttpRequest req) throws Exception;
+    /**
+     * Returns the {@link WebClient} of this upstream.
+     */
+    WebClient client();
 }
