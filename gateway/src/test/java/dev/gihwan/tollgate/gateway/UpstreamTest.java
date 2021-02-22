@@ -51,7 +51,7 @@ import com.linecorp.armeria.testing.junit5.server.ServerExtension;
 import dev.gihwan.tollgate.junit5.GatewayExtension;
 import dev.gihwan.tollgate.testing.TestGateway;
 
-class DefaultUpstreamTest {
+class UpstreamTest {
 
     private static final AtomicReference<AggregatedHttpRequest> reqCapture = new AtomicReference<>();
 

@@ -24,15 +24,11 @@
 
 package dev.gihwan.tollgate.gateway;
 
-import java.util.concurrent.CompletableFuture;
-
-import com.linecorp.armeria.client.UnprocessedRequestException;
 import com.linecorp.armeria.client.WebClient;
-import com.linecorp.armeria.common.HttpRequest;
-import com.linecorp.armeria.common.HttpResponse;
-import com.linecorp.armeria.common.HttpStatus;
-import com.linecorp.armeria.server.ServiceRequestContext;
 
+/**
+ * The default implementation of {@link Upstream}.
+ */
 final class DefaultUpstream implements Upstream {
 
     private final WebClient client;
@@ -42,26 +38,7 @@ final class DefaultUpstream implements Upstream {
     }
 
     @Override
-    public HttpResponse forward(ServiceRequestContext ctx, HttpRequest req) throws Exception {
-        final CompletableFuture<HttpResponse> resFuture = new CompletableFuture<>();
-        final HttpResponse res = HttpResponse.from(resFuture);
-        client.execute(req).aggregate().handleAsync((aggregated, cause) -> {
-            if (cause != null) {
-                resolveException(resFuture, cause);
-                return null;
-            }
-
-            resFuture.complete(aggregated.toHttpResponse());
-            return null;
-        }, ctx.eventLoop());
-        return res;
-    }
-
-    private static void resolveException(CompletableFuture<HttpResponse> responseFuture, Throwable t) {
-        if (t instanceof UnprocessedRequestException) {
-            responseFuture.complete(HttpResponse.of(HttpStatus.SERVICE_UNAVAILABLE));
-            return;
-        }
-        responseFuture.completeExceptionally(t);
+    public WebClient client() {
+        return client;
     }
 }
