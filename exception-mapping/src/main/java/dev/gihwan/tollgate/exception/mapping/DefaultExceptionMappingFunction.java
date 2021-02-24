@@ -22,27 +22,21 @@
  * SOFTWARE.
  */
 
-rootProject.name = "tollgate"
+package dev.gihwan.tollgate.exception.mapping;
 
-include("gateway")
+import com.linecorp.armeria.client.UnprocessedRequestException;
+import com.linecorp.armeria.common.HttpResponse;
+import com.linecorp.armeria.common.HttpStatus;
 
-include("exception-mapping")
-include("hocon")
-include("junit5")
-include("remapping")
-include("standalone")
-include("testing")
-include("util")
+enum DefaultExceptionMappingFunction implements ExceptionMappingFunction {
 
-include(":examples:helloworld")
-include(":examples:pokeapi:pokeapi-berry")
-include(":examples:pokeapi:pokeapi-contest")
-include(":examples:pokeapi:pokeapi-encounter")
-include(":examples:pokeapi:pokeapi-evolution")
-include(":examples:pokeapi:pokeapi-game")
-include(":examples:pokeapi:pokeapi-gateway")
-include(":examples:pokeapi:pokeapi-item")
-include(":examples:pokeapi:pokeapi-location")
-include(":examples:pokeapi:pokeapi-machine")
-include(":examples:pokeapi:pokeapi-move")
-include(":examples:pokeapi:pokeapi-pokemon")
+    INSTANCE;
+
+    @Override
+    public HttpResponse apply(Throwable cause) {
+        if (cause instanceof UnprocessedRequestException) {
+            return HttpResponse.of(HttpStatus.SERVICE_UNAVAILABLE);
+        }
+        return HttpResponse.ofFailure(cause);
+    }
+}

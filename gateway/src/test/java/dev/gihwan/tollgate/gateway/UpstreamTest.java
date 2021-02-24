@@ -24,13 +24,9 @@
 
 package dev.gihwan.tollgate.gateway;
 
-import static dev.gihwan.tollgate.testing.TestGateway.withTestGateway;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 import static org.awaitility.Awaitility.await;
 
-import java.io.IOException;
-import java.net.ServerSocket;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
@@ -38,7 +34,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import com.linecorp.armeria.client.Endpoint;
 import com.linecorp.armeria.client.WebClient;
 import com.linecorp.armeria.common.AggregatedHttpRequest;
 import com.linecorp.armeria.common.AggregatedHttpResponse;
@@ -49,7 +44,6 @@ import com.linecorp.armeria.server.ServerBuilder;
 import com.linecorp.armeria.testing.junit5.server.ServerExtension;
 
 import dev.gihwan.tollgate.junit5.GatewayExtension;
-import dev.gihwan.tollgate.testing.TestGateway;
 
 class UpstreamTest {
 
@@ -104,25 +98,5 @@ class UpstreamTest {
         assertThat(req.method()).isEqualTo(HttpMethod.POST);
         assertThat(req.path()).isEqualTo("/foo");
         assertThat(req.contentUtf8()).isEqualTo("qux");
-    }
-
-    @Test
-    void respondServiceUnavailableWhenUnProcessedRequestException() {
-        try (TestGateway gateway = withTestGateway(builder -> {
-            final int unusedPort;
-            try (ServerSocket ss = new ServerSocket(0)) {
-                unusedPort = ss.getLocalPort();
-            } catch (IOException e) {
-                fail(e.getMessage());
-                return;
-            }
-
-            builder.upstream("/refused", Upstream.of("http", Endpoint.of("127.0.0.1", unusedPort)));
-        })) {
-            final WebClient webClient = WebClient.builder(gateway.httpUri()).build();
-
-            final AggregatedHttpResponse res = webClient.get("/refused").aggregate().join();
-            assertThat(res.status()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
-        }
     }
 }

@@ -22,27 +22,25 @@
  * SOFTWARE.
  */
 
-rootProject.name = "tollgate"
+package dev.gihwan.tollgate.exception.mapping;
 
-include("gateway")
+import static org.assertj.core.api.Assertions.assertThat;
 
-include("exception-mapping")
-include("hocon")
-include("junit5")
-include("remapping")
-include("standalone")
-include("testing")
-include("util")
+import org.junit.jupiter.api.Test;
 
-include(":examples:helloworld")
-include(":examples:pokeapi:pokeapi-berry")
-include(":examples:pokeapi:pokeapi-contest")
-include(":examples:pokeapi:pokeapi-encounter")
-include(":examples:pokeapi:pokeapi-evolution")
-include(":examples:pokeapi:pokeapi-game")
-include(":examples:pokeapi:pokeapi-gateway")
-include(":examples:pokeapi:pokeapi-item")
-include(":examples:pokeapi:pokeapi-location")
-include(":examples:pokeapi:pokeapi-machine")
-include(":examples:pokeapi:pokeapi-move")
-include(":examples:pokeapi:pokeapi-pokemon")
+import com.linecorp.armeria.client.UnprocessedRequestException;
+import com.linecorp.armeria.common.AggregatedHttpResponse;
+import com.linecorp.armeria.common.HttpResponse;
+import com.linecorp.armeria.common.HttpStatus;
+
+class ExceptionMappingFunctionTest {
+
+    @Test
+    void respondServiceUnavailableWhenUnProcessedRequestException() {
+        final ExceptionMappingFunction mappingFunction = ExceptionMappingFunction.ofDefault();
+
+        final HttpResponse res = mappingFunction.apply(UnprocessedRequestException.of(new RuntimeException()));
+        final AggregatedHttpResponse aggregatedRes = res.aggregate().join();
+        assertThat(aggregatedRes.status()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+    }
+}
