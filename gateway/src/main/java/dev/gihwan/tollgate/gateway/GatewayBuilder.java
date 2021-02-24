@@ -50,7 +50,7 @@ public final class GatewayBuilder {
 
     private final ServerBuilder serverBuilder = Server.builder();
 
-    protected GatewayBuilder() {}
+    GatewayBuilder() {}
 
     /**
      * @see ServerBuilder#http(int)
@@ -152,7 +152,6 @@ public final class GatewayBuilder {
 
     /**
      * @see ServerBuilder#tls(PrivateKey, String, Iterable)
-     * @return
      */
     public GatewayBuilder tls(PrivateKey key,
                               @Nullable String keyPassword,
@@ -236,7 +235,7 @@ public final class GatewayBuilder {
         return route().path(pathPattern).decorators(decorators).build(upstream);
     }
 
-    public final Gateway build() {
+    public Gateway build() {
         return new Gateway(serverBuilder.build());
     }
 }
