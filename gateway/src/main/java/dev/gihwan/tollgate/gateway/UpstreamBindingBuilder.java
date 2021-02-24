@@ -259,7 +259,7 @@ public final class UpstreamBindingBuilder {
         return this;
     }
 
-    public final GatewayBuilder build(Upstream upstream) {
+    public GatewayBuilder build(Upstream upstream) {
         serviceBindingBuilder.build(new UpstreamHttpService(requireNonNull(upstream, "upstream")));
         return gatewayBuilder;
     }
