@@ -76,4 +76,26 @@ class HoconGatewayBuilderTest {
             gateway.stop().join();
         }
     }
+
+    @Test
+    void logging() {
+        final Config config =
+                ConfigFactory.load("application-logging.conf")
+                             .withValue("tollgate.routing.foo.upstream.uri",
+                                        ConfigValueFactory.fromAnyRef(serviceServer.httpUri().toString()));
+
+        final Gateway gateway = HoconGatewayBuilder.of().build(config);
+        try {
+            gateway.start().join();
+            assertThat(gateway.activeLocalPort()).isPositive();
+
+            final WebClient client = WebClient.of("http://127.0.0.1:" + gateway.activeLocalPort());
+
+            final AggregatedHttpResponse res = client.get("/foo").aggregate().join();
+            assertThat(res.status()).isEqualTo(HttpStatus.OK);
+            assertThat(res.contentUtf8()).isEqualTo("bar");
+        } finally {
+            gateway.stop().join();
+        }
+    }
 }

@@ -44,6 +44,7 @@ dependencies {
     testImplementation(Dependency.armeriaJunit)
 
     testRuntimeOnly(Dependency.junitEngine)
+    testRuntimeOnly(Dependency.logback)
 }
 
 java {
