@@ -36,10 +36,17 @@ import com.typesafe.config.ConfigObject;
 
 import com.linecorp.armeria.client.Endpoint;
 import com.linecorp.armeria.client.endpoint.EndpointGroup;
+import com.linecorp.armeria.client.logging.LoggingClient;
+import com.linecorp.armeria.client.logging.LoggingClientBuilder;
 import com.linecorp.armeria.common.HttpMethod;
+import com.linecorp.armeria.common.logging.LogLevel;
+import com.linecorp.armeria.common.logging.LoggingDecoratorBuilder;
+import com.linecorp.armeria.server.logging.LoggingService;
+import com.linecorp.armeria.server.logging.LoggingServiceBuilder;
 
 import dev.gihwan.tollgate.gateway.GatewayBuilder;
 import dev.gihwan.tollgate.gateway.Upstream;
+import dev.gihwan.tollgate.gateway.UpstreamBindingBuilder;
 import dev.gihwan.tollgate.gateway.UpstreamBuilder;
 import dev.gihwan.tollgate.remapping.RemappingClient;
 import dev.gihwan.tollgate.remapping.RemappingClientBuilder;
@@ -73,10 +80,25 @@ enum DefaultHoconGatewayConfigurator implements HoconGatewayConfigurator {
         checkArgument(routeConfig.hasPath("path"), "Route config must have path.");
         checkArgument(routeConfig.hasPath("upstream"), "Route config must have upstream.");
 
-        builder.route()
-               .methods(routeConfig.getEnum(HttpMethod.class, "method"))
-               .path(routeConfig.getString("path"))
-               .build(configureUpstreamConfig(routeConfig.getObject("upstream").toConfig()));
+        final UpstreamBindingBuilder routeBuilder =
+                builder.route()
+                       .methods(routeConfig.getEnum(HttpMethod.class, "method"))
+                       .path(routeConfig.getString("path"));
+
+        if (routeConfig.hasPath("logging")) {
+            final Config loggingConfig = routeConfig.getObject("logging").toConfig();
+
+            final LoggingServiceBuilder loggingBuilder = LoggingService.builder();
+            configureLoggingConfig(loggingBuilder, loggingConfig);
+
+            if (loggingConfig.hasPath("samplingRate")) {
+                loggingBuilder.samplingRate((float) loggingConfig.getDouble("samplingRate"));
+            }
+
+            routeBuilder.decorator(loggingBuilder.newDecorator());
+        }
+
+        routeBuilder.build(configureUpstreamConfig(routeConfig.getObject("upstream").toConfig()));
     }
 
     private static Upstream configureUpstreamConfig(Config upstreamConfig) {
@@ -110,6 +132,39 @@ enum DefaultHoconGatewayConfigurator implements HoconGatewayConfigurator {
             builder.decorator(remappingBuilder.newDecorator());
         }
 
+        if (upstreamConfig.hasPath("logging")) {
+            final Config loggingConfig = upstreamConfig.getObject("logging").toConfig();
+
+            final LoggingClientBuilder loggingBuilder = LoggingClient.builder();
+            configureLoggingConfig(loggingBuilder, loggingConfig);
+
+            if (loggingConfig.hasPath("samplingRate")) {
+                loggingBuilder.samplingRate((float) loggingConfig.getDouble("samplingRate"));
+            }
+
+            builder.decorator(loggingBuilder.newDecorator());
+        }
+
         return builder.build();
+    }
+
+    private static void configureLoggingConfig(LoggingDecoratorBuilder builder, Config loggingConfig) {
+        if (loggingConfig.hasPath("logger")) {
+            builder.logger(loggingConfig.getString("logger"));
+        }
+        if (loggingConfig.hasPath("requestLogLevel")) {
+            final LogLevel requestLogLevel = LogLevel.valueOf(loggingConfig.getString("requestLogLevel"));
+            builder.requestLogLevel(requestLogLevel);
+        }
+        if (loggingConfig.hasPath("successfulResponseLogLevel")) {
+            final LogLevel successfulResponseLogLevel =
+                    LogLevel.valueOf(loggingConfig.getString("successfulResponseLogLevel"));
+            builder.successfulResponseLogLevel(successfulResponseLogLevel);
+        }
+        if (loggingConfig.hasPath("failureResponseLogLevel")) {
+            final LogLevel failureResponseLogLevel =
+                    LogLevel.valueOf(loggingConfig.getString("failureResponseLogLevel"));
+            builder.failureResponseLogLevel(failureResponseLogLevel);
+        }
     }
 }
