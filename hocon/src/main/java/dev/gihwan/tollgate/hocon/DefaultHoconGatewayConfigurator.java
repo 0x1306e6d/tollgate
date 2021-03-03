@@ -61,7 +61,8 @@ enum DefaultHoconGatewayConfigurator implements HoconGatewayConfigurator {
         requireNonNull(config, "config");
 
         if (config.hasPath("tollgate.port")) {
-            builder.http(config.getInt("tollgate.port"));
+            final int port = config.getInt("tollgate.port");
+            builder.server(serverBuilder -> serverBuilder.http(port));
         }
         if (config.hasPath("tollgate.healthCheckPath")) {
             builder.healthCheck(config.getString("tollgate.healthCheckPath"));

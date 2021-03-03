@@ -43,7 +43,7 @@ public final class HelloWorldGateway {
 
     public static void main(String[] args) {
         final Gateway gateway = Gateway.builder()
-                                       .http(8080)
+                                       .server(builder -> builder.http(8080))
                                        .upstream("/helloworld", Upstream.of("http://localhost:9090"))
                                        .build();
 

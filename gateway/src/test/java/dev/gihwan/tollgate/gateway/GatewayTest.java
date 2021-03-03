@@ -52,7 +52,7 @@ class GatewayTest {
     @Test
     void http() {
         final Gateway gateway = Gateway.builder()
-                                       .http(0)
+                                       .server(builder -> builder.http(0))
                                        .upstream("/foo", Upstream.of(serviceServer.httpUri()))
                                        .build();
         gateway.start().join();
@@ -70,8 +70,7 @@ class GatewayTest {
     @Test
     void https() {
         final Gateway gateway = Gateway.builder()
-                                       .https(0)
-                                       .tlsSelfSigned()
+                                       .server(builder -> builder.https(0).tlsSelfSigned())
                                        .upstream("/foo", Upstream.of(serviceServer.httpUri()))
                                        .build();
         gateway.start().join();
