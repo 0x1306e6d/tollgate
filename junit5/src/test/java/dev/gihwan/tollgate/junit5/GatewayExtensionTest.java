@@ -41,8 +41,8 @@ class GatewayExtensionTest {
     static GatewayExtension gateway = new GatewayExtension() {
         @Override
         public void configure(GatewayBuilder builder) {
-            builder.http(0);
-            builder.https(0).tlsSelfSigned();
+            builder.server(serverBuilder -> serverBuilder.http(0)
+                                                         .https(0).tlsSelfSigned());
             builder.healthCheck("/health");
         }
     };
