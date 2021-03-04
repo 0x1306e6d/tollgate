@@ -27,6 +27,7 @@ package dev.gihwan.tollgate.gateway;
 import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import com.linecorp.armeria.client.HttpClient;
@@ -54,6 +55,24 @@ public final class UpstreamBuilder {
                                           requireNonNull(path, "path"));
     }
 
+    /**
+     * Configures a {@link WebClient} of a {@link Upstream} with the given {@code configurator}.
+     *
+     * Please note that calling {@link WebClientBuilder#build()} inside {@code configurator} does not affect
+     * building {@link Upstream}.
+     */
+    public UpstreamBuilder client(Consumer<? super WebClientBuilder> configurator) {
+        requireNonNull(configurator, "configurator");
+        configurator.accept(clientBuilder);
+        return this;
+    }
+
+    /**
+     * Decorates a {@link WebClient} of a {@link Upstream} with the given {@code decorator}.
+     *
+     * This method is a shortcut for {@link UpstreamBuilder#client(Consumer)} with a {@code configurator}
+     * which calls {@link WebClientBuilder#decorator(Function)}.
+     */
     public UpstreamBuilder decorator(Function<? super HttpClient, ? extends HttpClient> decorator) {
         clientBuilder.decorator(requireNonNull(decorator, "decorator"));
         return this;
