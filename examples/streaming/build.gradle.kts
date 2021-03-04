@@ -22,28 +22,27 @@
  * SOFTWARE.
  */
 
-rootProject.name = "tollgate"
+import dev.gihwan.tollgate.Dependency
 
-include("gateway")
+plugins {
+    java
+    application
+}
 
-include("exception-mapping")
-include("hocon")
-include("junit5")
-include("remapping")
-include("standalone")
-include("testing")
-include("util")
+dependencies {
+    implementation(project(":gateway"))
+    implementation(project(":util"))
 
-include(":examples:helloworld")
-include(":examples:pokeapi:pokeapi-berry")
-include(":examples:pokeapi:pokeapi-contest")
-include(":examples:pokeapi:pokeapi-encounter")
-include(":examples:pokeapi:pokeapi-evolution")
-include(":examples:pokeapi:pokeapi-game")
-include(":examples:pokeapi:pokeapi-gateway")
-include(":examples:pokeapi:pokeapi-item")
-include(":examples:pokeapi:pokeapi-location")
-include(":examples:pokeapi:pokeapi-machine")
-include(":examples:pokeapi:pokeapi-move")
-include(":examples:pokeapi:pokeapi-pokemon")
-include(":examples:streaming")
+    implementation(Dependency.slf4j)
+
+    runtimeOnly(Dependency.logback)
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
