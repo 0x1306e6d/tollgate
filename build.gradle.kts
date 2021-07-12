@@ -34,6 +34,5 @@ allprojects {
 
     repositories {
         mavenCentral()
-        jcenter()
     }
 }
