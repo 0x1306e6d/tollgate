@@ -22,30 +22,51 @@
  * SOFTWARE.
  */
 
-import dev.gihwan.tollgate.Dependency
+package dev.gihwan.tollgate.springframework.boot.autoconfigure;
 
-plugins {
-    id("java-library")
-    id("dev.gihwan.tollgate.publish")
-}
+import org.springframework.context.SmartLifecycle;
 
-dependencies {
-    api(project(":gateway"))
-    api(Dependency.springBootAutoConfigure)
+import dev.gihwan.tollgate.gateway.Gateway;
 
-    implementation(project(":util"))
-    implementation(Dependency.guava)
+/**
+ * A {@link SmartLifecycle} to start and stop the specified {@link Gateway}.
+ */
+class GatewayStartStopLifecycle implements SmartLifecycle {
 
-    testImplementation(project(":junit5"))
-    testImplementation(Dependency.assertj)
-    testImplementation(Dependency.mockito)
-}
+    private final Gateway gateway;
+    private volatile boolean running;
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
+    GatewayStartStopLifecycle(Gateway gateway) {
+        this.gateway = gateway;
+    }
 
-tasks.test {
-    useJUnitPlatform()
+    @Override
+    public void start() {
+        gateway.start()
+               .handle((ignored, cause) -> {
+                   if (cause != null) {
+                       throw new IllegalStateException("Failed to start Tollgate gateway", cause);
+                   }
+
+                   running = true;
+                   return null;
+               })
+               .join();
+    }
+
+    @Override
+    public void stop() {
+        running = false;
+        gateway.stop().join();
+    }
+
+    @Override
+    public boolean isRunning() {
+        return running;
+    }
+
+    @Override
+    public int getPhase() {
+        return Integer.MAX_VALUE - 1;
+    }
 }

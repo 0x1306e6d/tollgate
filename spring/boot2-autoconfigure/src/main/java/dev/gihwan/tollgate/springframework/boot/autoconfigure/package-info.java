@@ -22,30 +22,7 @@
  * SOFTWARE.
  */
 
-import dev.gihwan.tollgate.Dependency
+@NonNullApi
+package dev.gihwan.tollgate.springframework.boot.autoconfigure;
 
-plugins {
-    id("java-library")
-    id("dev.gihwan.tollgate.publish")
-}
-
-dependencies {
-    api(project(":gateway"))
-    api(Dependency.springBootAutoConfigure)
-
-    implementation(project(":util"))
-    implementation(Dependency.guava)
-
-    testImplementation(project(":junit5"))
-    testImplementation(Dependency.assertj)
-    testImplementation(Dependency.mockito)
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
+import org.springframework.lang.NonNullApi;

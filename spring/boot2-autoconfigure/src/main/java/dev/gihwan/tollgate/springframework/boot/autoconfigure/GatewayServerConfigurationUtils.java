@@ -22,30 +22,27 @@
  * SOFTWARE.
  */
 
-import dev.gihwan.tollgate.Dependency
+package dev.gihwan.tollgate.springframework.boot.autoconfigure;
 
-plugins {
-    id("java-library")
-    id("dev.gihwan.tollgate.publish")
-}
+import java.util.List;
 
-dependencies {
-    api(project(":gateway"))
-    api(Dependency.springBootAutoConfigure)
+import com.linecorp.armeria.server.ServerBuilder;
 
-    implementation(project(":util"))
-    implementation(Dependency.guava)
+import dev.gihwan.tollgate.springframework.boot.autoconfigure.GatewayProperties.Server.Port;
 
-    testImplementation(project(":junit5"))
-    testImplementation(Dependency.assertj)
-    testImplementation(Dependency.mockito)
-}
+final class GatewayServerConfigurationUtils {
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
+    static void configureServer(ServerBuilder builder, GatewayProperties.Server properties) {
+        configurePorts(builder, properties.getPorts());
+    }
 
-tasks.test {
-    useJUnitPlatform()
+    private static void configurePorts(ServerBuilder builder, List<Port> ports) {
+        ports.forEach(port -> configurePort(builder, port));
+    }
+
+    private static void configurePort(ServerBuilder builder, Port port) {
+        builder.port(port.getPort(), port.getProtocols());
+    }
+
+    private GatewayServerConfigurationUtils() {}
 }

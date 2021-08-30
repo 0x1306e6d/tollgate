@@ -22,30 +22,19 @@
  * SOFTWARE.
  */
 
-import dev.gihwan.tollgate.Dependency
+package dev.gihwan.tollgate.springframework.boot.autoconfigure;
 
-plugins {
-    id("java-library")
-    id("dev.gihwan.tollgate.publish")
-}
+import dev.gihwan.tollgate.gateway.Gateway;
+import dev.gihwan.tollgate.gateway.GatewayBuilder;
 
-dependencies {
-    api(project(":gateway"))
-    api(Dependency.springBootAutoConfigure)
+/**
+ * A {@link FunctionalInterface} for customizing {@link Gateway} using {@link GatewayBuilder}.
+ */
+@FunctionalInterface
+public interface GatewayCustomizer {
 
-    implementation(project(":util"))
-    implementation(Dependency.guava)
-
-    testImplementation(project(":junit5"))
-    testImplementation(Dependency.assertj)
-    testImplementation(Dependency.mockito)
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-
-tasks.test {
-    useJUnitPlatform()
+    /**
+     * Customizes the given {@link GatewayBuilder}.
+     */
+    void customize(GatewayBuilder builder);
 }
