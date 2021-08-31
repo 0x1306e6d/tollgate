@@ -39,6 +39,8 @@ object Dependency {
         "org.springframework.boot:spring-boot-autoconfigure:${Version.springBoot}"
     const val springBootStarter =
         "org.springframework.boot:spring-boot-starter:${Version.springBoot}"
+    const val springBootStarterTest =
+        "org.springframework.boot:spring-boot-starter-test:${Version.springBoot}"
 
     const val assertj = "org.assertj:assertj-core:${Version.assertj}"
     const val awaitility = "org.awaitility:awaitility:${Version.awaitility}"

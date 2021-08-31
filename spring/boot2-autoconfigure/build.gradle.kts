@@ -37,6 +37,7 @@ dependencies {
     implementation(Dependency.guava)
 
     testImplementation(project(":junit5"))
+    testImplementation(Dependency.springBootStarterTest)
     testImplementation(Dependency.assertj)
     testImplementation(Dependency.mockito)
 }
