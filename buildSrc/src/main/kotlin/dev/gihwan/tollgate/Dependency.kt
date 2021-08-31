@@ -35,6 +35,13 @@ object Dependency {
     const val logback = "ch.qos.logback:logback-classic:${Version.logback}"
     const val slf4j = "org.slf4j:slf4j-api:${Version.slf4j}"
 
+    const val springBootAutoConfigure =
+        "org.springframework.boot:spring-boot-autoconfigure:${Version.springBoot}"
+    const val springBootStarter =
+        "org.springframework.boot:spring-boot-starter:${Version.springBoot}"
+    const val springBootStarterTest =
+        "org.springframework.boot:spring-boot-starter-test:${Version.springBoot}"
+
     const val assertj = "org.assertj:assertj-core:${Version.assertj}"
     const val awaitility = "org.awaitility:awaitility:${Version.awaitility}"
     const val junitApi = "org.junit.jupiter:junit-jupiter-api:${Version.junit}"

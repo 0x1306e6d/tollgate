@@ -22,21 +22,19 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate
+package boot;
 
-object Version {
-    const val armeria = "1.9.2"
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-    const val commonsLang3 = "3.12.0"
-    const val config = "1.4.1"
-    const val guava = "30.1.1-jre"
-    const val jsr305 = "3.0.2"
-    const val logback = "1.2.3"
-    const val slf4j = "1.7.31"
-    const val springBoot = "2.5.4"
+import dev.gihwan.tollgate.gateway.Upstream;
+import dev.gihwan.tollgate.springframework.boot.autoconfigure.GatewayCustomizer;
 
-    const val assertj = "3.20.2"
-    const val awaitility = "4.1.0"
-    const val junit = "5.7.2"
-    const val mockito = "3.11.2"
+@Configuration
+public class ExampleProxyConfiguration {
+
+    @Bean
+    public GatewayCustomizer googleProxyCustomizer() {
+        return builder -> builder.upstream("/", Upstream.of("https://example.com"));
+    }
 }
