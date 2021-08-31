@@ -22,31 +22,19 @@
  * SOFTWARE.
  */
 
-rootProject.name = "tollgate"
+package boot;
 
-include("gateway")
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-include("exception-mapping")
-include("hocon")
-include("junit5")
-include("remapping")
-include("spring:boot2-autoconfigure")
-include("spring:boot2-starter")
-include("standalone")
-include("testing")
-include("util")
+import dev.gihwan.tollgate.gateway.Upstream;
+import dev.gihwan.tollgate.springframework.boot.autoconfigure.GatewayCustomizer;
 
-include(":examples:helloworld")
-include(":examples:pokeapi:pokeapi-berry")
-include(":examples:pokeapi:pokeapi-contest")
-include(":examples:pokeapi:pokeapi-encounter")
-include(":examples:pokeapi:pokeapi-evolution")
-include(":examples:pokeapi:pokeapi-game")
-include(":examples:pokeapi:pokeapi-gateway")
-include(":examples:pokeapi:pokeapi-item")
-include(":examples:pokeapi:pokeapi-location")
-include(":examples:pokeapi:pokeapi-machine")
-include(":examples:pokeapi:pokeapi-move")
-include(":examples:pokeapi:pokeapi-pokemon")
-include(":examples:spring:boot2")
-include(":examples:streaming")
+@Configuration
+public class ExampleProxyConfiguration {
+
+    @Bean
+    public GatewayCustomizer googleProxyCustomizer() {
+        return builder -> builder.upstream("/", Upstream.of("https://example.com"));
+    }
+}

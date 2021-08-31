@@ -22,31 +22,15 @@
  * SOFTWARE.
  */
 
-rootProject.name = "tollgate"
+package boot;
 
-include("gateway")
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-include("exception-mapping")
-include("hocon")
-include("junit5")
-include("remapping")
-include("spring:boot2-autoconfigure")
-include("spring:boot2-starter")
-include("standalone")
-include("testing")
-include("util")
+@SpringBootApplication
+public class TollgateApplication {
 
-include(":examples:helloworld")
-include(":examples:pokeapi:pokeapi-berry")
-include(":examples:pokeapi:pokeapi-contest")
-include(":examples:pokeapi:pokeapi-encounter")
-include(":examples:pokeapi:pokeapi-evolution")
-include(":examples:pokeapi:pokeapi-game")
-include(":examples:pokeapi:pokeapi-gateway")
-include(":examples:pokeapi:pokeapi-item")
-include(":examples:pokeapi:pokeapi-location")
-include(":examples:pokeapi:pokeapi-machine")
-include(":examples:pokeapi:pokeapi-move")
-include(":examples:pokeapi:pokeapi-pokemon")
-include(":examples:spring:boot2")
-include(":examples:streaming")
+    public static void main(String[] args) {
+        SpringApplication.run(TollgateApplication.class, args);
+    }
+}

@@ -22,31 +22,16 @@
  * SOFTWARE.
  */
 
-rootProject.name = "tollgate"
+plugins {
+    java
+    application
+}
 
-include("gateway")
+dependencies {
+    implementation(project(":spring:boot2-starter"))
+}
 
-include("exception-mapping")
-include("hocon")
-include("junit5")
-include("remapping")
-include("spring:boot2-autoconfigure")
-include("spring:boot2-starter")
-include("standalone")
-include("testing")
-include("util")
-
-include(":examples:helloworld")
-include(":examples:pokeapi:pokeapi-berry")
-include(":examples:pokeapi:pokeapi-contest")
-include(":examples:pokeapi:pokeapi-encounter")
-include(":examples:pokeapi:pokeapi-evolution")
-include(":examples:pokeapi:pokeapi-game")
-include(":examples:pokeapi:pokeapi-gateway")
-include(":examples:pokeapi:pokeapi-item")
-include(":examples:pokeapi:pokeapi-location")
-include(":examples:pokeapi:pokeapi-machine")
-include(":examples:pokeapi:pokeapi-move")
-include(":examples:pokeapi:pokeapi-pokemon")
-include(":examples:spring:boot2")
-include(":examples:streaming")
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
