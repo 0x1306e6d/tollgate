@@ -21,5 +21,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  dev.gihwan.tollgate.springframework.boot.autoconfigure.TollgateAutoConfiguration
+tollgate:
+  server:
+    ports:
+      - port: 8080
+        protocol: HTTP

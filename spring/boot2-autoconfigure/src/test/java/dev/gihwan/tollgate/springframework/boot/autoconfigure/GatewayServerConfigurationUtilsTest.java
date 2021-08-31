@@ -38,13 +38,13 @@ import com.linecorp.armeria.server.ServerBuilder;
 import com.linecorp.armeria.server.ServerConfig;
 import com.linecorp.armeria.server.ServerPort;
 
-import dev.gihwan.tollgate.springframework.boot.autoconfigure.GatewayProperties.Server.Port;
+import dev.gihwan.tollgate.springframework.boot.autoconfigure.TollgateProperties.Server.Port;
 
 class GatewayServerConfigurationUtilsTest {
 
     @Test
     void configurePort() {
-        final GatewayProperties.Server properties = new GatewayProperties.Server();
+        final TollgateProperties.Server properties = new TollgateProperties.Server();
         properties.setPorts(List.of(newPort(8080, List.of(SessionProtocol.HTTP))));
 
         final ServerBuilder builder = newServerBuilder();
@@ -58,7 +58,7 @@ class GatewayServerConfigurationUtilsTest {
 
     @Test
     void configurePortAndProtocols() {
-        final GatewayProperties.Server properties = new GatewayProperties.Server();
+        final TollgateProperties.Server properties = new TollgateProperties.Server();
         properties.setPorts(List.of(newPort(8080, List.of(SessionProtocol.HTTP, SessionProtocol.HTTPS))));
 
         final ServerBuilder builder = newServerBuilder().tlsSelfSigned();
@@ -72,7 +72,7 @@ class GatewayServerConfigurationUtilsTest {
 
     @Test
     void configurePorts() {
-        final GatewayProperties.Server properties = new GatewayProperties.Server();
+        final TollgateProperties.Server properties = new TollgateProperties.Server();
         properties.setPorts(List.of(newPort(8080, List.of(SessionProtocol.HTTP)),
                                     newPort(8443, List.of(SessionProtocol.HTTPS))));
 
@@ -88,7 +88,7 @@ class GatewayServerConfigurationUtilsTest {
 
     @Test
     void configureDefaultPorts() {
-        final GatewayProperties.Server properties = new GatewayProperties.Server();
+        final TollgateProperties.Server properties = new TollgateProperties.Server();
 
         final ServerBuilder builder = newServerBuilder();
         GatewayServerConfigurationUtils.configureServer(builder, properties);
@@ -104,8 +104,8 @@ class GatewayServerConfigurationUtilsTest {
                      .service("/", (ctx, req) -> HttpResponse.of(HttpStatus.OK));
     }
 
-    private static GatewayProperties.Server.Port newPort(int port, List<SessionProtocol> protocols) {
-        final GatewayProperties.Server.Port properties = new Port();
+    private static TollgateProperties.Server.Port newPort(int port, List<SessionProtocol> protocols) {
+        final TollgateProperties.Server.Port properties = new Port();
         properties.setPort(port);
         properties.setProtocols(protocols);
         return properties;

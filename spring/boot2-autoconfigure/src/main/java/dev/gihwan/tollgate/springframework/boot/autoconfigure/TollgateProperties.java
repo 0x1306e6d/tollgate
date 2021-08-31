@@ -37,10 +37,10 @@ import com.linecorp.armeria.server.ServerPort;
 import dev.gihwan.tollgate.gateway.Gateway;
 
 /**
- * {@link ConfigurationProperties @ConfigurationProperties} for {@link Gateway}.
+ * {@link ConfigurationProperties @ConfigurationProperties} for Tollgate.
  */
 @ConfigurationProperties("tollgate")
-public class GatewayProperties {
+public class TollgateProperties {
 
     /**
      * {@link com.linecorp.armeria.server.Server} which serves the {@link Gateway}.

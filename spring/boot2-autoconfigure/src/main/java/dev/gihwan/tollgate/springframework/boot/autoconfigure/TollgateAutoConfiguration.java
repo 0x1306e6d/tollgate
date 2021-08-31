@@ -24,45 +24,37 @@
 
 package dev.gihwan.tollgate.springframework.boot.autoconfigure;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static dev.gihwan.tollgate.springframework.boot.autoconfigure.GatewayServerConfigurationUtils.configureServer;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.autoconfigure.AutoConfigurations;
-import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import dev.gihwan.tollgate.gateway.Gateway;
-import dev.gihwan.tollgate.gateway.Upstream;
+import dev.gihwan.tollgate.gateway.GatewayBuilder;
 
-class GatewayAutoConfigurationTest {
+/**
+ * {@link EnableAutoConfiguration Auto-configuration} for Tollgate.
+ */
+@Configuration(proxyBeanMethods = false)
+@ConditionalOnBean(GatewayCustomizer.class)
+@EnableConfigurationProperties(TollgateProperties.class)
+public class TollgateAutoConfiguration {
 
-    private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-            .withConfiguration(AutoConfigurations.of(GatewayAutoConfiguration.class));
-
-    @Test
-    void shouldNotCreateGatewayBeanByDefault() {
-        contextRunner.run(context -> {
-            assertThat(context).doesNotHaveBean(Gateway.class);
-            assertThat(context).doesNotHaveBean(GatewayStartStopLifecycle.class);
-        });
+    @Bean
+    public Gateway gateway(TollgateProperties properties, ObjectProvider<GatewayCustomizer> customizers) {
+        final GatewayBuilder builder = Gateway.builder();
+        builder.server(serverBuilder -> configureServer(serverBuilder, properties.getServer()));
+        customizers.forEach(customizer -> customizer.customize(builder));
+        return builder.build();
     }
 
-    @Test
-    void createGatewayBean() {
-        contextRunner.withUserConfiguration(CustomGatewayConfiguration.class)
-                     .run(context -> {
-                         assertThat(context).hasSingleBean(Gateway.class);
-                         assertThat(context).hasSingleBean(GatewayStartStopLifecycle.class);
-                     });
-    }
-
-    @Configuration(proxyBeanMethods = false)
-    static class CustomGatewayConfiguration {
-
-        @Bean
-        GatewayCustomizer gatewayCustomizer() {
-            return builder -> builder.upstream("/", Upstream.of("https://example.com"));
-        }
+    @Bean
+    public SmartLifecycle gatewayStartStopLifecycle(Gateway gateway) {
+        return new GatewayStartStopLifecycle(gateway);
     }
 }

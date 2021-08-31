@@ -28,11 +28,11 @@ import java.util.List;
 
 import com.linecorp.armeria.server.ServerBuilder;
 
-import dev.gihwan.tollgate.springframework.boot.autoconfigure.GatewayProperties.Server.Port;
+import dev.gihwan.tollgate.springframework.boot.autoconfigure.TollgateProperties.Server.Port;
 
 final class GatewayServerConfigurationUtils {
 
-    static void configureServer(ServerBuilder builder, GatewayProperties.Server properties) {
+    static void configureServer(ServerBuilder builder, TollgateProperties.Server properties) {
         configurePorts(builder, properties.getPorts());
     }
 
