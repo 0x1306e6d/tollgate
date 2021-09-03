@@ -50,7 +50,7 @@ class PublishPlugin : Plugin<Project> {
         val mavenPublication = publishing.publications.create("maven", MavenPublication::class.java)
         project.afterEvaluate {
             mavenPublication.groupId = group.toString()
-            mavenPublication.artifactId = "tollgate-${name}"
+            mavenPublication.artifactId = artifactId
             mavenPublication.version = version.toString()
 
             project.plugins.withType(JavaPlugin::class.java).all {
@@ -62,4 +62,7 @@ class PublishPlugin : Plugin<Project> {
             }
         }
     }
+
+    private val Project.artifactId: String
+        get() = parent?.let { "${it.artifactId}-${name}" } ?: name
 }
