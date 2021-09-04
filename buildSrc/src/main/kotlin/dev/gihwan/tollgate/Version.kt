@@ -27,6 +27,7 @@ package dev.gihwan.tollgate
 object Version {
     const val armeria = "1.9.2"
 
+    const val bouncycastle = "1.69"
     const val commonsLang3 = "3.12.0"
     const val config = "1.4.1"
     const val guava = "30.1.1-jre"
