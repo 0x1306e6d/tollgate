@@ -33,6 +33,8 @@ dependencies {
     implementation(project(":util"))
 
     api(Dependency.armeria)
+    implementation(Dependency.bcpkix)
+    implementation(Dependency.bcprov)
     implementation(Dependency.commonsLang3)
     implementation(Dependency.guava)
     implementation(Dependency.jsr305)

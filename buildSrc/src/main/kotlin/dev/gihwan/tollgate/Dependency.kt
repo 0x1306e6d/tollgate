@@ -28,6 +28,8 @@ object Dependency {
     const val armeria = "com.linecorp.armeria:armeria:${Version.armeria}"
     const val armeriaJunit = "com.linecorp.armeria:armeria-junit5:${Version.armeria}"
 
+    const val bcpkix = "org.bouncycastle:bcpkix-jdk15on:${Version.bouncycastle}"
+    const val bcprov = "org.bouncycastle:bcprov-jdk15on:${Version.bouncycastle}"
     const val commonsLang3 = "org.apache.commons:commons-lang3:${Version.commonsLang3}"
     const val config = "com.typesafe:config:${Version.config}"
     const val guava = "com.google.guava:guava:${Version.guava}"
