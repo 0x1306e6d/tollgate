@@ -23,7 +23,7 @@
  */
 
 plugins {
-    id("com.google.cloud.tools.jib") version "3.1.2" apply false
+    id("com.google.cloud.tools.jib") version "3.1.4" apply false
 }
 
 allprojects {
