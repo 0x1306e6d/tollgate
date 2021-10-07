@@ -18,6 +18,8 @@ jobs:
           java-version: 11
       - name: Build using Gradle
         run: gradle build
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
       - name: Publish to GitHub Packages
         run: gradle publish
         env:
