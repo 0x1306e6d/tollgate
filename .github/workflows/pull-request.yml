@@ -21,4 +21,5 @@ jobs:
       - name: Build using Gradle
         run: gradle build
       - name: Upload coverage to Codecov
+        if: ${{ matrix.java-version == 16 }}
         uses: codecov/codecov-action@v2
