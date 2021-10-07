@@ -43,6 +43,8 @@ class CoveragePlugin : Plugin<Project> {
             dependsOn(test)
 
             reports {
+                xml.required.set(true)
+                xml.outputLocation.set(project.layout.buildDirectory.file("jacoco/jacocoTestReport.xml"))
                 html.required.set(true)
                 html.outputLocation.set(project.layout.buildDirectory.dir("jacoco/html"))
             }
