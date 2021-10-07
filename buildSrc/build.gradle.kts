@@ -33,6 +33,10 @@ repositories {
 
 gradlePlugin {
     plugins {
+        register("coveragePlugin") {
+            id = "dev.gihwan.tollgate.coverage"
+            implementationClass = "dev.gihwan.tollgate.CoveragePlugin"
+        }
         register("publishPlugin") {
             id = "dev.gihwan.tollgate.publish"
             implementationClass = "dev.gihwan.tollgate.PublishPlugin"

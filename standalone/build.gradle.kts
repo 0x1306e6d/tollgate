@@ -27,6 +27,7 @@ import dev.gihwan.tollgate.Dependency
 plugins {
     java
     application
+    id("dev.gihwan.tollgate.coverage")
     id("dev.gihwan.tollgate.publish")
     id("com.google.cloud.tools.jib")
 }

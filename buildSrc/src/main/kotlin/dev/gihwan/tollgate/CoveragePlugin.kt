@@ -22,40 +22,31 @@
  * SOFTWARE.
  */
 
-import dev.gihwan.tollgate.Dependency
+package dev.gihwan.tollgate
 
-plugins {
-    id("java-library")
-    id("dev.gihwan.tollgate.coverage")
-    id("dev.gihwan.tollgate.publish")
-}
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+import org.gradle.api.tasks.testing.Test
+import org.gradle.testing.jacoco.plugins.JacocoPlugin
+import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
+import org.gradle.testing.jacoco.tasks.JacocoReport
 
-dependencies {
-    implementation(project(":util"))
+class CoveragePlugin : Plugin<Project> {
+    override fun apply(project: Project) {
+        project.plugins.apply(JacocoPlugin::class.java)
 
-    api(Dependency.armeria)
-    implementation(Dependency.bcpkix)
-    implementation(Dependency.bcprov)
-    implementation(Dependency.commonsLang3)
-    implementation(Dependency.guava)
-    implementation(Dependency.jsr305)
-    implementation(Dependency.slf4j)
+        val jacoco = project.extensions.getByType(JacocoPluginExtension::class.java)
+        jacoco.toolVersion = "0.8.7"
 
-    testImplementation(project(":junit5"))
-    testImplementation(Dependency.assertj)
-    testImplementation(Dependency.awaitility)
-    testImplementation(Dependency.mockito)
-    testImplementation(Dependency.armeriaJunit)
+        val test = project.tasks.withType(Test::class.java)
+        val jacocoReport = project.tasks.withType(JacocoReport::class.java) {
+            dependsOn(test)
 
-    testRuntimeOnly(Dependency.junitEngine)
-    testRuntimeOnly(Dependency.logback)
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-
-tasks.test {
-    useJUnitPlatform()
+            reports {
+                html.required.set(true)
+                html.outputLocation.set(project.layout.buildDirectory.dir("jacoco/html"))
+            }
+        }
+        test.all { finalizedBy(jacocoReport) }
+    }
 }
