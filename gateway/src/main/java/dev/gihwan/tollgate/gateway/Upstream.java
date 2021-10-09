@@ -28,13 +28,13 @@ import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
 
-import com.linecorp.armeria.client.WebClient;
 import com.linecorp.armeria.client.endpoint.EndpointGroup;
 import com.linecorp.armeria.common.HttpRequest;
+import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.SessionProtocol;
 
 /**
- * A upstream which forwards {@link HttpRequest}s from client to the specified destination.
+ * An upstream which forwards {@link HttpRequest}s from client to the specified destination.
  */
 public interface Upstream {
 
@@ -115,7 +115,7 @@ public interface Upstream {
     }
 
     /**
-     * Returns the {@link WebClient} of this upstream.
+     * Sends the given {@link HttpRequest} to this upstream.
      */
-    WebClient client();
+    HttpResponse execute(HttpRequest req);
 }

@@ -24,7 +24,18 @@
 
 package dev.gihwan.tollgate.gateway;
 
+import java.util.Set;
+
 import com.linecorp.armeria.client.WebClient;
+import com.linecorp.armeria.common.HttpHeaderNames;
+import com.linecorp.armeria.common.HttpRequest;
+import com.linecorp.armeria.common.HttpResponse;
+import com.linecorp.armeria.common.RequestHeaders;
+import com.linecorp.armeria.common.RequestHeadersBuilder;
+import com.linecorp.armeria.common.ResponseHeaders;
+import com.linecorp.armeria.common.ResponseHeadersBuilder;
+
+import io.netty.util.AsciiString;
 
 /**
  * The default implementation of {@link Upstream}.
@@ -33,12 +44,49 @@ final class DefaultUpstream implements Upstream {
 
     private final WebClient client;
 
-    DefaultUpstream(WebClient client) {
+    private final Set<AsciiString> disallowedRequestHeaders;
+    private final Set<AsciiString> disallowedResponseHeaders;
+
+    DefaultUpstream(WebClient client,
+                    Set<AsciiString> disallowedRequestHeaders,
+                    Set<AsciiString> disallowedResponseHeaders) {
         this.client = client;
+        this.disallowedRequestHeaders = disallowedRequestHeaders;
+        this.disallowedResponseHeaders = disallowedResponseHeaders;
     }
 
     @Override
-    public WebClient client() {
-        return client;
+    public HttpResponse execute(HttpRequest req) {
+        final HttpRequest newReq;
+        if (disallowedRequestHeaders.isEmpty()) {
+            newReq = req;
+        } else {
+            newReq = req.mapHeaders(this::disallowRequestHeaders);
+        }
+
+        final HttpResponse res = client.execute(newReq);
+        final HttpResponse newRes;
+        if (disallowedResponseHeaders.isEmpty()) {
+            newRes = res;
+        } else {
+            newRes = res.mapHeaders(this::disallowResponseHeaders);
+        }
+        return newRes;
+    }
+
+    private RequestHeaders disallowRequestHeaders(RequestHeaders headers) {
+        final RequestHeadersBuilder builder = headers.toBuilder();
+        for (AsciiString disallowed : disallowedRequestHeaders) {
+            builder.remove(disallowed);
+        }
+        return builder.build();
+    }
+
+    private ResponseHeaders disallowResponseHeaders(ResponseHeaders headers) {
+        final ResponseHeadersBuilder builder = headers.toBuilder();
+        for (AsciiString disallowed : disallowedResponseHeaders) {
+            builder.remove(disallowed);
+        }
+        return builder.build();
     }
 }

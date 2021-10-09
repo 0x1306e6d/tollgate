@@ -24,21 +24,36 @@
 
 package dev.gihwan.tollgate.gateway;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Streams;
+
 import com.linecorp.armeria.client.HttpClient;
 import com.linecorp.armeria.client.WebClient;
 import com.linecorp.armeria.client.WebClientBuilder;
 import com.linecorp.armeria.client.endpoint.EndpointGroup;
+import com.linecorp.armeria.common.HttpHeaderNames;
 import com.linecorp.armeria.common.SessionProtocol;
 
+import io.netty.util.AsciiString;
+
+/**
+ * A builder for {@link Upstream}.
+ */
 public final class UpstreamBuilder {
 
     private final WebClientBuilder clientBuilder;
+
+    private final ImmutableSet.Builder<AsciiString> disallowedRequestHeadersBuilder = ImmutableSet.builder();
+    private final ImmutableSet.Builder<AsciiString> disallowedResponseHeadersBuilder = ImmutableSet.builder();
 
     UpstreamBuilder(URI uri) {
         clientBuilder = WebClient.builder(requireNonNull(uri, "uri"));
@@ -56,7 +71,7 @@ public final class UpstreamBuilder {
     }
 
     /**
-     * Configures a {@link WebClient} of a {@link Upstream} with the given {@code configurator}.
+     * Configures a {@link WebClient} of this {@link Upstream} with the given {@code configurator}.
      *
      * Please note that calling {@link WebClientBuilder#build()} inside {@code configurator} does not affect
      * building {@link Upstream}.
@@ -68,7 +83,41 @@ public final class UpstreamBuilder {
     }
 
     /**
-     * Decorates a {@link WebClient} of a {@link Upstream} with the given {@code decorator}.
+     * Disallows the given {@code headers} to be included in a request from a user to the upstream server.
+     */
+    public UpstreamBuilder disallowRequestHeaders(CharSequence... headers) {
+        return disallowRequestHeaders(ImmutableList.copyOf(requireNonNull(headers, "headers")));
+    }
+
+    /**
+     * Disallows the given {@code headers} to be included in a request from a user to the upstream server.
+     */
+    public UpstreamBuilder disallowRequestHeaders(Iterable<? extends CharSequence> headers) {
+        requireNonNull(headers, "headers");
+        checkArgument(!Iterables.isEmpty(headers), "headers should not be empty.");
+        Streams.stream(headers).map(HttpHeaderNames::of).forEach(disallowedRequestHeadersBuilder::add);
+        return this;
+    }
+
+    /**
+     * Disallows the given {@code headers} to be included in a response from the upstream server to a user.
+     */
+    public UpstreamBuilder disallowResponseHeaders(CharSequence... headers) {
+        return disallowResponseHeaders(ImmutableList.copyOf(requireNonNull(headers, "headers")));
+    }
+
+    /**
+     * Disallows the given {@code headers} to be included in a response from the upstream server to a user.
+     */
+    public UpstreamBuilder disallowResponseHeaders(Iterable<? extends CharSequence> headers) {
+        requireNonNull(headers, "headers");
+        checkArgument(!Iterables.isEmpty(headers), "headers should not be empty.");
+        Streams.stream(headers).map(HttpHeaderNames::of).forEach(disallowedResponseHeadersBuilder::add);
+        return this;
+    }
+
+    /**
+     * Decorates a {@link WebClient} of this {@link Upstream} with the given {@code decorator}.
      *
      * This method is a shortcut for {@link UpstreamBuilder#client(Consumer)} with a {@code configurator}
      * which calls {@link WebClientBuilder#decorator(Function)}.
@@ -78,7 +127,12 @@ public final class UpstreamBuilder {
         return this;
     }
 
+    /**
+     * Builds a new {@link Upstream} based on the properties of this builder.
+     */
     public Upstream build() {
-        return new DefaultUpstream(clientBuilder.build());
+        return new DefaultUpstream(clientBuilder.build(),
+                                   disallowedRequestHeadersBuilder.build(),
+                                   disallowedResponseHeadersBuilder.build());
     }
 }
