@@ -55,27 +55,6 @@ enum DefaultHoconGatewayConfigurator implements HoconGatewayConfigurator {
 
     INSTANCE;
 
-    @Override
-    public void configure(GatewayBuilder builder, Config config) {
-        requireNonNull(builder, "builder");
-        requireNonNull(config, "config");
-
-        if (config.hasPath("tollgate.port")) {
-            final int port = config.getInt("tollgate.port");
-            builder.server(serverBuilder -> serverBuilder.http(port));
-        }
-        if (config.hasPath("tollgate.healthCheckPath")) {
-            builder.healthCheck(config.getString("tollgate.healthCheckPath"));
-        }
-        if (config.hasPath("tollgate.routing")) {
-            final Set<String> routes = config.getObject("tollgate.routing").keySet();
-            routes.stream()
-                  .map(route -> config.getObject("tollgate.routing." + route))
-                  .map(ConfigObject::toConfig)
-                  .forEach(routeConfig -> configureRouteConfig(builder, routeConfig));
-        }
-    }
-
     private static void configureRouteConfig(GatewayBuilder builder, Config routeConfig) {
         checkArgument(routeConfig.hasPath("method"), "Route config must have method.");
         checkArgument(routeConfig.hasPath("path"), "Route config must have path.");
@@ -124,6 +103,21 @@ enum DefaultHoconGatewayConfigurator implements HoconGatewayConfigurator {
             builder = Upstream.builder(upstreamConfig.getString("scheme"), EndpointGroup.of(endpoints));
         }
 
+        if (upstreamConfig.hasPath("disallowRequestHeaders")) {
+            final List<String> disallowRequestHeaders = upstreamConfig.getStringList("disallowRequestHeaders");
+            if (!disallowRequestHeaders.isEmpty()) {
+                builder.disallowRequestHeaders(disallowRequestHeaders);
+            }
+        }
+
+        if (upstreamConfig.hasPath("disallowResponseHeaders")) {
+            final List<String> disallowResponseHeaders =
+                    upstreamConfig.getStringList("disallowResponseHeaders");
+            if (!disallowResponseHeaders.isEmpty()) {
+                builder.disallowResponseHeaders(disallowResponseHeaders);
+            }
+        }
+
         if (upstreamConfig.hasPath("remapping")) {
             final Config remappingConfig = upstreamConfig.getObject("remapping").toConfig();
             final RemappingClientBuilder remappingBuilder = RemappingClient.builder();
@@ -166,6 +160,27 @@ enum DefaultHoconGatewayConfigurator implements HoconGatewayConfigurator {
             final LogLevel failureResponseLogLevel =
                     LogLevel.valueOf(loggingConfig.getString("failureResponseLogLevel"));
             builder.failureResponseLogLevel(failureResponseLogLevel);
+        }
+    }
+
+    @Override
+    public void configure(GatewayBuilder builder, Config config) {
+        requireNonNull(builder, "builder");
+        requireNonNull(config, "config");
+
+        if (config.hasPath("tollgate.port")) {
+            final int port = config.getInt("tollgate.port");
+            builder.server(serverBuilder -> serverBuilder.http(port));
+        }
+        if (config.hasPath("tollgate.healthCheckPath")) {
+            builder.healthCheck(config.getString("tollgate.healthCheckPath"));
+        }
+        if (config.hasPath("tollgate.routing")) {
+            final Set<String> routes = config.getObject("tollgate.routing").keySet();
+            routes.stream()
+                  .map(route -> config.getObject("tollgate.routing." + route))
+                  .map(ConfigObject::toConfig)
+                  .forEach(routeConfig -> configureRouteConfig(builder, routeConfig));
         }
     }
 }
