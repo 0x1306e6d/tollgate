@@ -24,40 +24,56 @@
 
 package dev.gihwan.tollgate.gateway;
 
+import static dev.gihwan.tollgate.testing.TestGateway.withTestGateway;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 
-import java.time.Duration;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.linecorp.armeria.client.WebClient;
-import com.linecorp.armeria.common.AggregatedHttpRequest;
 import com.linecorp.armeria.common.AggregatedHttpResponse;
+import com.linecorp.armeria.common.HttpHeaders;
 import com.linecorp.armeria.common.HttpMethod;
+import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
+import com.linecorp.armeria.common.MediaType;
+import com.linecorp.armeria.common.RequestHeaders;
+import com.linecorp.armeria.common.ResponseHeaders;
+import com.linecorp.armeria.common.logging.RequestLog;
 import com.linecorp.armeria.server.ServerBuilder;
+import com.linecorp.armeria.server.ServiceRequestContext;
+import com.linecorp.armeria.server.logging.ContentPreviewingService;
 import com.linecorp.armeria.testing.junit5.server.ServerExtension;
 
 import dev.gihwan.tollgate.junit5.GatewayExtension;
+import dev.gihwan.tollgate.testing.TestGateway;
 
 class UpstreamTest {
 
-    private static final AtomicReference<AggregatedHttpRequest> reqCapture = new AtomicReference<>();
+    private static final AtomicReference<ServiceRequestContext> ctxCapture = new AtomicReference<>();
+    private static final AtomicReference<ServiceRequestContext> serviceCtxCapture = new AtomicReference<>();
 
     @RegisterExtension
     static final ServerExtension serviceServer = new ServerExtension() {
         @Override
-        protected void configure(ServerBuilder sb) {
-            sb.service("/foo",
-                       (ctx, req) -> HttpResponse.from(req.aggregate().thenApply(aggregated -> {
-                           reqCapture.set(aggregated);
-                           return HttpResponse.of("bar");
-                       })));
+        protected void configure(ServerBuilder builder) {
+            builder.service("/", (ctx, req) -> HttpResponse.of(HttpStatus.OK));
+            builder.service("/body", (ctx, req) -> HttpResponse.from(req.aggregate().thenApply(
+                    aggregated -> HttpResponse.of("Hello, " + aggregated.contentUtf8() + "!"))));
+
+            builder.service("/header", (ctx, req) -> HttpResponse.of(
+                    ResponseHeaders.of(HttpStatus.OK,
+                                       "public", "this is public",
+                                       "private", "this is private")));
+
+            builder.decorator(ContentPreviewingService.newDecorator(Integer.MAX_VALUE));
+            builder.decorator(((delegate, ctx, req) -> {
+                serviceCtxCapture.set(ctx);
+                return delegate.serve(ctx, req);
+            }));
         }
     };
 
@@ -65,38 +81,86 @@ class UpstreamTest {
     static final GatewayExtension gateway = new GatewayExtension() {
         @Override
         protected void configure(GatewayBuilder builder) {
-            builder.upstream("/foo", Upstream.of(serviceServer.httpUri()));
+            builder.upstream("/", Upstream.of(serviceServer.httpUri()));
+            builder.upstream("/body", Upstream.of(serviceServer.httpUri()));
+            builder.server(serverBuilder -> serverBuilder.decorator(((delegate, ctx, req) -> {
+                ctxCapture.set(ctx);
+                return delegate.serve(ctx, req);
+            })));
         }
     };
 
     @Test
     void proxy() {
-        final WebClient webClient = WebClient.builder(gateway.httpUri()).build();
+        final WebClient client = WebClient.builder(gateway.httpUri()).build();
 
-        final CompletableFuture<AggregatedHttpResponse> future = webClient.get("/foo").aggregate();
-        await().atMost(Duration.ofSeconds(1)).until(future::isDone);
-        final AggregatedHttpResponse res = future.join();
+        final AggregatedHttpResponse res = client.get("/").aggregate().join();
         assertThat(res.status()).isEqualTo(HttpStatus.OK);
-        assertThat(res.contentUtf8()).isEqualTo("bar");
 
-        final AggregatedHttpRequest req = reqCapture.get();
+        final ServiceRequestContext req = ctxCapture.get();
         assertThat(req.method()).isEqualTo(HttpMethod.GET);
-        assertThat(req.path()).isEqualTo("/foo");
+        assertThat(req.path()).isEqualTo("/");
+
+        final ServiceRequestContext serviceReq = serviceCtxCapture.get();
+        assertThat(serviceReq.method()).isEqualTo(HttpMethod.GET);
+        assertThat(serviceReq.path()).isEqualTo("/");
     }
 
     @Test
     void proxyWithBody() {
-        final WebClient webClient = WebClient.builder(gateway.httpUri()).build();
+        final WebClient client = WebClient.builder(gateway.httpUri()).build();
 
-        final CompletableFuture<AggregatedHttpResponse> future = webClient.post("/foo", "qux").aggregate();
-        await().atMost(Duration.ofSeconds(1)).until(future::isDone);
-        final AggregatedHttpResponse res = future.join();
+        final HttpRequest req = HttpRequest.of(HttpMethod.POST, "/body", MediaType.PLAIN_TEXT, "Tollgate");
+        final AggregatedHttpResponse res = client.execute(req).aggregate().join();
         assertThat(res.status()).isEqualTo(HttpStatus.OK);
-        assertThat(res.contentUtf8()).isEqualTo("bar");
+        assertThat(res.contentUtf8()).isEqualTo("Hello, Tollgate!");
 
-        final AggregatedHttpRequest req = reqCapture.get();
-        assertThat(req.method()).isEqualTo(HttpMethod.POST);
-        assertThat(req.path()).isEqualTo("/foo");
-        assertThat(req.contentUtf8()).isEqualTo("qux");
+        final ServiceRequestContext ctx = ctxCapture.get();
+        assertThat(ctx.method()).isEqualTo(HttpMethod.POST);
+        assertThat(ctx.path()).isEqualTo("/body");
+
+        final ServiceRequestContext serviceCtx = serviceCtxCapture.get();
+        assertThat(serviceCtx.method()).isEqualTo(HttpMethod.POST);
+        assertThat(serviceCtx.path()).isEqualTo("/body");
+        final RequestLog serviceLog = serviceCtx.log().whenComplete().join();
+        assertThat(serviceLog.requestContentPreview()).isEqualTo("Tollgate");
+        assertThat(serviceLog.responseContentPreview()).isEqualTo("Hello, Tollgate!");
+    }
+
+    @Test
+    void disallowRequestHeaders() {
+        try (TestGateway gateway = withTestGateway(builder -> {
+            builder.upstream("/", Upstream.builder(serviceServer.httpUri())
+                                          .disallowRequestHeaders("private")
+                                          .build());
+        })) {
+            final WebClient client = WebClient.builder(gateway.httpUri()).build();
+            final HttpRequest req = HttpRequest.of(RequestHeaders.of(HttpMethod.GET, "/",
+                                                                     "public", "this is public",
+                                                                     "private", "this is private"));
+            final AggregatedHttpResponse res = client.execute(req).aggregate().join();
+            assertThat(res.status()).isEqualTo(HttpStatus.OK);
+
+            final ServiceRequestContext serviceCtx = serviceCtxCapture.get();
+            assertThat(serviceCtx.method()).isEqualTo(HttpMethod.GET);
+            final HttpHeaders serviceHeaders = serviceCtx.request().headers();
+            assertThat(serviceHeaders.get("public")).isEqualTo("this is public");
+            assertThat(serviceHeaders.get("private")).isNull();
+        }
+    }
+
+    @Test
+    void disallowResponseHeaders() {
+        try (TestGateway gateway = withTestGateway(builder -> {
+            builder.upstream("/header", Upstream.builder(serviceServer.httpUri())
+                                                .disallowResponseHeaders("private")
+                                                .build());
+        })) {
+            final WebClient client = WebClient.builder(gateway.httpUri()).build();
+            final AggregatedHttpResponse res = client.get("/header").aggregate().join();
+            assertThat(res.status()).isEqualTo(HttpStatus.OK);
+            assertThat(res.headers().get("public")).isEqualTo("this is public");
+            assertThat(res.headers().get("private")).isNull();
+        }
     }
 }

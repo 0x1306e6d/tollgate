@@ -42,6 +42,6 @@ final class UpstreamHttpService implements HttpService {
 
     @Override
     public HttpResponse serve(ServiceRequestContext ctx, HttpRequest req) {
-        return upstream.client().execute(req);
+        return upstream.execute(req);
     }
 }
