@@ -97,13 +97,13 @@ class UpstreamTest {
         final AggregatedHttpResponse res = client.get("/").aggregate().join();
         assertThat(res.status()).isEqualTo(HttpStatus.OK);
 
-        final ServiceRequestContext req = ctxCapture.get();
-        assertThat(req.method()).isEqualTo(HttpMethod.GET);
-        assertThat(req.path()).isEqualTo("/");
+        final ServiceRequestContext ctx = ctxCapture.get();
+        assertThat(ctx.method()).isEqualTo(HttpMethod.GET);
+        assertThat(ctx.path()).isEqualTo("/");
 
-        final ServiceRequestContext serviceReq = serviceCtxCapture.get();
-        assertThat(serviceReq.method()).isEqualTo(HttpMethod.GET);
-        assertThat(serviceReq.path()).isEqualTo("/");
+        final ServiceRequestContext serviceCtx = serviceCtxCapture.get();
+        assertThat(serviceCtx.method()).isEqualTo(HttpMethod.GET);
+        assertThat(serviceCtx.path()).isEqualTo("/");
     }
 
     @Test
@@ -128,6 +128,45 @@ class UpstreamTest {
     }
 
     @Test
+    void mapRequest() {
+        try (TestGateway gateway = withTestGateway(builder -> {
+            builder.upstream("/",
+                             Upstream.builder(serviceServer.httpUri())
+                                     .mapRequest(req -> req.mapHeaders(headers -> headers.toBuilder()
+                                                                                         .add("foo",
+                                                                                              "this is foo")
+                                                                                         .build()))
+                                     .build());
+        })) {
+            final WebClient client = WebClient.builder(gateway.httpUri()).build();
+            final AggregatedHttpResponse res = client.get("/").aggregate().join();
+            assertThat(res.status()).isEqualTo(HttpStatus.OK);
+
+            final ServiceRequestContext serviceCtx = serviceCtxCapture.get();
+            assertThat(serviceCtx.method()).isEqualTo(HttpMethod.GET);
+            final HttpHeaders serviceHeaders = serviceCtx.request().headers();
+            assertThat(serviceHeaders.get("foo")).isEqualTo("this is foo");
+        }
+    }
+
+    @Test
+    void mapRequestShouldTransformInOrder() {
+        try (TestGateway gateway = withTestGateway(builder -> {
+            builder.upstream("/", Upstream.builder(serviceServer.httpUri())
+                                          .mapRequest(req -> HttpRequest.of(HttpMethod.POST, "/"))
+                                          .mapRequest(req -> HttpRequest.of(HttpMethod.PUT, "/"))
+                                          .build());
+        })) {
+            final WebClient client = WebClient.builder(gateway.httpUri()).build();
+            final AggregatedHttpResponse res = client.get("/").aggregate().join();
+            assertThat(res.status()).isEqualTo(HttpStatus.OK);
+
+            final ServiceRequestContext serviceCtx = serviceCtxCapture.get();
+            assertThat(serviceCtx.method()).isEqualTo(HttpMethod.PUT);
+        }
+    }
+
+    @Test
     void disallowRequestHeaders() {
         try (TestGateway gateway = withTestGateway(builder -> {
             builder.upstream("/", Upstream.builder(serviceServer.httpUri())
@@ -146,6 +185,38 @@ class UpstreamTest {
             final HttpHeaders serviceHeaders = serviceCtx.request().headers();
             assertThat(serviceHeaders.get("public")).isEqualTo("this is public");
             assertThat(serviceHeaders.get("private")).isNull();
+        }
+    }
+
+    @Test
+    void mapResponse() {
+        try (TestGateway gateway = withTestGateway(builder -> {
+            builder.upstream("/",
+                             Upstream.builder(serviceServer.httpUri())
+                                     .mapResponse(res -> res.mapHeaders(headers -> headers.toBuilder()
+                                                                                          .add("foo",
+                                                                                               "this is foo")
+                                                                                          .build()))
+                                     .build());
+        })) {
+            final WebClient client = WebClient.builder(gateway.httpUri()).build();
+            final AggregatedHttpResponse res = client.get("/").aggregate().join();
+            assertThat(res.status()).isEqualTo(HttpStatus.OK);
+            assertThat(res.headers().get("foo")).isEqualTo("this is foo");
+        }
+    }
+
+    @Test
+    void mapResponseShouldTransformInOrder() {
+        try (TestGateway gateway = withTestGateway(builder -> {
+            builder.upstream("/", Upstream.builder(serviceServer.httpUri())
+                                          .mapResponse(res -> HttpResponse.of(HttpStatus.CREATED))
+                                          .mapResponse(res -> HttpResponse.of(HttpStatus.NO_CONTENT))
+                                          .build());
+        })) {
+            final WebClient client = WebClient.builder(gateway.httpUri()).build();
+            final AggregatedHttpResponse res = client.get("/").aggregate().join();
+            assertThat(res.status()).isEqualTo(HttpStatus.NO_CONTENT);
         }
     }
 
