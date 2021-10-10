@@ -24,18 +24,13 @@
 
 package dev.gihwan.tollgate.gateway;
 
-import java.util.Set;
+import static java.util.Objects.requireNonNull;
+
+import java.util.function.Function;
 
 import com.linecorp.armeria.client.WebClient;
-import com.linecorp.armeria.common.HttpHeaderNames;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
-import com.linecorp.armeria.common.RequestHeaders;
-import com.linecorp.armeria.common.RequestHeadersBuilder;
-import com.linecorp.armeria.common.ResponseHeaders;
-import com.linecorp.armeria.common.ResponseHeadersBuilder;
-
-import io.netty.util.AsciiString;
 
 /**
  * The default implementation of {@link Upstream}.
@@ -44,49 +39,25 @@ final class DefaultUpstream implements Upstream {
 
     private final WebClient client;
 
-    private final Set<AsciiString> disallowedRequestHeaders;
-    private final Set<AsciiString> disallowedResponseHeaders;
+    private final Function<HttpRequest, HttpRequest> requestFunction;
+    private final Function<HttpResponse, HttpResponse> responseFunction;
 
     DefaultUpstream(WebClient client,
-                    Set<AsciiString> disallowedRequestHeaders,
-                    Set<AsciiString> disallowedResponseHeaders) {
+                    Function<HttpRequest, HttpRequest> requestFunction,
+                    Function<HttpResponse, HttpResponse> responseFunction) {
         this.client = client;
-        this.disallowedRequestHeaders = disallowedRequestHeaders;
-        this.disallowedResponseHeaders = disallowedResponseHeaders;
+        this.requestFunction = requestFunction;
+        this.responseFunction = responseFunction;
     }
 
     @Override
     public HttpResponse execute(HttpRequest req) {
-        final HttpRequest newReq;
-        if (disallowedRequestHeaders.isEmpty()) {
-            newReq = req;
-        } else {
-            newReq = req.mapHeaders(this::disallowRequestHeaders);
-        }
+        final HttpRequest newReq = requestFunction.apply(req);
+        requireNonNull(newReq, "transformed request should not be null");
 
         final HttpResponse res = client.execute(newReq);
-        final HttpResponse newRes;
-        if (disallowedResponseHeaders.isEmpty()) {
-            newRes = res;
-        } else {
-            newRes = res.mapHeaders(this::disallowResponseHeaders);
-        }
+        final HttpResponse newRes = responseFunction.apply(res);
+        requireNonNull(newRes, "transformed response should not be null");
         return newRes;
-    }
-
-    private RequestHeaders disallowRequestHeaders(RequestHeaders headers) {
-        final RequestHeadersBuilder builder = headers.toBuilder();
-        for (AsciiString disallowed : disallowedRequestHeaders) {
-            builder.remove(disallowed);
-        }
-        return builder.build();
-    }
-
-    private ResponseHeaders disallowResponseHeaders(ResponseHeaders headers) {
-        final ResponseHeadersBuilder builder = headers.toBuilder();
-        for (AsciiString disallowed : disallowedResponseHeaders) {
-            builder.remove(disallowed);
-        }
-        return builder.build();
     }
 }

@@ -24,16 +24,15 @@
 
 package dev.gihwan.tollgate.gateway;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Streams;
 
 import com.linecorp.armeria.client.HttpClient;
@@ -41,6 +40,8 @@ import com.linecorp.armeria.client.WebClient;
 import com.linecorp.armeria.client.WebClientBuilder;
 import com.linecorp.armeria.client.endpoint.EndpointGroup;
 import com.linecorp.armeria.common.HttpHeaderNames;
+import com.linecorp.armeria.common.HttpRequest;
+import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.SessionProtocol;
 
 import io.netty.util.AsciiString;
@@ -52,8 +53,8 @@ public final class UpstreamBuilder {
 
     private final WebClientBuilder clientBuilder;
 
-    private final ImmutableSet.Builder<AsciiString> disallowedRequestHeadersBuilder = ImmutableSet.builder();
-    private final ImmutableSet.Builder<AsciiString> disallowedResponseHeadersBuilder = ImmutableSet.builder();
+    private Function<HttpRequest, HttpRequest> requestFunction = Function.identity();
+    private Function<HttpResponse, HttpResponse> responseFunction = Function.identity();
 
     UpstreamBuilder(URI uri) {
         clientBuilder = WebClient.builder(requireNonNull(uri, "uri"));
@@ -83,6 +84,14 @@ public final class UpstreamBuilder {
     }
 
     /**
+     * Transforms a request from a user using the given {@link Function}.
+     */
+    public UpstreamBuilder mapRequest(Function<? super HttpRequest, ? extends HttpRequest> function) {
+        requestFunction = requestFunction.andThen(function);
+        return this;
+    }
+
+    /**
      * Disallows the given {@code headers} to be included in a request from a user to the upstream server.
      */
     public UpstreamBuilder disallowRequestHeaders(CharSequence... headers) {
@@ -94,8 +103,17 @@ public final class UpstreamBuilder {
      */
     public UpstreamBuilder disallowRequestHeaders(Iterable<? extends CharSequence> headers) {
         requireNonNull(headers, "headers");
-        checkArgument(!Iterables.isEmpty(headers), "headers should not be empty.");
-        Streams.stream(headers).map(HttpHeaderNames::of).forEach(disallowedRequestHeadersBuilder::add);
+        final Set<AsciiString> disallowedRequestHeaders = Streams.stream(headers)
+                                                                 .map(HttpHeaderNames::of)
+                                                                 .collect(Collectors.toUnmodifiableSet());
+        return mapRequest(DisallowRequestHeadersFunction.ofSet(disallowedRequestHeaders));
+    }
+
+    /**
+     * Transforms a response from the upstream server using the given {@link Function}.
+     */
+    public UpstreamBuilder mapResponse(Function<? super HttpResponse, ? extends HttpResponse> function) {
+        responseFunction = responseFunction.andThen(function);
         return this;
     }
 
@@ -111,9 +129,10 @@ public final class UpstreamBuilder {
      */
     public UpstreamBuilder disallowResponseHeaders(Iterable<? extends CharSequence> headers) {
         requireNonNull(headers, "headers");
-        checkArgument(!Iterables.isEmpty(headers), "headers should not be empty.");
-        Streams.stream(headers).map(HttpHeaderNames::of).forEach(disallowedResponseHeadersBuilder::add);
-        return this;
+        final Set<AsciiString> disallowedResponseHeaders = Streams.stream(headers)
+                                                                  .map(HttpHeaderNames::of)
+                                                                  .collect(Collectors.toUnmodifiableSet());
+        return mapResponse(DisallowResponseHeadersFunction.ofSet(disallowedResponseHeaders));
     }
 
     /**
@@ -131,8 +150,6 @@ public final class UpstreamBuilder {
      * Builds a new {@link Upstream} based on the properties of this builder.
      */
     public Upstream build() {
-        return new DefaultUpstream(clientBuilder.build(),
-                                   disallowedRequestHeadersBuilder.build(),
-                                   disallowedResponseHeadersBuilder.build());
+        return new DefaultUpstream(clientBuilder.build(), requestFunction, responseFunction);
     }
 }
