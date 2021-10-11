@@ -27,7 +27,10 @@ import dev.gihwan.tollgate.Dependency
 plugins {
     java
     application
-    id("com.google.cloud.tools.jib")
+}
+
+application {
+    mainClass.set("dev.gihwan.tollgate.example.pokeapi.berry.BerryService")
 }
 
 dependencies {
@@ -41,10 +44,4 @@ dependencies {
 java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
-}
-
-jib {
-    to {
-        image = "pokeapi-berry"
-    }
 }
