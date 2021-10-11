@@ -25,6 +25,7 @@
 package dev.gihwan.tollgate.gateway;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
 
@@ -59,6 +60,24 @@ class RemappingPathFunctionTest {
         try (SafeCloseable ignored = ctx.push()) {
             final HttpRequest applied = function.apply(req);
             assertThat(applied.path()).isEqualTo("/foo/qux");
+        }
+    }
+
+    @Test
+    void shouldThrowIllegalStateExceptionIfPathParamDoesNotExist() {
+        final RemappingPathFunction function = new RemappingPathFunction("/foo/{bar}");
+
+        final HttpRequest req = HttpRequest.of(HttpMethod.GET, "/baz/qux");
+        final ServiceRequestContext ctx =
+                ServiceRequestContext.builder(req)
+                                     .routingResult(RoutingResult.builder()
+                                                                 .path(req.path())
+                                                                 .decodedParam("foo", "baz")
+                                                                 .build())
+                                     .build();
+        try (SafeCloseable ignored = ctx.push()) {
+            assertThatThrownBy(() -> function.apply(req))
+                    .isInstanceOf(IllegalStateException.class);
         }
     }
 }
