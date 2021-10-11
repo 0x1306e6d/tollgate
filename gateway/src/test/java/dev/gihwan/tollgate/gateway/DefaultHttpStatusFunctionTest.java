@@ -47,10 +47,7 @@ class DefaultHttpStatusFunctionTest {
         final DefaultHttpStatusFunction function =
                 new DefaultHttpStatusFunction(Set.of(HttpStatus.OK), HttpStatus.CREATED);
 
-        HttpStatus applied = function.apply(HttpStatus.ACCEPTED);
+        final HttpStatus applied = function.apply(HttpStatus.ACCEPTED);
         assertThat(applied).isEqualTo(HttpStatus.ACCEPTED);
-
-        applied = function.apply(HttpStatus.OK);
-        assertThat(applied).isEqualTo(HttpStatus.CREATED);
     }
 }
