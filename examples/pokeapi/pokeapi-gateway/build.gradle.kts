@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 Gihwan Kim
+ * Copyright (c) 2020 - 2021 Gihwan Kim
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,3 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+import dev.gihwan.tollgate.Dependency
+
+plugins {
+    java
+    application
+}
+
+application {
+    mainClass.set("dev.gihwan.tollgate.example.pokeapi.gateway.GatewayService")
+}
+
+dependencies {
+    implementation(project(":gateway"))
+
+    implementation(Dependency.slf4j)
+
+    runtimeOnly(Dependency.logback)
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
