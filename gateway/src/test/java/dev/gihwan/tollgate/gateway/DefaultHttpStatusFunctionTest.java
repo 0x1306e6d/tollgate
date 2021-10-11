@@ -22,24 +22,35 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.remapping;
+package dev.gihwan.tollgate.gateway;
 
-import java.util.function.Function;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Set;
+
+import org.junit.jupiter.api.Test;
 
 import com.linecorp.armeria.common.HttpStatus;
 
-/**
- * A {@link FunctionalInterface} for mapping a {@link HttpStatus} to another {@link HttpStatus}.
- *
- * @deprecated Use {@link dev.gihwan.tollgate.gateway.HttpStatusFunction} instead.
- */
-@FunctionalInterface
-@Deprecated(forRemoval = true)
-public interface HttpStatusFunction extends Function<HttpStatus, HttpStatus> {
+class DefaultHttpStatusFunctionTest {
+    @Test
+    void returnToStatusIfFromContains() {
+        final DefaultHttpStatusFunction function =
+                new DefaultHttpStatusFunction(Set.of(HttpStatus.OK), HttpStatus.CREATED);
 
-    /**
-     * Maps the given {@link HttpStatus} to another {@link HttpStatus}.
-     */
-    @Override
-    HttpStatus apply(HttpStatus status);
+        final HttpStatus applied = function.apply(HttpStatus.OK);
+        assertThat(applied).isEqualTo(HttpStatus.CREATED);
+    }
+
+    @Test
+    void returnGivenStatusIfFromDoesNotContain() {
+        final DefaultHttpStatusFunction function =
+                new DefaultHttpStatusFunction(Set.of(HttpStatus.OK), HttpStatus.CREATED);
+
+        HttpStatus applied = function.apply(HttpStatus.ACCEPTED);
+        assertThat(applied).isEqualTo(HttpStatus.ACCEPTED);
+
+        applied = function.apply(HttpStatus.OK);
+        assertThat(applied).isEqualTo(HttpStatus.CREATED);
+    }
 }

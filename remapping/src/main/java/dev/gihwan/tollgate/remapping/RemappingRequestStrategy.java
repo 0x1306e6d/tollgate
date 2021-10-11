@@ -26,6 +26,8 @@ package dev.gihwan.tollgate.remapping;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.function.Function;
+
 import com.linecorp.armeria.client.ClientRequestContext;
 import com.linecorp.armeria.common.HttpRequest;
 
@@ -33,8 +35,11 @@ import dev.gihwan.tollgate.gateway.UpstreamBuilder;
 
 /**
  * A strategy for remapping {@link HttpRequest}.
+ *
+ * @deprecated Use {@link UpstreamBuilder#mapRequest(Function)} instead.
  */
 @FunctionalInterface
+@Deprecated(forRemoval = true)
 public interface RemappingRequestStrategy {
 
     /**

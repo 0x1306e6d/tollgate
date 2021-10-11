@@ -22,26 +22,28 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.remapping;
+package dev.gihwan.tollgate.gateway;
 
-import com.linecorp.armeria.client.ClientRequestContext;
+import static java.util.Objects.requireNonNull;
+
+import java.util.function.Function;
+
 import com.linecorp.armeria.common.FilteredHttpResponse;
 import com.linecorp.armeria.common.HttpObject;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.common.ResponseHeaders;
 
-@Deprecated(forRemoval = true)
-final class RemappingResponseStatusStrategy implements RemappingResponseStrategy {
+final class RemappingStatusFunction implements Function<HttpResponse, HttpResponse> {
 
     private final HttpStatusFunction statusFunction;
 
-    RemappingResponseStatusStrategy(HttpStatusFunction statusFunction) {
+    RemappingStatusFunction(HttpStatusFunction statusFunction) {
         this.statusFunction = statusFunction;
     }
 
     @Override
-    public HttpResponse remap(ClientRequestContext ctx, HttpResponse res) {
+    public HttpResponse apply(HttpResponse res) {
         return new FilteredHttpResponse(res) {
             @Override
             protected HttpObject filter(HttpObject obj) {
@@ -50,8 +52,11 @@ final class RemappingResponseStatusStrategy implements RemappingResponseStrategy
                 }
 
                 final ResponseHeaders headers = (ResponseHeaders) obj;
-                final HttpStatus remappedStatus = statusFunction.apply(headers.status());
-                return headers.toBuilder().status(remappedStatus).build();
+                final HttpStatus newStatus = statusFunction.apply(headers.status());
+                requireNonNull(newStatus, "transformed response status should not be null");
+                return headers.toBuilder()
+                              .status(newStatus)
+                              .build();
             }
         };
     }

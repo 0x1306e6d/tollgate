@@ -22,20 +22,40 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.remapping;
+package dev.gihwan.tollgate.gateway;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
 
 import java.util.function.Function;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 
 import com.linecorp.armeria.common.HttpStatus;
 
 /**
  * A {@link FunctionalInterface} for mapping a {@link HttpStatus} to another {@link HttpStatus}.
- *
- * @deprecated Use {@link dev.gihwan.tollgate.gateway.HttpStatusFunction} instead.
  */
 @FunctionalInterface
-@Deprecated(forRemoval = true)
 public interface HttpStatusFunction extends Function<HttpStatus, HttpStatus> {
+
+    /**
+     * Returns a new {@link HttpStatusFunctionBuilder} with the given {@code from} {@link HttpStatus}es.
+     */
+    static HttpStatusFunctionBuilder from(HttpStatus... from) {
+        requireNonNull(from, "from");
+        return from(ImmutableSet.copyOf(from));
+    }
+
+    /**
+     * Returns a new {@link HttpStatusFunctionBuilder} with the given {@code from} {@link HttpStatus}es.
+     */
+    static HttpStatusFunctionBuilder from(Iterable<HttpStatus> from) {
+        requireNonNull(from, "from");
+        checkArgument(!Iterables.isEmpty(from), "from should not be empty");
+        return new HttpStatusFunctionBuilder(ImmutableSet.copyOf(from));
+    }
 
     /**
      * Maps the given {@link HttpStatus} to another {@link HttpStatus}.

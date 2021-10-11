@@ -36,15 +36,24 @@ import com.linecorp.armeria.client.SimpleDecoratingHttpClient;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 
+import dev.gihwan.tollgate.gateway.Upstream;
+import dev.gihwan.tollgate.gateway.UpstreamBuilder;
+
 /**
  * A {@link HttpClient} decorator for remapping {@link HttpRequest} and {@link HttpResponse}.
+ *
+ * @deprecated Use {@link Upstream} instead.
  */
+@Deprecated(forRemoval = true)
 public final class RemappingClient extends SimpleDecoratingHttpClient {
 
     /**
      * Returns a new {@link HttpClient} decorator which remaps {@link HttpRequest} using the given
      * {@link RemappingRequestStrategy}.
+     *
+     * @deprecated Use {@link UpstreamBuilder#mapRequest(Function)} instead.
      */
+    @Deprecated(forRemoval = true)
     public static Function<? super HttpClient, RemappingClient> newDecorator(
             RemappingRequestStrategy requestStrategy) {
         return builder().requestStrategy(requireNonNull(requestStrategy, "requestStrategy")).newDecorator();
@@ -53,7 +62,10 @@ public final class RemappingClient extends SimpleDecoratingHttpClient {
     /**
      * Returns a new {@link HttpClient} decorator which remaps {@link HttpResponse} using the given
      * {@link RemappingResponseStrategy}.
+     *
+     * @deprecated Use {@link UpstreamBuilder#mapResponse(Function)} instead.
      */
+    @Deprecated(forRemoval = true)
     public static Function<? super HttpClient, RemappingClient> newDecorator(
             RemappingResponseStrategy responseStrategy) {
         return builder().responseStrategy(requireNonNull(responseStrategy, "responseStrategy")).newDecorator();
@@ -62,7 +74,11 @@ public final class RemappingClient extends SimpleDecoratingHttpClient {
     /**
      * Returns a new {@link HttpClient} decorator which remaps {@link HttpRequest} and {@link HttpResponse} using
      * the given {@link RemappingRequestStrategy} and {@link RemappingResponseStrategy} respectively.
+     *
+     * @deprecated Use {@link UpstreamBuilder#mapRequest(Function)} and
+     *             {@link UpstreamBuilder#mapResponse(Function)} instead.
      */
+    @Deprecated(forRemoval = true)
     public static Function<? super HttpClient, RemappingClient> newDecorator(
             RemappingRequestStrategy requestStrategy, RemappingResponseStrategy responseStrategy) {
         return builder().requestStrategy(requireNonNull(requestStrategy, "requestStrategy"))
@@ -72,7 +88,10 @@ public final class RemappingClient extends SimpleDecoratingHttpClient {
 
     /**
      * Returns a new {@link RemappingClientBuilder}.
+     *
+     * @deprecated Use {@link UpstreamBuilder} instead.
      */
+    @Deprecated(forRemoval = true)
     public static RemappingClientBuilder builder() {
         return new RemappingClientBuilder();
     }

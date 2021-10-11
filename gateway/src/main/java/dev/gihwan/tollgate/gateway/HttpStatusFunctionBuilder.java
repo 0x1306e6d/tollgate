@@ -22,37 +22,31 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.remapping;
+package dev.gihwan.tollgate.gateway;
 
-import com.linecorp.armeria.client.ClientRequestContext;
-import com.linecorp.armeria.common.FilteredHttpResponse;
-import com.linecorp.armeria.common.HttpObject;
-import com.linecorp.armeria.common.HttpResponse;
+import static java.util.Objects.requireNonNull;
+
+import java.util.Set;
+
 import com.linecorp.armeria.common.HttpStatus;
-import com.linecorp.armeria.common.ResponseHeaders;
 
-@Deprecated(forRemoval = true)
-final class RemappingResponseStatusStrategy implements RemappingResponseStrategy {
+/**
+ * A builder for {@link HttpStatusFunction}.
+ */
+public final class HttpStatusFunctionBuilder {
 
-    private final HttpStatusFunction statusFunction;
+    private final Set<HttpStatus> from;
 
-    RemappingResponseStatusStrategy(HttpStatusFunction statusFunction) {
-        this.statusFunction = statusFunction;
+    HttpStatusFunctionBuilder(Set<HttpStatus> from) {
+        this.from = from;
     }
 
-    @Override
-    public HttpResponse remap(ClientRequestContext ctx, HttpResponse res) {
-        return new FilteredHttpResponse(res) {
-            @Override
-            protected HttpObject filter(HttpObject obj) {
-                if (!(obj instanceof ResponseHeaders)) {
-                    return obj;
-                }
-
-                final ResponseHeaders headers = (ResponseHeaders) obj;
-                final HttpStatus remappedStatus = statusFunction.apply(headers.status());
-                return headers.toBuilder().status(remappedStatus).build();
-            }
-        };
+    /**
+     * Returns a new {@link HttpStatusFunction} which returns the {@code to} {@link HttpStatus} if a given
+     * {@link HttpStatus} is contained in the specified {@code from} {@link HttpStatus}es.
+     */
+    public HttpStatusFunction to(HttpStatus to) {
+        requireNonNull(to, "to");
+        return new DefaultHttpStatusFunction(from, to);
     }
 }

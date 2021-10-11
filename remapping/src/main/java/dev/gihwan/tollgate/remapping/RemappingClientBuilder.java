@@ -40,7 +40,10 @@ import dev.gihwan.tollgate.gateway.UpstreamBuilder;
 
 /**
  * A builder for {@link RemappingClient}.
+ *
+ * @deprecated Use {@link UpstreamBuilder} instead.
  */
+@Deprecated(forRemoval = true)
 public final class RemappingClientBuilder {
 
     @Nullable
@@ -66,7 +69,10 @@ public final class RemappingClientBuilder {
 
     /**
      * Adds the given {@link RemappingRequestStrategy}.
+     *
+     * @deprecated Use {@link UpstreamBuilder#mapRequest(Function)} instead.
      */
+    @Deprecated(forRemoval = true)
     public RemappingClientBuilder requestStrategy(RemappingRequestStrategy requestStrategy) {
         requireNonNull(requestStrategy, "requestStrategy");
         if (this.requestStrategy == null) {
@@ -83,14 +89,20 @@ public final class RemappingClientBuilder {
      *
      * @see RemappingResponseStrategy#status(HttpStatusFunction)
      * @see RemappingClientBuilder#responseStrategy(RemappingResponseStrategy)
+     *
+     * @deprecated Use {@link UpstreamBuilder#status(dev.gihwan.tollgate.gateway.HttpStatusFunction)} instead.
      */
+    @Deprecated(forRemoval = true)
     public RemappingClientBuilder responseStatus(HttpStatusFunction statusFunction) {
         return responseStrategy(RemappingResponseStrategy.status(statusFunction));
     }
 
     /**
      * Adds the given {@link RemappingResponseStrategy}.
+     *
+     * @deprecated Use {@link UpstreamBuilder#mapResponse(Function)} instead.
      */
+    @Deprecated(forRemoval = true)
     public RemappingClientBuilder responseStrategy(RemappingResponseStrategy responseStrategy) {
         requireNonNull(responseStrategy, "responseStrategy");
         if (this.responseStrategy == null) {
