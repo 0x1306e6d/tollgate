@@ -91,6 +91,7 @@ tollgate {
 |------|------|-----------|-------------|------|
 | `uri` | `string` | `optional` | An URI of the upstream | |
 | `scheme` | `string` | `optional` | A scheme of an URI of the upstream | |
+| `path` | `string` | `optional` | Request path to the upstream | |
 | `endpoints` | `list` | `optional` | A list of [Endpoint Configuration](#endpoint-configuration) of an URI of the upstream | |
 | `remapping` | `object` | `optional` | A [Remapping Upstream Configuration](#remapping-upstream-configuration) to remap request or response | |
 | `logging` | `object` | `optional` | A [Logging Configuration](#logging-configuration) to log requests and responses to the upstream | |

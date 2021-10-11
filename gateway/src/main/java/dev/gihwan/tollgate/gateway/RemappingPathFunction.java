@@ -22,43 +22,56 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.remapping;
-
-import static com.google.common.base.Preconditions.checkState;
+package dev.gihwan.tollgate.gateway;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import com.google.common.base.Splitter;
 
-import com.linecorp.armeria.client.ClientRequestContext;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.RequestHeaders;
 import com.linecorp.armeria.server.ServiceRequestContext;
 
-@Deprecated(forRemoval = true)
-final class RemappingRequestPathStrategy implements RemappingRequestStrategy {
+final class RemappingPathFunction implements Function<HttpRequest, HttpRequest> {
 
     private static final String PATH_SEPARATOR = "/";
     private static final Splitter PATH_SPLITTER = Splitter.on(PATH_SEPARATOR);
 
     private final String pathPattern;
+    private final boolean hasPathParams;
 
-    RemappingRequestPathStrategy(String pathPattern) {
+    RemappingPathFunction(String pathPattern) {
         this.pathPattern = pathPattern;
+        this.hasPathParams = hasPathParams(pathPattern);
+    }
+
+    private static boolean hasPathParams(String pathPattern) {
+        for (String segment : PATH_SPLITTER.split(pathPattern)) {
+            if (segment.startsWith("{") && segment.endsWith("}")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
-    public HttpRequest remap(ClientRequestContext ctx, HttpRequest req) {
+    public HttpRequest apply(HttpRequest req) {
+        if (hasPathParams) {
+            final ServiceRequestContext ctx = ServiceRequestContext.current();
+            return req.mapHeaders(headers -> remapPathWithPathParams(ctx, headers));
+        } else {
+            return req.mapHeaders(this::remapPath);
+        }
+    }
+
+    private RequestHeaders remapPathWithPathParams(ServiceRequestContext ctx, RequestHeaders headers) {
         final List<String> segments = new ArrayList<>();
         for (String segment : PATH_SPLITTER.split(pathPattern)) {
             if (segment.startsWith("{") && segment.endsWith("}")) {
-                final ServiceRequestContext serviceCtx = ctx.root();
-                checkState(serviceCtx != null,
-                           "remapping request path param should be in the context of a server request");
-
                 final String pathParamName = segment.substring(1, segment.length() - 1);
-                final String pathParamValue = serviceCtx.pathParam(pathParamName);
+                final String pathParamValue = ctx.pathParam(pathParamName);
                 if (pathParamValue == null) {
                     throw new IllegalStateException("pathParam " + pathParamName + " does not exist");
                 }
@@ -69,7 +82,14 @@ final class RemappingRequestPathStrategy implements RemappingRequestStrategy {
         }
 
         final String remappedPath = String.join(PATH_SEPARATOR, segments);
-        final RequestHeaders headers = req.headers().toBuilder().path(remappedPath).build();
-        return req.withHeaders(headers);
+        return headers.toBuilder()
+                      .path(remappedPath)
+                      .build();
+    }
+
+    private RequestHeaders remapPath(RequestHeaders headers) {
+        return headers.toBuilder()
+                      .path(pathPattern)
+                      .build();
     }
 }

@@ -103,6 +103,10 @@ enum DefaultHoconGatewayConfigurator implements HoconGatewayConfigurator {
             builder = Upstream.builder(upstreamConfig.getString("scheme"), EndpointGroup.of(endpoints));
         }
 
+        if (upstreamConfig.hasPath("path")) {
+            builder.path(upstreamConfig.getString("path"));
+        }
+
         if (upstreamConfig.hasPath("disallowRequestHeaders")) {
             final List<String> disallowRequestHeaders = upstreamConfig.getStringList("disallowRequestHeaders");
             if (!disallowRequestHeaders.isEmpty()) {
