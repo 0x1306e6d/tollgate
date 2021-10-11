@@ -1,27 +1,27 @@
 version: "3.8"
 services:
   berry:
-    image: pokeapi-berry
+    build: pokeapi-berry
   contest:
-    image: pokeapi-contest
+    build: pokeapi-contest
   encounter:
-    image: pokeapi-encounter
+    build: pokeapi-encounter
   evolution:
-    image: pokeapi-evolution
+    build: pokeapi-evolution
   game:
-    image: pokeapi-game
+    build: pokeapi-game
   gateway:
     build: ./pokeapi-gateway
     image: pokeapi-gateway
     ports:
       - "8080:8080"
   item:
-    image: pokeapi-item
+    build: pokeapi-item
   location:
-    image: pokeapi-location
+    build: pokeapi-location
   machine:
-    image: pokeapi-machine
+    build: pokeapi-machine
   move:
-    image: pokeapi-move
+    build: pokeapi-move
   pokemon:
-    image: pokeapi-pokemon
+    build: pokeapi-pokemon
