@@ -59,7 +59,8 @@ class HoconGatewayBuilderTest {
     static final ServerExtension serviceServer = new ServerExtension() {
         @Override
         protected void configure(ServerBuilder builder) {
-            builder.service("/foo", (ctx, req) -> HttpResponse.of("bar"));
+            builder.service("/foo", (ctx, req) -> HttpResponse.of("foo"));
+            builder.service("/bar", (ctx, req) -> HttpResponse.of("bar"));
             builder.service("/header", (ctx, req) -> HttpResponse.of(
                     ResponseHeaders.of(HttpStatus.OK,
                                        "public", "this is public",
@@ -90,6 +91,32 @@ class HoconGatewayBuilderTest {
             assertThat(res.status()).isEqualTo(HttpStatus.OK);
 
             res = client.get("/foo").aggregate().join();
+            assertThat(res.status()).isEqualTo(HttpStatus.OK);
+            assertThat(res.contentUtf8()).isEqualTo("foo");
+        } finally {
+            gateway.stop().join();
+        }
+    }
+
+    @Test
+    void path() {
+        final Config config =
+                ConfigFactory.empty()
+                             .withValue("tollgate.routing.foo.method",
+                                        ConfigValueFactory.fromAnyRef("GET"))
+                             .withValue("tollgate.routing.foo.path",
+                                        ConfigValueFactory.fromAnyRef("/foo"))
+                             .withValue("tollgate.routing.foo.upstream.uri",
+                                        ConfigValueFactory.fromAnyRef(serviceServer.httpUri().toString()))
+                             .withValue("tollgate.routing.foo.upstream.path",
+                                        ConfigValueFactory.fromAnyRef("/bar"));
+
+        final Gateway gateway = HoconGatewayBuilder.of().build(config);
+        try {
+            gateway.start().join();
+
+            final WebClient client = WebClient.of("http://127.0.0.1:" + gateway.activeLocalPort());
+            final AggregatedHttpResponse res = client.get("/foo").aggregate().join();
             assertThat(res.status()).isEqualTo(HttpStatus.OK);
             assertThat(res.contentUtf8()).isEqualTo("bar");
         } finally {

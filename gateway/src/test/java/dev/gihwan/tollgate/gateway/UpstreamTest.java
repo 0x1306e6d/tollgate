@@ -64,6 +64,8 @@ class UpstreamTest {
             builder.service("/body", (ctx, req) -> HttpResponse.from(req.aggregate().thenApply(
                     aggregated -> HttpResponse.of("Hello, " + aggregated.contentUtf8() + "!"))));
 
+            builder.service("/foo", (ctx, req) -> HttpResponse.of("foo"));
+            builder.service("/bar", (ctx, req) -> HttpResponse.of("bar"));
             builder.service("/header", (ctx, req) -> HttpResponse.of(
                     ResponseHeaders.of(HttpStatus.OK,
                                        "public", "this is public",
@@ -163,6 +165,25 @@ class UpstreamTest {
 
             final ServiceRequestContext serviceCtx = serviceCtxCapture.get();
             assertThat(serviceCtx.method()).isEqualTo(HttpMethod.PUT);
+        }
+    }
+
+    @Test
+    void path() {
+        try (TestGateway gateway = withTestGateway(builder -> {
+            builder.upstream("/a", Upstream.builder(serviceServer.httpUri())
+                                           .path("/foo")
+                                           .build());
+            builder.upstream("/b", Upstream.builder(serviceServer.httpUri())
+                                           .path("/bar")
+                                           .build());
+        })) {
+            final WebClient client = WebClient.builder(gateway.httpUri()).build();
+            AggregatedHttpResponse res = client.get("/a").aggregate().join();
+            assertThat(res.contentUtf8()).isEqualTo("foo");
+
+            res = client.get("/b").aggregate().join();
+            assertThat(res.contentUtf8()).isEqualTo("bar");
         }
     }
 

@@ -29,6 +29,8 @@ import static java.util.Objects.requireNonNull;
 import com.linecorp.armeria.client.ClientRequestContext;
 import com.linecorp.armeria.common.HttpRequest;
 
+import dev.gihwan.tollgate.gateway.UpstreamBuilder;
+
 /**
  * A strategy for remapping {@link HttpRequest}.
  */
@@ -38,7 +40,10 @@ public interface RemappingRequestStrategy {
     /**
      * Returns a new {@link RemappingRequestStrategy} that remaps {@link HttpRequest} path with the given
      * {@code pathPattern}.
+     *
+     * @deprecated Use {@link UpstreamBuilder#path(String)} instead.
      */
+    @Deprecated(forRemoval = true)
     static RemappingRequestStrategy path(String pathPattern) {
         return new RemappingRequestPathStrategy(requireNonNull(pathPattern, "pathPattern"));
     }

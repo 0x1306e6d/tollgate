@@ -36,6 +36,8 @@ import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
 
+import dev.gihwan.tollgate.gateway.UpstreamBuilder;
+
 /**
  * A builder for {@link RemappingClient}.
  */
@@ -54,7 +56,10 @@ public final class RemappingClientBuilder {
      *
      * @see RemappingRequestPathStrategy#path(String)
      * @see RemappingClientBuilder#requestStrategy(RemappingRequestStrategy)
+     *
+     * @deprecated Use {@link UpstreamBuilder#path(String)} instead.
      */
+    @Deprecated(forRemoval = true)
     public RemappingClientBuilder requestPath(String pathPattern) {
         return requestStrategy(RemappingRequestStrategy.path(pathPattern));
     }

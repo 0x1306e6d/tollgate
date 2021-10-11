@@ -92,6 +92,14 @@ public final class UpstreamBuilder {
     }
 
     /**
+     * Sets request path to this upstream with the given {@code pathPattern}.
+     */
+    public UpstreamBuilder path(String pathPattern) {
+        requireNonNull(pathPattern, "pathPattern");
+        return mapRequest(new RemappingPathFunction(pathPattern));
+    }
+
+    /**
      * Disallows the given {@code headers} to be included in a request from a user to the upstream server.
      */
     public UpstreamBuilder disallowRequestHeaders(CharSequence... headers) {
