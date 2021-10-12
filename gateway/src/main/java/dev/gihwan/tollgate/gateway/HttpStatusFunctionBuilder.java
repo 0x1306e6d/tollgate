@@ -26,7 +26,7 @@ package dev.gihwan.tollgate.gateway;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.Set;
+import java.util.function.Predicate;
 
 import com.linecorp.armeria.common.HttpStatus;
 
@@ -35,18 +35,18 @@ import com.linecorp.armeria.common.HttpStatus;
  */
 public final class HttpStatusFunctionBuilder {
 
-    private final Set<HttpStatus> from;
+    private final Predicate<HttpStatus> predicate;
 
-    HttpStatusFunctionBuilder(Set<HttpStatus> from) {
-        this.from = from;
+    HttpStatusFunctionBuilder(Predicate<HttpStatus> predicate) {
+        this.predicate = predicate;
     }
 
     /**
      * Returns a new {@link HttpStatusFunction} which returns the {@code to} {@link HttpStatus} if a given
-     * {@link HttpStatus} is contained in the specified {@code from} {@link HttpStatus}es.
+     * {@link HttpStatus} satisfies the specified {@link Predicate}.
      */
     public HttpStatusFunction to(HttpStatus to) {
         requireNonNull(to, "to");
-        return new DefaultHttpStatusFunction(from, to);
+        return new DefaultHttpStatusFunction(predicate, to);
     }
 }

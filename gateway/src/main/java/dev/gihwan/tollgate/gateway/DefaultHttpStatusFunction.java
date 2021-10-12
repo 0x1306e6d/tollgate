@@ -24,23 +24,23 @@
 
 package dev.gihwan.tollgate.gateway;
 
-import java.util.Set;
+import java.util.function.Predicate;
 
 import com.linecorp.armeria.common.HttpStatus;
 
 final class DefaultHttpStatusFunction implements HttpStatusFunction {
 
-    private final Set<HttpStatus> from;
+    private final Predicate<HttpStatus> predicate;
     private final HttpStatus to;
 
-    DefaultHttpStatusFunction(Set<HttpStatus> from, HttpStatus to) {
-        this.from = from;
+    DefaultHttpStatusFunction(Predicate<HttpStatus> predicate, HttpStatus to) {
+        this.predicate = predicate;
         this.to = to;
     }
 
     @Override
     public HttpStatus apply(HttpStatus status) {
-        if (from.contains(status)) {
+        if (predicate.test(status)) {
             return to;
         } else {
             return status;

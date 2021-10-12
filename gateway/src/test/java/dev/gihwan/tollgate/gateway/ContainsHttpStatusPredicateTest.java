@@ -26,26 +26,22 @@ package dev.gihwan.tollgate.gateway;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Set;
+
 import org.junit.jupiter.api.Test;
 
 import com.linecorp.armeria.common.HttpStatus;
 
-class DefaultHttpStatusFunctionTest {
+class ContainsHttpStatusPredicateTest {
     @Test
-    void returnToStatusIfMatches() {
-        final DefaultHttpStatusFunction function = new DefaultHttpStatusFunction(HttpStatus::isSuccess,
-                                                                                 HttpStatus.OK);
-
-        final HttpStatus applied = function.apply(HttpStatus.CREATED);
-        assertThat(applied).isEqualTo(HttpStatus.OK);
+    void returnTrueIfContains() {
+        final ContainsHttpStatusPredicate predicate = new ContainsHttpStatusPredicate(Set.of(HttpStatus.OK));
+        assertThat(predicate.test(HttpStatus.OK)).isTrue();
     }
 
     @Test
-    void returnGivenStatusIfDoesNotMatch() {
-        final DefaultHttpStatusFunction function = new DefaultHttpStatusFunction(HttpStatus::isSuccess,
-                                                                                 HttpStatus.OK);
-
-        final HttpStatus applied = function.apply(HttpStatus.BAD_REQUEST);
-        assertThat(applied).isEqualTo(HttpStatus.BAD_REQUEST);
+    void returnFalseIfDoesNotContain() {
+        final ContainsHttpStatusPredicate predicate = new ContainsHttpStatusPredicate(Set.of(HttpStatus.OK));
+        assertThat(predicate.test(HttpStatus.BAD_REQUEST)).isFalse();
     }
 }

@@ -24,28 +24,21 @@
 
 package dev.gihwan.tollgate.gateway;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import org.junit.jupiter.api.Test;
+import java.util.Set;
+import java.util.function.Predicate;
 
 import com.linecorp.armeria.common.HttpStatus;
 
-class DefaultHttpStatusFunctionTest {
-    @Test
-    void returnToStatusIfMatches() {
-        final DefaultHttpStatusFunction function = new DefaultHttpStatusFunction(HttpStatus::isSuccess,
-                                                                                 HttpStatus.OK);
+final class ContainsHttpStatusPredicate implements Predicate<HttpStatus> {
 
-        final HttpStatus applied = function.apply(HttpStatus.CREATED);
-        assertThat(applied).isEqualTo(HttpStatus.OK);
+    private final Set<HttpStatus> statusSet;
+
+    ContainsHttpStatusPredicate(Set<HttpStatus> statusSet) {
+        this.statusSet = statusSet;
     }
 
-    @Test
-    void returnGivenStatusIfDoesNotMatch() {
-        final DefaultHttpStatusFunction function = new DefaultHttpStatusFunction(HttpStatus::isSuccess,
-                                                                                 HttpStatus.OK);
-
-        final HttpStatus applied = function.apply(HttpStatus.BAD_REQUEST);
-        assertThat(applied).isEqualTo(HttpStatus.BAD_REQUEST);
+    @Override
+    public boolean test(HttpStatus status) {
+        return statusSet.contains(status);
     }
 }

@@ -28,6 +28,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -41,7 +42,8 @@ import com.linecorp.armeria.common.HttpStatus;
 public interface HttpStatusFunction extends Function<HttpStatus, HttpStatus> {
 
     /**
-     * Returns a new {@link HttpStatusFunctionBuilder} with the given {@code from} {@link HttpStatus}es.
+     * Returns a new {@link HttpStatusFunctionBuilder} which produces only if a {@link HttpStatus} argument is
+     * in the given {@code from} {@link HttpStatus}es.
      */
     static HttpStatusFunctionBuilder from(HttpStatus... from) {
         requireNonNull(from, "from");
@@ -49,12 +51,21 @@ public interface HttpStatusFunction extends Function<HttpStatus, HttpStatus> {
     }
 
     /**
-     * Returns a new {@link HttpStatusFunctionBuilder} with the given {@code from} {@link HttpStatus}es.
+     * Returns a new {@link HttpStatusFunctionBuilder} which produces only if a {@link HttpStatus} argument is
+     * in the given {@code from} {@link HttpStatus}es.
      */
     static HttpStatusFunctionBuilder from(Iterable<HttpStatus> from) {
         requireNonNull(from, "from");
         checkArgument(!Iterables.isEmpty(from), "from should not be empty");
-        return new HttpStatusFunctionBuilder(ImmutableSet.copyOf(from));
+        return when(new ContainsHttpStatusPredicate(ImmutableSet.copyOf(from)));
+    }
+
+    /**
+     * Returns a new {@link HttpStatusFunctionBuilder} with the given {@link Predicate}.
+     */
+    static HttpStatusFunctionBuilder when(Predicate<HttpStatus> predicate) {
+        requireNonNull(predicate, "predicate");
+        return new HttpStatusFunctionBuilder(predicate);
     }
 
     /**
