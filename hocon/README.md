@@ -92,11 +92,19 @@ tollgate {
 | `uri` | `string` | `optional` | An URI of the upstream | |
 | `scheme` | `string` | `optional` | A scheme of an URI of the upstream | |
 | `path` | `string` | `optional` | Request path to the upstream | |
+| `status` | `list` | `optional` | List of [Status Function Configuration](#status-function-configuration) to apply to response status from the upstream | |
 | `endpoints` | `list` | `optional` | A list of [Endpoint Configuration](#endpoint-configuration) of an URI of the upstream | |
 | `remapping` | `object` | `optional` | A [Remapping Upstream Configuration](#remapping-upstream-configuration) to remap request or response | |
 | `logging` | `object` | `optional` | A [Logging Configuration](#logging-configuration) to log requests and responses to the upstream | |
 
 > **Note** One of `uri` or `scheme` and `endpoints` pair MUST be required.
+
+### Status Function Configuration
+
+| Name | Type | Mandatory | Description | Note |
+|------|------|-----------|-------------|------|
+| `from` | `list` | `required` | List of HTTP status (code) to transform | |
+| `to` | `string` or `int` | `required` | Transformed HTTP status (code) | |
 
 ### Endpoint Configuration
 

@@ -22,37 +22,23 @@
  * SOFTWARE.
  */
 
-package dev.gihwan.tollgate.remapping;
+package dev.gihwan.tollgate.gateway;
 
-import com.linecorp.armeria.client.ClientRequestContext;
-import com.linecorp.armeria.common.FilteredHttpResponse;
-import com.linecorp.armeria.common.HttpObject;
-import com.linecorp.armeria.common.HttpResponse;
+import java.util.Set;
+import java.util.function.Predicate;
+
 import com.linecorp.armeria.common.HttpStatus;
-import com.linecorp.armeria.common.ResponseHeaders;
 
-@Deprecated(forRemoval = true)
-final class RemappingResponseStatusStrategy implements RemappingResponseStrategy {
+final class ContainsHttpStatusPredicate implements Predicate<HttpStatus> {
 
-    private final HttpStatusFunction statusFunction;
+    private final Set<HttpStatus> statusSet;
 
-    RemappingResponseStatusStrategy(HttpStatusFunction statusFunction) {
-        this.statusFunction = statusFunction;
+    ContainsHttpStatusPredicate(Set<HttpStatus> statusSet) {
+        this.statusSet = statusSet;
     }
 
     @Override
-    public HttpResponse remap(ClientRequestContext ctx, HttpResponse res) {
-        return new FilteredHttpResponse(res) {
-            @Override
-            protected HttpObject filter(HttpObject obj) {
-                if (!(obj instanceof ResponseHeaders)) {
-                    return obj;
-                }
-
-                final ResponseHeaders headers = (ResponseHeaders) obj;
-                final HttpStatus remappedStatus = statusFunction.apply(headers.status());
-                return headers.toBuilder().status(remappedStatus).build();
-            }
-        };
+    public boolean test(HttpStatus status) {
+        return statusSet.contains(status);
     }
 }

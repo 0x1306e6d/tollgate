@@ -70,6 +70,7 @@ class UpstreamTest {
                     ResponseHeaders.of(HttpStatus.OK,
                                        "public", "this is public",
                                        "private", "this is private")));
+            builder.service("/created", (ctx, req) -> HttpResponse.of(HttpStatus.CREATED));
 
             builder.decorator(ContentPreviewingService.newDecorator(Integer.MAX_VALUE));
             builder.decorator(((delegate, ctx, req) -> {
@@ -238,6 +239,28 @@ class UpstreamTest {
             final WebClient client = WebClient.builder(gateway.httpUri()).build();
             final AggregatedHttpResponse res = client.get("/").aggregate().join();
             assertThat(res.status()).isEqualTo(HttpStatus.NO_CONTENT);
+        }
+    }
+
+    @Test
+    void status() {
+        try (TestGateway gateway = withTestGateway(builder -> {
+            builder.upstream("/created", Upstream.of(serviceServer.httpUri()));
+        })) {
+            final WebClient client = WebClient.builder(gateway.httpUri()).build();
+            final AggregatedHttpResponse res = client.get("/created").aggregate().join();
+            assertThat(res.status()).isEqualTo(HttpStatus.CREATED);
+        }
+
+        try (TestGateway gateway = withTestGateway(builder -> {
+            builder.upstream("/created", Upstream.builder(serviceServer.httpUri())
+                                                 .status(HttpStatusFunction.from(HttpStatus.CREATED)
+                                                                           .to(HttpStatus.OK))
+                                                 .build());
+        })) {
+            final WebClient client = WebClient.builder(gateway.httpUri()).build();
+            final AggregatedHttpResponse res = client.get("/created").aggregate().join();
+            assertThat(res.status()).isEqualTo(HttpStatus.OK);
         }
     }
 

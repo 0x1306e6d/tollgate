@@ -22,41 +22,26 @@
  * SOFTWARE.
  */
 
-import dev.gihwan.tollgate.Dependency
+package dev.gihwan.tollgate.gateway;
 
-plugins {
-    id("java-library")
-    id("dev.gihwan.tollgate.coverage")
-    id("dev.gihwan.tollgate.publish")
-}
+import static org.assertj.core.api.Assertions.assertThat;
 
-dependencies {
-    implementation(project(":util"))
+import java.util.Set;
 
-    api(Dependency.armeria)
-    implementation(Dependency.bcpkix)
-    implementation(Dependency.bcprov)
-    implementation(Dependency.commonsLang3)
-    implementation(Dependency.guava)
-    implementation(Dependency.jsr305)
-    implementation(Dependency.slf4j)
+import org.junit.jupiter.api.Test;
 
-    testImplementation(project(":junit5"))
-    testImplementation(Dependency.junitParams)
-    testImplementation(Dependency.assertj)
-    testImplementation(Dependency.awaitility)
-    testImplementation(Dependency.mockito)
-    testImplementation(Dependency.armeriaJunit)
+import com.linecorp.armeria.common.HttpStatus;
 
-    testRuntimeOnly(Dependency.junitEngine)
-    testRuntimeOnly(Dependency.logback)
-}
+class ContainsHttpStatusPredicateTest {
+    @Test
+    void returnTrueIfContains() {
+        final ContainsHttpStatusPredicate predicate = new ContainsHttpStatusPredicate(Set.of(HttpStatus.OK));
+        assertThat(predicate.test(HttpStatus.OK)).isTrue();
+    }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-
-tasks.test {
-    useJUnitPlatform()
+    @Test
+    void returnFalseIfDoesNotContain() {
+        final ContainsHttpStatusPredicate predicate = new ContainsHttpStatusPredicate(Set.of(HttpStatus.OK));
+        assertThat(predicate.test(HttpStatus.BAD_REQUEST)).isFalse();
+    }
 }

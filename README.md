@@ -27,7 +27,7 @@ gateway.start().join();
     - Maps a `Throwable` which is thrown while forwarding to an appropriate `HttpResponse`.
 - [HOCON](/hocon)
     - Builds `Gateway` using a HOCON (Human-Optimized Config Object Notation) configuration.
-- [remapping](/remapping)
+- [remapping](/remapping) (deprecated)
     - Remaps `HttpRequest` or `HttpResponse`.
 
 ## License

@@ -24,9 +24,13 @@
 
 package dev.gihwan.tollgate.hocon;
 
+import static com.typesafe.config.ConfigValueFactory.fromAnyRef;
+import static com.typesafe.config.ConfigValueFactory.fromIterable;
+import static com.typesafe.config.ConfigValueFactory.fromMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Test;
@@ -34,7 +38,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import com.typesafe.config.ConfigValueFactory;
 
 import com.linecorp.armeria.client.WebClient;
 import com.linecorp.armeria.common.AggregatedHttpResponse;
@@ -65,6 +68,7 @@ class HoconGatewayBuilderTest {
                     ResponseHeaders.of(HttpStatus.OK,
                                        "public", "this is public",
                                        "private", "this is private")));
+            builder.service("/created", (ctx, req) -> HttpResponse.of(HttpStatus.CREATED));
 
             builder.decorator(((delegate, ctx, req) -> {
                 ctxCapture.set(ctx);
@@ -78,7 +82,7 @@ class HoconGatewayBuilderTest {
         final Config config =
                 ConfigFactory.load()
                              .withValue("tollgate.routing.foo.upstream.uri",
-                                        ConfigValueFactory.fromAnyRef(serviceServer.httpUri().toString()));
+                                        fromAnyRef(serviceServer.httpUri().toString()));
 
         final Gateway gateway = HoconGatewayBuilder.of().build(config);
         try {
@@ -102,14 +106,11 @@ class HoconGatewayBuilderTest {
     void path() {
         final Config config =
                 ConfigFactory.empty()
-                             .withValue("tollgate.routing.foo.method",
-                                        ConfigValueFactory.fromAnyRef("GET"))
-                             .withValue("tollgate.routing.foo.path",
-                                        ConfigValueFactory.fromAnyRef("/foo"))
+                             .withValue("tollgate.routing.foo.method", fromAnyRef("GET"))
+                             .withValue("tollgate.routing.foo.path", fromAnyRef("/foo"))
                              .withValue("tollgate.routing.foo.upstream.uri",
-                                        ConfigValueFactory.fromAnyRef(serviceServer.httpUri().toString()))
-                             .withValue("tollgate.routing.foo.upstream.path",
-                                        ConfigValueFactory.fromAnyRef("/bar"));
+                                        fromAnyRef(serviceServer.httpUri().toString()))
+                             .withValue("tollgate.routing.foo.upstream.path", fromAnyRef("/bar"));
 
         final Gateway gateway = HoconGatewayBuilder.of().build(config);
         try {
@@ -128,14 +129,12 @@ class HoconGatewayBuilderTest {
     void disallowRequestHeaders() {
         final Config config =
                 ConfigFactory.empty()
-                             .withValue("tollgate.routing.foo.method",
-                                        ConfigValueFactory.fromAnyRef("GET"))
-                             .withValue("tollgate.routing.foo.path",
-                                        ConfigValueFactory.fromAnyRef("/foo"))
+                             .withValue("tollgate.routing.foo.method", fromAnyRef("GET"))
+                             .withValue("tollgate.routing.foo.path", fromAnyRef("/foo"))
                              .withValue("tollgate.routing.foo.upstream.uri",
-                                        ConfigValueFactory.fromAnyRef(serviceServer.httpUri().toString()))
+                                        fromAnyRef(serviceServer.httpUri().toString()))
                              .withValue("tollgate.routing.foo.upstream.disallowRequestHeaders",
-                                        ConfigValueFactory.fromIterable(List.of("private")));
+                                        fromIterable(List.of("private")));
 
         final Gateway gateway = HoconGatewayBuilder.of().build(config);
         try {
@@ -159,17 +158,39 @@ class HoconGatewayBuilderTest {
     }
 
     @Test
+    void status() {
+        final Config config =
+                ConfigFactory.empty()
+                             .withValue("tollgate.routing.created.method", fromAnyRef("GET"))
+                             .withValue("tollgate.routing.created.path", fromAnyRef("/created"))
+                             .withValue("tollgate.routing.created.upstream.uri",
+                                        fromAnyRef(serviceServer.httpUri().toString()))
+                             .withValue("tollgate.routing.created.upstream.status",
+                                        fromIterable(List.of(fromMap(Map.of("from", List.of(201),
+                                                                            "to", 200)))));
+
+        final Gateway gateway = HoconGatewayBuilder.of().build(config);
+        try {
+            gateway.start().join();
+
+            final WebClient client = WebClient.of("http://127.0.0.1:" + gateway.activeLocalPort());
+            final AggregatedHttpResponse res = client.get("/created").aggregate().join();
+            assertThat(res.status()).isEqualTo(HttpStatus.OK);
+        } finally {
+            gateway.stop().join();
+        }
+    }
+
+    @Test
     void disallowResponseHeaders() {
         final Config config =
                 ConfigFactory.empty()
-                             .withValue("tollgate.routing.header.method",
-                                        ConfigValueFactory.fromAnyRef("GET"))
-                             .withValue("tollgate.routing.header.path",
-                                        ConfigValueFactory.fromAnyRef("/header"))
+                             .withValue("tollgate.routing.header.method", fromAnyRef("GET"))
+                             .withValue("tollgate.routing.header.path", fromAnyRef("/header"))
                              .withValue("tollgate.routing.header.upstream.uri",
-                                        ConfigValueFactory.fromAnyRef(serviceServer.httpUri().toString()))
+                                        fromAnyRef(serviceServer.httpUri().toString()))
                              .withValue("tollgate.routing.header.upstream.disallowResponseHeaders",
-                                        ConfigValueFactory.fromIterable(List.of("private")));
+                                        fromIterable(List.of("private")));
 
         final Gateway gateway = HoconGatewayBuilder.of().build(config);
         try {
@@ -190,7 +211,7 @@ class HoconGatewayBuilderTest {
         final Config config =
                 ConfigFactory.load("application-logging.conf")
                              .withValue("tollgate.routing.foo.upstream.uri",
-                                        ConfigValueFactory.fromAnyRef(serviceServer.httpUri().toString()));
+                                        fromAnyRef(serviceServer.httpUri().toString()));
 
         final Gateway gateway = HoconGatewayBuilder.of().build(config);
         try {

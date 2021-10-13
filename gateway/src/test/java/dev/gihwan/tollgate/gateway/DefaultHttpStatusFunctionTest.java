@@ -22,41 +22,30 @@
  * SOFTWARE.
  */
 
-import dev.gihwan.tollgate.Dependency
+package dev.gihwan.tollgate.gateway;
 
-plugins {
-    id("java-library")
-    id("dev.gihwan.tollgate.coverage")
-    id("dev.gihwan.tollgate.publish")
-}
+import static org.assertj.core.api.Assertions.assertThat;
 
-dependencies {
-    implementation(project(":util"))
+import org.junit.jupiter.api.Test;
 
-    api(Dependency.armeria)
-    implementation(Dependency.bcpkix)
-    implementation(Dependency.bcprov)
-    implementation(Dependency.commonsLang3)
-    implementation(Dependency.guava)
-    implementation(Dependency.jsr305)
-    implementation(Dependency.slf4j)
+import com.linecorp.armeria.common.HttpStatus;
 
-    testImplementation(project(":junit5"))
-    testImplementation(Dependency.junitParams)
-    testImplementation(Dependency.assertj)
-    testImplementation(Dependency.awaitility)
-    testImplementation(Dependency.mockito)
-    testImplementation(Dependency.armeriaJunit)
+class DefaultHttpStatusFunctionTest {
+    @Test
+    void returnToStatusIfMatches() {
+        final DefaultHttpStatusFunction function = new DefaultHttpStatusFunction(HttpStatus::isSuccess,
+                                                                                 HttpStatus.OK);
 
-    testRuntimeOnly(Dependency.junitEngine)
-    testRuntimeOnly(Dependency.logback)
-}
+        final HttpStatus applied = function.apply(HttpStatus.CREATED);
+        assertThat(applied).isEqualTo(HttpStatus.OK);
+    }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
+    @Test
+    void returnGivenStatusIfDoesNotMatch() {
+        final DefaultHttpStatusFunction function = new DefaultHttpStatusFunction(HttpStatus::isSuccess,
+                                                                                 HttpStatus.OK);
 
-tasks.test {
-    useJUnitPlatform()
+        final HttpStatus applied = function.apply(HttpStatus.BAD_REQUEST);
+        assertThat(applied).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
 }

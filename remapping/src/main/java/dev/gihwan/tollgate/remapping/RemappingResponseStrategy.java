@@ -26,20 +26,30 @@ package dev.gihwan.tollgate.remapping;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.function.Function;
+
 import com.linecorp.armeria.client.ClientRequestContext;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
 
+import dev.gihwan.tollgate.gateway.UpstreamBuilder;
+
 /**
  * A strategy for remapping {@link HttpResponse}
+ *
+ * @deprecated Use {@link UpstreamBuilder#mapResponse(Function)} instead.
  */
 @FunctionalInterface
+@Deprecated(forRemoval = true)
 public interface RemappingResponseStrategy {
 
     /**
      * Returns a new {@link RemappingResponseStrategy} that remaps {@link HttpStatus} of {@link HttpResponse}
      * with the given {@link HttpStatusFunction}.
+     *
+     * @deprecated Use {@link UpstreamBuilder#status(dev.gihwan.tollgate.gateway.HttpStatusFunction)} instead.
      */
+    @Deprecated(forRemoval = true)
     static RemappingResponseStrategy status(HttpStatusFunction statusFunction) {
         return new RemappingResponseStatusStrategy(requireNonNull(statusFunction, "statusFunction"));
     }

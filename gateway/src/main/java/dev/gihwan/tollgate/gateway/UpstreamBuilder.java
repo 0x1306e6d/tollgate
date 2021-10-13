@@ -126,6 +126,14 @@ public final class UpstreamBuilder {
     }
 
     /**
+     * Sets response status from this upstream with the given {@link HttpStatusFunction}.
+     */
+    public UpstreamBuilder status(HttpStatusFunction statusFunction) {
+        requireNonNull(statusFunction, "statusFunction");
+        return mapResponse(new RemappingStatusFunction(statusFunction));
+    }
+
+    /**
      * Disallows the given {@code headers} to be included in a response from the upstream server to a user.
      */
     public UpstreamBuilder disallowResponseHeaders(CharSequence... headers) {
