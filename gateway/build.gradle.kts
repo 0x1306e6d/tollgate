@@ -42,6 +42,7 @@ dependencies {
     implementation(Dependency.slf4j)
 
     testImplementation(project(":junit5"))
+    testImplementation(Dependency.junitParams)
     testImplementation(Dependency.assertj)
     testImplementation(Dependency.awaitility)
     testImplementation(Dependency.mockito)

@@ -48,5 +48,6 @@ object Dependency {
     const val awaitility = "org.awaitility:awaitility:${Version.awaitility}"
     const val junitApi = "org.junit.jupiter:junit-jupiter-api:${Version.junit}"
     const val junitEngine = "org.junit.jupiter:junit-jupiter-engine:${Version.junit}"
+    const val junitParams = "org.junit.jupiter:junit-jupiter-params:${Version.junit}"
     const val mockito = "org.mockito:mockito-core:${Version.mockito}"
 }

@@ -114,6 +114,14 @@ enum DefaultHoconGatewayConfigurator implements HoconGatewayConfigurator {
             }
         }
 
+        if (upstreamConfig.hasPath("status")) {
+            upstreamConfig.getObjectList("status")
+                          .stream()
+                          .map(ConfigObject::toConfig)
+                          .map(HoconHttpStatusFunction::of)
+                          .forEach(builder::status);
+        }
+
         if (upstreamConfig.hasPath("disallowResponseHeaders")) {
             final List<String> disallowResponseHeaders =
                     upstreamConfig.getStringList("disallowResponseHeaders");
