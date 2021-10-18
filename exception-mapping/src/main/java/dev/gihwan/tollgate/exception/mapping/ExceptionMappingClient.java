@@ -38,12 +38,14 @@ import com.linecorp.armeria.common.HttpResponse;
 /**
  * A {@link HttpClient} decorator which maps a {@link Throwable} to a {@link HttpResponse}.
  */
+@Deprecated(forRemoval = true)
 public final class ExceptionMappingClient extends SimpleDecoratingHttpClient {
 
     /**
      * Returns a new {@link HttpClient} decorator which maps a {@link Throwable} to a {@link HttpResponse}
      * using the default {@link ExceptionMappingFunction}.
      */
+    @Deprecated(forRemoval = true)
     public static Function<? super HttpClient, ExceptionMappingClient> newDecorator() {
         return newDecorator(ExceptionMappingFunction.ofDefault());
     }
@@ -52,6 +54,7 @@ public final class ExceptionMappingClient extends SimpleDecoratingHttpClient {
      * Returns a new {@link HttpClient} decorator which maps a {@link Throwable} to a {@link HttpResponse}
      * using the given {@link ExceptionMappingFunction}.
      */
+    @Deprecated(forRemoval = true)
     public static Function<? super HttpClient, ExceptionMappingClient> newDecorator(
             ExceptionMappingFunction mappingFunction) {
         requireNonNull(mappingFunction, "mappingFunction");
