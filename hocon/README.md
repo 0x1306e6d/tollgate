@@ -94,7 +94,6 @@ tollgate {
 | `path` | `string` | `optional` | Request path to the upstream | |
 | `status` | `list` | `optional` | List of [Status Function Configuration](#status-function-configuration) to apply to response status from the upstream | |
 | `endpoints` | `list` | `optional` | A list of [Endpoint Configuration](#endpoint-configuration) of an URI of the upstream | |
-| `remapping` | `object` | `optional` | A [Remapping Upstream Configuration](#remapping-upstream-configuration) to remap request or response | |
 | `logging` | `object` | `optional` | A [Logging Configuration](#logging-configuration) to log requests and responses to the upstream | |
 
 > **Note** One of `uri` or `scheme` and `endpoints` pair MUST be required.
@@ -112,12 +111,6 @@ tollgate {
 |------|------|-----------|-------------|------|
 | `host` | `string` | `requried` | A host of the endpoint | |
 | `port` | `int` | `required` | A port of the endpoint | |
-
-### Remapping Upstream Configuration
-
-| Name | Type | Mandatory | Description | Note |
-|------|------|-----------|-------------|------|
-| `path` | `string` | `optional` | Remaps request path | |
 
 ### Logging Configuration
 

@@ -33,7 +33,6 @@ plugins {
 dependencies {
     api(project(":gateway"))
     implementation(project(":util"))
-    implementation(project(":remapping"))
 
     api(Dependency.config)
     implementation(Dependency.guava)

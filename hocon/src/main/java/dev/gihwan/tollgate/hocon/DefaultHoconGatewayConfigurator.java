@@ -48,8 +48,6 @@ import dev.gihwan.tollgate.gateway.GatewayBuilder;
 import dev.gihwan.tollgate.gateway.Upstream;
 import dev.gihwan.tollgate.gateway.UpstreamBindingBuilder;
 import dev.gihwan.tollgate.gateway.UpstreamBuilder;
-import dev.gihwan.tollgate.remapping.RemappingClient;
-import dev.gihwan.tollgate.remapping.RemappingClientBuilder;
 
 enum DefaultHoconGatewayConfigurator implements HoconGatewayConfigurator {
 
@@ -128,15 +126,6 @@ enum DefaultHoconGatewayConfigurator implements HoconGatewayConfigurator {
             if (!disallowResponseHeaders.isEmpty()) {
                 builder.disallowResponseHeaders(disallowResponseHeaders);
             }
-        }
-
-        if (upstreamConfig.hasPath("remapping")) {
-            final Config remappingConfig = upstreamConfig.getObject("remapping").toConfig();
-            final RemappingClientBuilder remappingBuilder = RemappingClient.builder();
-            if (remappingConfig.hasPath("path")) {
-                remappingBuilder.requestPath(remappingConfig.getString("path"));
-            }
-            builder.decorator(remappingBuilder.newDecorator());
         }
 
         if (upstreamConfig.hasPath("logging")) {
