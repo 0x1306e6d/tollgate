@@ -26,7 +26,6 @@ rootProject.name = "tollgate"
 
 include("gateway")
 
-include("exception-mapping")
 include("hocon")
 include("junit5")
 include("spring:boot2-autoconfigure")
