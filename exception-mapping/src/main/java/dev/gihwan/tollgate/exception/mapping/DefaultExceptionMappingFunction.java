@@ -28,6 +28,7 @@ import com.linecorp.armeria.client.UnprocessedRequestException;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
 
+@Deprecated(forRemoval = true)
 enum DefaultExceptionMappingFunction implements ExceptionMappingFunction {
 
     INSTANCE;

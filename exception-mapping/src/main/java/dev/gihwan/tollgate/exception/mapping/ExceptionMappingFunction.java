@@ -32,11 +32,13 @@ import com.linecorp.armeria.common.HttpResponse;
  * A {@link Function} for mapping a {@link Throwable} to a {@link HttpResponse}.
  */
 @FunctionalInterface
+@Deprecated(forRemoval = true)
 public interface ExceptionMappingFunction extends Function<Throwable, HttpResponse> {
 
     /**
      * Returns the default implementation of {@link ExceptionMappingFunction}.
      */
+    @Deprecated(forRemoval = true)
     static ExceptionMappingFunction ofDefault() {
         return DefaultExceptionMappingFunction.INSTANCE;
     }
