@@ -23,8 +23,6 @@ gateway.start().join();
 
 ## Features
 
-- [exception-mapping](/exception-mapping) (deprecated)
-    - Maps a `Throwable` which is thrown while forwarding to an appropriate `HttpResponse`.
 - [HOCON](/hocon)
     - Builds `Gateway` using a HOCON (Human-Optimized Config Object Notation) configuration.
 
