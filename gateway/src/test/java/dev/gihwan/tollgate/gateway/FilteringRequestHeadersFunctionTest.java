@@ -35,11 +35,11 @@ import com.linecorp.armeria.common.HttpMethod;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.RequestHeaders;
 
-class DisallowRequestHeadersFunctionTest {
+class FilteringRequestHeadersFunctionTest {
     @Test
     void ofSetShouldDisallowSpecifiedRequestHeaders() {
-        final DisallowRequestHeadersFunction function =
-                DisallowRequestHeadersFunction.ofSet(Set.of(HttpHeaderNames.of("foo")));
+        final FilteringRequestHeadersFunction function =
+                FilteringRequestHeadersFunction.ofDisallowedSet(Set.of(HttpHeaderNames.of("foo")));
 
         final HttpRequest req = HttpRequest.of(RequestHeaders.builder(HttpMethod.GET, "/")
                                                              .add("foo", "this is foo")
@@ -55,8 +55,8 @@ class DisallowRequestHeadersFunctionTest {
 
     @Test
     void ofSetShouldDisallowSpecifiedRequestHeadersWithMultiValues() {
-        final DisallowRequestHeadersFunction function =
-                DisallowRequestHeadersFunction.ofSet(Set.of(HttpHeaderNames.of("foo")));
+        final FilteringRequestHeadersFunction function =
+                FilteringRequestHeadersFunction.ofDisallowedSet(Set.of(HttpHeaderNames.of("foo")));
 
         final HttpRequest req = HttpRequest.of(RequestHeaders.builder(HttpMethod.GET, "/")
                                                              .add("foo", "this is first foo")
@@ -75,9 +75,9 @@ class DisallowRequestHeadersFunctionTest {
 
     @Test
     void ofSetShouldDisallowAllSpecifiedRequestHeaders() {
-        final DisallowRequestHeadersFunction function =
-                DisallowRequestHeadersFunction.ofSet(Set.of(HttpHeaderNames.of("foo"),
-                                                            HttpHeaderNames.of("bar")));
+        final FilteringRequestHeadersFunction function =
+                FilteringRequestHeadersFunction.ofDisallowedSet(Set.of(HttpHeaderNames.of("foo"),
+                                                                       HttpHeaderNames.of("bar")));
 
         final HttpRequest req = HttpRequest.of(RequestHeaders.builder(HttpMethod.GET, "/")
                                                              .add("foo", "this is foo")

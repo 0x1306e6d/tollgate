@@ -36,11 +36,11 @@ import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.common.ResponseHeaders;
 
-class DisallowResponseHeadersFunctionTest {
+class FilteringResponseHeadersFunctionTest {
     @Test
     void ofSetShouldDisallowSpecifiedResponseHeaders() {
-        final DisallowResponseHeadersFunction function =
-                DisallowResponseHeadersFunction.ofSet(Set.of(HttpHeaderNames.of("foo")));
+        final FilteringResponseHeadersFunction function =
+                FilteringResponseHeadersFunction.ofDisallowedSet(Set.of(HttpHeaderNames.of("foo")));
 
         final HttpResponse res = HttpResponse.of(ResponseHeaders.builder(HttpStatus.OK)
                                                                 .add("foo", "this is foo")
@@ -56,8 +56,8 @@ class DisallowResponseHeadersFunctionTest {
 
     @Test
     void ofSetShouldDisallowSpecifiedResponseHeadersWithMultiValues() {
-        final DisallowResponseHeadersFunction function =
-                DisallowResponseHeadersFunction.ofSet(Set.of(HttpHeaderNames.of("foo")));
+        final FilteringResponseHeadersFunction function =
+                FilteringResponseHeadersFunction.ofDisallowedSet(Set.of(HttpHeaderNames.of("foo")));
 
         final HttpResponse res = HttpResponse.of(ResponseHeaders.builder(HttpStatus.OK)
                                                                 .add("foo", "this is first foo")
@@ -76,9 +76,9 @@ class DisallowResponseHeadersFunctionTest {
 
     @Test
     void ofSetShouldDisallowAllSpecifiedResponseHeaders() {
-        final DisallowResponseHeadersFunction function =
-                DisallowResponseHeadersFunction.ofSet(Set.of(HttpHeaderNames.of("foo"),
-                                                             HttpHeaderNames.of("bar")));
+        final FilteringResponseHeadersFunction function =
+                FilteringResponseHeadersFunction.ofDisallowedSet(Set.of(HttpHeaderNames.of("foo"),
+                                                                        HttpHeaderNames.of("bar")));
 
         final HttpResponse res = HttpResponse.of(ResponseHeaders.builder(HttpStatus.OK)
                                                                 .add("foo", "this is foo")

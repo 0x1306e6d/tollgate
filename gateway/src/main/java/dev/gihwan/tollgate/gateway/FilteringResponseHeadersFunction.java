@@ -24,8 +24,6 @@
 
 package dev.gihwan.tollgate.gateway;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -36,25 +34,28 @@ import com.linecorp.armeria.common.ResponseHeadersBuilder;
 
 import io.netty.util.AsciiString;
 
-final class DisallowResponseHeadersFunction implements Function<HttpResponse, HttpResponse> {
+final class FilteringResponseHeadersFunction implements Function<HttpResponse, HttpResponse> {
 
-    static DisallowResponseHeadersFunction ofSet(Set<AsciiString> disallowedResponseHeaders) {
-        checkArgument(!disallowedResponseHeaders.isEmpty(), "disallowed response headers should not be empty");
-        return new DisallowResponseHeadersFunction((name, value) -> disallowedResponseHeaders.contains(name));
+    static FilteringResponseHeadersFunction ofAllowedSet(Set<AsciiString> allowedResponseHeaders) {
+        return new FilteringResponseHeadersFunction((name, value) -> !allowedResponseHeaders.contains(name));
+    }
+
+    static FilteringResponseHeadersFunction ofDisallowedSet(Set<AsciiString> disallowedResponseHeaders) {
+        return new FilteringResponseHeadersFunction((name, value) -> disallowedResponseHeaders.contains(name));
     }
 
     private final BiPredicate<AsciiString, String> predicate;
 
-    private DisallowResponseHeadersFunction(BiPredicate<AsciiString, String> predicate) {
+    private FilteringResponseHeadersFunction(BiPredicate<AsciiString, String> predicate) {
         this.predicate = predicate;
     }
 
     @Override
     public HttpResponse apply(HttpResponse res) {
-        return res.mapHeaders(this::disallowResponseHeaders);
+        return res.mapHeaders(this::filterResponseHeaders);
     }
 
-    private ResponseHeaders disallowResponseHeaders(ResponseHeaders headers) {
+    private ResponseHeaders filterResponseHeaders(ResponseHeaders headers) {
         final ResponseHeadersBuilder builder = headers.toBuilder();
         headers.forEach((name, value) -> {
             if (predicate.test(name, value)) {

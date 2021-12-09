@@ -24,8 +24,6 @@
 
 package dev.gihwan.tollgate.gateway;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -36,25 +34,28 @@ import com.linecorp.armeria.common.RequestHeadersBuilder;
 
 import io.netty.util.AsciiString;
 
-final class DisallowRequestHeadersFunction implements Function<HttpRequest, HttpRequest> {
+final class FilteringRequestHeadersFunction implements Function<HttpRequest, HttpRequest> {
 
-    static DisallowRequestHeadersFunction ofSet(Set<AsciiString> disallowedRequestHeaders) {
-        checkArgument(!disallowedRequestHeaders.isEmpty(), "disallowed request headers should not be empty");
-        return new DisallowRequestHeadersFunction((name, value) -> disallowedRequestHeaders.contains(name));
+    static FilteringRequestHeadersFunction ofAllowedSet(Set<AsciiString> allowedRequestHeaders) {
+        return new FilteringRequestHeadersFunction((name, value) -> !allowedRequestHeaders.contains(name));
+    }
+
+    static FilteringRequestHeadersFunction ofDisallowedSet(Set<AsciiString> disallowedRequestHeaders) {
+        return new FilteringRequestHeadersFunction((name, value) -> disallowedRequestHeaders.contains(name));
     }
 
     private final BiPredicate<AsciiString, String> predicate;
 
-    private DisallowRequestHeadersFunction(BiPredicate<AsciiString, String> predicate) {
+    private FilteringRequestHeadersFunction(BiPredicate<AsciiString, String> predicate) {
         this.predicate = predicate;
     }
 
     @Override
     public HttpRequest apply(HttpRequest req) {
-        return req.mapHeaders(this::disallowRequestHeaders);
+        return req.mapHeaders(this::filterRequestHeaders);
     }
 
-    private RequestHeaders disallowRequestHeaders(RequestHeaders headers) {
+    private RequestHeaders filterRequestHeaders(RequestHeaders headers) {
         final RequestHeadersBuilder builder = headers.toBuilder();
         headers.forEach((name, value) -> {
             if (predicate.test(name, value)) {

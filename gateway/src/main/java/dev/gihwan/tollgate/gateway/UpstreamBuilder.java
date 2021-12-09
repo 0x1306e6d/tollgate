@@ -24,6 +24,7 @@
 
 package dev.gihwan.tollgate.gateway;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
@@ -99,6 +100,19 @@ public final class UpstreamBuilder {
         return mapRequest(new RemappingPathFunction(pathPattern));
     }
 
+    public UpstreamBuilder allowRequestHeaders(CharSequence... headers) {
+        return allowResponseHeaders(ImmutableList.copyOf(requireNonNull(headers, "headers")));
+    }
+
+    public UpstreamBuilder allowRequestHeaders(Iterable<? extends CharSequence> headers) {
+        requireNonNull(headers, "headers");
+        final Set<AsciiString> allowedRequestHeaders = Streams.stream(headers)
+                                                              .map(HttpHeaderNames::of)
+                                                              .collect(Collectors.toUnmodifiableSet());
+        checkArgument(!allowedRequestHeaders.isEmpty(), "allowed request headers should not be empty");
+        return mapRequest(FilteringRequestHeadersFunction.ofAllowedSet(allowedRequestHeaders));
+    }
+
     /**
      * Disallows the given {@code headers} to be included in a request from a user to the upstream server.
      */
@@ -114,7 +128,8 @@ public final class UpstreamBuilder {
         final Set<AsciiString> disallowedRequestHeaders = Streams.stream(headers)
                                                                  .map(HttpHeaderNames::of)
                                                                  .collect(Collectors.toUnmodifiableSet());
-        return mapRequest(DisallowRequestHeadersFunction.ofSet(disallowedRequestHeaders));
+        checkArgument(!disallowedRequestHeaders.isEmpty(), "disallowed request headers should not be empty");
+        return mapRequest(FilteringRequestHeadersFunction.ofDisallowedSet(disallowedRequestHeaders));
     }
 
     /**
@@ -133,6 +148,19 @@ public final class UpstreamBuilder {
         return mapResponse(new RemappingStatusFunction(statusFunction));
     }
 
+    public UpstreamBuilder allowResponseHeaders(CharSequence... headers) {
+        return allowResponseHeaders(ImmutableList.copyOf(requireNonNull(headers, "headers")));
+    }
+
+    public UpstreamBuilder allowResponseHeaders(Iterable<? extends CharSequence> headers) {
+        requireNonNull(headers, "headers");
+        final Set<AsciiString> allowedResponseHeaders = Streams.stream(headers)
+                                                               .map(HttpHeaderNames::of)
+                                                               .collect(Collectors.toUnmodifiableSet());
+        checkArgument(!allowedResponseHeaders.isEmpty(), "allowed response headers should not be empty");
+        return mapResponse(FilteringResponseHeadersFunction.ofAllowedSet(allowedResponseHeaders));
+    }
+
     /**
      * Disallows the given {@code headers} to be included in a response from the upstream server to a user.
      */
@@ -148,7 +176,8 @@ public final class UpstreamBuilder {
         final Set<AsciiString> disallowedResponseHeaders = Streams.stream(headers)
                                                                   .map(HttpHeaderNames::of)
                                                                   .collect(Collectors.toUnmodifiableSet());
-        return mapResponse(DisallowResponseHeadersFunction.ofSet(disallowedResponseHeaders));
+        checkArgument(!disallowedResponseHeaders.isEmpty(), "disallowed response headers should not be empty");
+        return mapResponse(FilteringResponseHeadersFunction.ofDisallowedSet(disallowedResponseHeaders));
     }
 
     /**
