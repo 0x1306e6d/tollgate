@@ -24,6 +24,8 @@
 
 package dev.gihwan.tollgate.gateway;
 
+import static dev.gihwan.tollgate.gateway.HttpHeaderUtil.isRequestPseudoHeader;
+
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -58,6 +60,9 @@ final class FilteringRequestHeadersFunction implements Function<HttpRequest, Htt
     private RequestHeaders filterRequestHeaders(RequestHeaders headers) {
         final RequestHeadersBuilder builder = headers.toBuilder();
         headers.forEach((name, value) -> {
+            if (isRequestPseudoHeader(name)) {
+                return;
+            }
             if (predicate.test(name, value)) {
                 builder.remove(name);
             }

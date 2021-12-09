@@ -34,10 +34,66 @@ import com.linecorp.armeria.common.HttpHeaderNames;
 import com.linecorp.armeria.common.HttpMethod;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.RequestHeaders;
+import com.linecorp.armeria.common.SessionProtocol;
 
 class FilteringRequestHeadersFunctionTest {
     @Test
-    void ofSetShouldDisallowSpecifiedRequestHeaders() {
+    void allowSpecifiedRequestHeaders() {
+        final FilteringRequestHeadersFunction function =
+                FilteringRequestHeadersFunction.ofAllowedSet(Set.of(HttpHeaderNames.of("foo")));
+
+        final HttpRequest req = HttpRequest.of(RequestHeaders.builder(HttpMethod.GET, "/")
+                                                             .add("foo", "this is foo")
+                                                             .add("bar", "this is bar")
+                                                             .add("baz", "this is baz")
+                                                             .build());
+        final HttpRequest applied = function.apply(req);
+        final RequestHeaders headers = applied.headers();
+        assertThat(headers.get("foo")).isEqualTo("this is foo");
+        assertThat(headers.get("bar")).isNull();
+        assertThat(headers.get("baz")).isNull();
+    }
+
+    @Test
+    void allowSpecifiedRequestHeadersWithMultiValues() {
+        final FilteringRequestHeadersFunction function =
+                FilteringRequestHeadersFunction.ofAllowedSet(Set.of(HttpHeaderNames.of("foo")));
+
+        final HttpRequest req = HttpRequest.of(RequestHeaders.builder(HttpMethod.GET, "/")
+                                                             .add("foo", "this is first foo")
+                                                             .add("foo", "this is second foo")
+                                                             .add("bar", "this is first bar")
+                                                             .add("bar", "this is second bar")
+                                                             .add("baz", "this is first baz")
+                                                             .add("baz", "this is second baz")
+                                                             .build());
+        final HttpRequest applied = function.apply(req);
+        final RequestHeaders headers = applied.headers();
+        assertThat(headers.getAll("foo")).containsExactlyInAnyOrder("this is first foo", "this is second foo");
+        assertThat(headers.getAll("bar")).isEmpty();
+        assertThat(headers.getAll("baz")).isEmpty();
+    }
+
+    @Test
+    void allowAllSpecifiedRequestHeaders() {
+        final FilteringRequestHeadersFunction function =
+                FilteringRequestHeadersFunction.ofAllowedSet(Set.of(HttpHeaderNames.of("foo"),
+                                                                    HttpHeaderNames.of("bar")));
+
+        final HttpRequest req = HttpRequest.of(RequestHeaders.builder(HttpMethod.GET, "/")
+                                                             .add("foo", "this is foo")
+                                                             .add("bar", "this is bar")
+                                                             .add("baz", "this is baz")
+                                                             .build());
+        final HttpRequest applied = function.apply(req);
+        final RequestHeaders headers = applied.headers();
+        assertThat(headers.get("foo")).isEqualTo("this is foo");
+        assertThat(headers.get("bar")).isEqualTo("this is bar");
+        assertThat(headers.get("baz")).isNull();
+    }
+
+    @Test
+    void disallowSpecifiedRequestHeaders() {
         final FilteringRequestHeadersFunction function =
                 FilteringRequestHeadersFunction.ofDisallowedSet(Set.of(HttpHeaderNames.of("foo")));
 
@@ -54,7 +110,7 @@ class FilteringRequestHeadersFunctionTest {
     }
 
     @Test
-    void ofSetShouldDisallowSpecifiedRequestHeadersWithMultiValues() {
+    void disallowSpecifiedRequestHeadersWithMultiValues() {
         final FilteringRequestHeadersFunction function =
                 FilteringRequestHeadersFunction.ofDisallowedSet(Set.of(HttpHeaderNames.of("foo")));
 
@@ -74,7 +130,7 @@ class FilteringRequestHeadersFunctionTest {
     }
 
     @Test
-    void ofSetShouldDisallowAllSpecifiedRequestHeaders() {
+    void disallowAllSpecifiedRequestHeaders() {
         final FilteringRequestHeadersFunction function =
                 FilteringRequestHeadersFunction.ofDisallowedSet(Set.of(HttpHeaderNames.of("foo"),
                                                                        HttpHeaderNames.of("bar")));
@@ -89,5 +145,28 @@ class FilteringRequestHeadersFunctionTest {
         assertThat(headers.get("foo")).isNull();
         assertThat(headers.get("bar")).isNull();
         assertThat(headers.get("baz")).isEqualTo("this is baz");
+    }
+
+    @Test
+    void shouldNotFilterPseudoHeaders() {
+        final FilteringRequestHeadersFunction function =
+                FilteringRequestHeadersFunction.ofAllowedSet(Set.of(HttpHeaderNames.of("foo")));
+
+        final HttpRequest req = HttpRequest.of(RequestHeaders.builder()
+                                                             .method(HttpMethod.GET)
+                                                             .scheme(SessionProtocol.HTTPS)
+                                                             .authority("example.com")
+                                                             .path("/")
+                                                             .add("foo", "this is foo")
+                                                             .add("bar", "this is bar")
+                                                             .build());
+        final HttpRequest applied = function.apply(req);
+        final RequestHeaders headers = applied.headers();
+        assertThat(headers.get("foo")).isEqualTo("this is foo");
+        assertThat(headers.get("bar")).isNull();
+        assertThat(headers.method()).isEqualTo(HttpMethod.GET);
+        assertThat(headers.scheme()).isEqualTo("https");
+        assertThat(headers.authority()).isEqualTo("example.com");
+        assertThat(headers.path()).isEqualTo("/");
     }
 }

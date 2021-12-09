@@ -101,7 +101,7 @@ public final class UpstreamBuilder {
     }
 
     public UpstreamBuilder allowRequestHeaders(CharSequence... headers) {
-        return allowResponseHeaders(ImmutableList.copyOf(requireNonNull(headers, "headers")));
+        return allowRequestHeaders(ImmutableList.copyOf(requireNonNull(headers, "headers")));
     }
 
     public UpstreamBuilder allowRequestHeaders(Iterable<? extends CharSequence> headers) {

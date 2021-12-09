@@ -38,7 +38,62 @@ import com.linecorp.armeria.common.ResponseHeaders;
 
 class FilteringResponseHeadersFunctionTest {
     @Test
-    void ofSetShouldDisallowSpecifiedResponseHeaders() {
+    void allowSpecifiedResponseHeaders() {
+        final FilteringResponseHeadersFunction function =
+                FilteringResponseHeadersFunction.ofAllowedSet(Set.of(HttpHeaderNames.of("foo")));
+
+        final HttpResponse res = HttpResponse.of(ResponseHeaders.builder(HttpStatus.OK)
+                                                                .add("foo", "this is foo")
+                                                                .add("bar", "this is bar")
+                                                                .add("baz", "this is baz")
+                                                                .build());
+        final AggregatedHttpResponse applied = function.apply(res).aggregate().join();
+        final ResponseHeaders headers = applied.headers();
+        assertThat(headers.get("foo")).isEqualTo("this is foo");
+        assertThat(headers.get("bar")).isNull();
+        assertThat(headers.get("baz")).isNull();
+    }
+
+    @Test
+    void allowSpecifiedResponseHeadersWithMultiValues() {
+        final FilteringResponseHeadersFunction function =
+                FilteringResponseHeadersFunction.ofAllowedSet(Set.of(HttpHeaderNames.of("foo")));
+
+        final HttpResponse res = HttpResponse.of(ResponseHeaders.builder(HttpStatus.OK)
+                                                                .add("foo", "this is first foo")
+                                                                .add("foo", "this is second foo")
+                                                                .add("bar", "this is first bar")
+                                                                .add("bar", "this is second bar")
+                                                                .add("baz", "this is first baz")
+                                                                .add("baz", "this is second baz")
+                                                                .build());
+        final AggregatedHttpResponse applied = function.apply(res).aggregate().join();
+        final ResponseHeaders headers = applied.headers();
+        assertThat(headers.getAll("foo")).containsExactlyInAnyOrder("this is first foo", "this is second foo");
+        assertThat(headers.getAll("bar")).isEmpty();
+        assertThat(headers.getAll("baz")).isEmpty();
+    }
+
+    @Test
+    void allowAllSpecifiedResponseHeaders() {
+        final FilteringResponseHeadersFunction function =
+                FilteringResponseHeadersFunction.ofAllowedSet(Set.of(HttpHeaderNames.of("foo"),
+                                                                     HttpHeaderNames.of("bar")));
+
+        final HttpResponse res = HttpResponse.of(ResponseHeaders.builder(HttpStatus.OK)
+                                                                .add("foo", "this is foo")
+                                                                .add("bar", "this is bar")
+                                                                .add("baz", "this is baz")
+                                                                .build());
+        final AggregatedHttpResponse applied = function.apply(res).aggregate().join();
+        final ResponseHeaders headers = applied.headers();
+        assertThat(headers.get("foo")).isEqualTo("this is foo");
+        assertThat(headers.get("bar")).isEqualTo("this is bar");
+        assertThat(headers.get("baz")).isNull();
+    }
+
+    @Test
+    void disallowSpecifiedResponseHeaders() {
         final FilteringResponseHeadersFunction function =
                 FilteringResponseHeadersFunction.ofDisallowedSet(Set.of(HttpHeaderNames.of("foo")));
 
@@ -55,7 +110,7 @@ class FilteringResponseHeadersFunctionTest {
     }
 
     @Test
-    void ofSetShouldDisallowSpecifiedResponseHeadersWithMultiValues() {
+    void disallowSpecifiedResponseHeadersWithMultiValues() {
         final FilteringResponseHeadersFunction function =
                 FilteringResponseHeadersFunction.ofDisallowedSet(Set.of(HttpHeaderNames.of("foo")));
 
@@ -75,7 +130,7 @@ class FilteringResponseHeadersFunctionTest {
     }
 
     @Test
-    void ofSetShouldDisallowAllSpecifiedResponseHeaders() {
+    void disallowAllSpecifiedResponseHeaders() {
         final FilteringResponseHeadersFunction function =
                 FilteringResponseHeadersFunction.ofDisallowedSet(Set.of(HttpHeaderNames.of("foo"),
                                                                         HttpHeaderNames.of("bar")));
@@ -90,5 +145,21 @@ class FilteringResponseHeadersFunctionTest {
         assertThat(headers.get("foo")).isNull();
         assertThat(headers.get("bar")).isNull();
         assertThat(headers.get("baz")).isEqualTo("this is baz");
+    }
+
+    @Test
+    void shouldNotFilterPseudoHeaders() {
+        final FilteringResponseHeadersFunction function =
+                FilteringResponseHeadersFunction.ofAllowedSet(Set.of(HttpHeaderNames.of("foo")));
+
+        final HttpResponse res = HttpResponse.of(ResponseHeaders.builder(HttpStatus.OK)
+                                                                .add("foo", "this is foo")
+                                                                .add("bar", "this is bar")
+                                                                .build());
+        final AggregatedHttpResponse applied = function.apply(res).aggregate().join();
+        final ResponseHeaders headers = applied.headers();
+        assertThat(headers.get("foo")).isEqualTo("this is foo");
+        assertThat(headers.get("bar")).isNull();
+        assertThat(headers.status()).isEqualTo(HttpStatus.OK);
     }
 }

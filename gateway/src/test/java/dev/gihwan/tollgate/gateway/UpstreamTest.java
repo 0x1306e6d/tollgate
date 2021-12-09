@@ -189,6 +189,28 @@ class UpstreamTest {
     }
 
     @Test
+    void allowRequestHeaders() {
+        try (TestGateway gateway = withTestGateway(builder -> {
+            builder.upstream("/", Upstream.builder(serviceServer.httpUri())
+                                          .allowRequestHeaders("public")
+                                          .build());
+        })) {
+            final WebClient client = WebClient.builder(gateway.httpUri()).build();
+            final HttpRequest req = HttpRequest.of(RequestHeaders.of(HttpMethod.GET, "/",
+                                                                     "public", "this is public",
+                                                                     "private", "this is private"));
+            final AggregatedHttpResponse res = client.execute(req).aggregate().join();
+            assertThat(res.status()).isEqualTo(HttpStatus.OK);
+
+            final ServiceRequestContext serviceCtx = serviceCtxCapture.get();
+            assertThat(serviceCtx.method()).isEqualTo(HttpMethod.GET);
+            final HttpHeaders serviceHeaders = serviceCtx.request().headers();
+            assertThat(serviceHeaders.get("public")).isEqualTo("this is public");
+            assertThat(serviceHeaders.get("private")).isNull();
+        }
+    }
+
+    @Test
     void disallowRequestHeaders() {
         try (TestGateway gateway = withTestGateway(builder -> {
             builder.upstream("/", Upstream.builder(serviceServer.httpUri())
@@ -261,6 +283,21 @@ class UpstreamTest {
             final WebClient client = WebClient.builder(gateway.httpUri()).build();
             final AggregatedHttpResponse res = client.get("/created").aggregate().join();
             assertThat(res.status()).isEqualTo(HttpStatus.OK);
+        }
+    }
+
+    @Test
+    void allowResponseHeaders() {
+        try (TestGateway gateway = withTestGateway(builder -> {
+            builder.upstream("/header", Upstream.builder(serviceServer.httpUri())
+                                                .allowResponseHeaders("public")
+                                                .build());
+        })) {
+            final WebClient client = WebClient.builder(gateway.httpUri()).build();
+            final AggregatedHttpResponse res = client.get("/header").aggregate().join();
+            assertThat(res.status()).isEqualTo(HttpStatus.OK);
+            assertThat(res.headers().get("public")).isEqualTo("this is public");
+            assertThat(res.headers().get("private")).isNull();
         }
     }
 
