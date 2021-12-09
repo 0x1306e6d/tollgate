@@ -100,10 +100,16 @@ public final class UpstreamBuilder {
         return mapRequest(new RemappingPathFunction(pathPattern));
     }
 
+    /**
+     * Allows only the given {@code headers} to be included in a request from a user to the upstream server.
+     */
     public UpstreamBuilder allowRequestHeaders(CharSequence... headers) {
         return allowRequestHeaders(ImmutableList.copyOf(requireNonNull(headers, "headers")));
     }
 
+    /**
+     * Allows only the given {@code headers} to be included in a request from a user to the upstream server.
+     */
     public UpstreamBuilder allowRequestHeaders(Iterable<? extends CharSequence> headers) {
         requireNonNull(headers, "headers");
         final Set<AsciiString> allowedRequestHeaders = Streams.stream(headers)
@@ -148,10 +154,16 @@ public final class UpstreamBuilder {
         return mapResponse(new RemappingStatusFunction(statusFunction));
     }
 
+    /**
+     * Allows only the given {@code headers} to be included in a response from the upstream server to a user.
+     */
     public UpstreamBuilder allowResponseHeaders(CharSequence... headers) {
         return allowResponseHeaders(ImmutableList.copyOf(requireNonNull(headers, "headers")));
     }
 
+    /**
+     * Allows only the given {@code headers} to be included in a response from the upstream server to a user.
+     */
     public UpstreamBuilder allowResponseHeaders(Iterable<? extends CharSequence> headers) {
         requireNonNull(headers, "headers");
         final Set<AsciiString> allowedResponseHeaders = Streams.stream(headers)
