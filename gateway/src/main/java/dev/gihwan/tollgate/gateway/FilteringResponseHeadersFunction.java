@@ -24,39 +24,45 @@
 
 package dev.gihwan.tollgate.gateway;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static dev.gihwan.tollgate.gateway.HttpHeaderUtil.isResponsePseudoHeader;
 
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
-import com.linecorp.armeria.common.HttpRequest;
-import com.linecorp.armeria.common.RequestHeaders;
-import com.linecorp.armeria.common.RequestHeadersBuilder;
+import com.linecorp.armeria.common.HttpResponse;
+import com.linecorp.armeria.common.ResponseHeaders;
+import com.linecorp.armeria.common.ResponseHeadersBuilder;
 
 import io.netty.util.AsciiString;
 
-final class DisallowRequestHeadersFunction implements Function<HttpRequest, HttpRequest> {
+final class FilteringResponseHeadersFunction implements Function<HttpResponse, HttpResponse> {
 
-    static DisallowRequestHeadersFunction ofSet(Set<AsciiString> disallowedRequestHeaders) {
-        checkArgument(!disallowedRequestHeaders.isEmpty(), "disallowed request headers should not be empty");
-        return new DisallowRequestHeadersFunction((name, value) -> disallowedRequestHeaders.contains(name));
+    static FilteringResponseHeadersFunction ofAllowedSet(Set<AsciiString> allowedResponseHeaders) {
+        return new FilteringResponseHeadersFunction((name, value) -> !allowedResponseHeaders.contains(name));
+    }
+
+    static FilteringResponseHeadersFunction ofDisallowedSet(Set<AsciiString> disallowedResponseHeaders) {
+        return new FilteringResponseHeadersFunction((name, value) -> disallowedResponseHeaders.contains(name));
     }
 
     private final BiPredicate<AsciiString, String> predicate;
 
-    private DisallowRequestHeadersFunction(BiPredicate<AsciiString, String> predicate) {
+    private FilteringResponseHeadersFunction(BiPredicate<AsciiString, String> predicate) {
         this.predicate = predicate;
     }
 
     @Override
-    public HttpRequest apply(HttpRequest req) {
-        return req.mapHeaders(this::disallowRequestHeaders);
+    public HttpResponse apply(HttpResponse res) {
+        return res.mapHeaders(this::filterResponseHeaders);
     }
 
-    private RequestHeaders disallowRequestHeaders(RequestHeaders headers) {
-        final RequestHeadersBuilder builder = headers.toBuilder();
+    private ResponseHeaders filterResponseHeaders(ResponseHeaders headers) {
+        final ResponseHeadersBuilder builder = headers.toBuilder();
         headers.forEach((name, value) -> {
+            if (isResponsePseudoHeader(name)) {
+                return;
+            }
             if (predicate.test(name, value)) {
                 builder.remove(name);
             }
