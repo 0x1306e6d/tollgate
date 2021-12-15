@@ -41,16 +41,19 @@ class TollgateAutoConfigurationTest {
             .withConfiguration(AutoConfigurations.of(TollgateAutoConfiguration.class));
 
     @Test
-    void shouldNotCreateGatewayBeanByDefault() {
-        contextRunner.run(context -> {
-            assertThat(context).doesNotHaveBean(Gateway.class);
-            assertThat(context).doesNotHaveBean(GatewayStartStopLifecycle.class);
-        });
+    void createGatewayBeanWithGatewayCustomizerBean() {
+        contextRunner.withUserConfiguration(CustomGatewayConfiguration.class)
+                     .run(context -> {
+                         assertThat(context).hasSingleBean(Gateway.class);
+                         assertThat(context).hasSingleBean(GatewayStartStopLifecycle.class);
+                     });
     }
 
     @Test
-    void createGatewayBean() {
-        contextRunner.withUserConfiguration(CustomGatewayConfiguration.class)
+    void createGatewayBeanWithProperties() {
+        contextRunner.withPropertyValues("tollgate.gateway.routes[0].name:exampleProxy",
+                                         "tollgate.gateway.routes[0].path:/",
+                                         "tollgate.gateway.routes[0].upstream.uri:https://example.com")
                      .run(context -> {
                          assertThat(context).hasSingleBean(Gateway.class);
                          assertThat(context).hasSingleBean(GatewayStartStopLifecycle.class);

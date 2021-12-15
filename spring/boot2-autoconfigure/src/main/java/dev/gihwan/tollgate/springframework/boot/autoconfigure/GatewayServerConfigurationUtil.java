@@ -22,19 +22,27 @@
  * SOFTWARE.
  */
 
-package boot;
+package dev.gihwan.tollgate.springframework.boot.autoconfigure;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import java.util.List;
 
-import dev.gihwan.tollgate.gateway.Upstream;
-import dev.gihwan.tollgate.springframework.boot.autoconfigure.GatewayCustomizer;
+import com.linecorp.armeria.server.ServerBuilder;
 
-@Configuration
-public class ExampleProxyConfiguration {
+import dev.gihwan.tollgate.springframework.boot.autoconfigure.TollgateProperties.Server.Port;
 
-    @Bean
-    public GatewayCustomizer googleProxyCustomizer() {
-        return builder -> builder.upstream("/", Upstream.of("https://example.com"));
+final class GatewayServerConfigurationUtil {
+
+    static void configureServer(ServerBuilder builder, TollgateProperties.Server properties) {
+        configurePorts(builder, properties.getPorts());
     }
+
+    private static void configurePorts(ServerBuilder builder, List<Port> ports) {
+        ports.forEach(port -> configurePort(builder, port));
+    }
+
+    private static void configurePort(ServerBuilder builder, Port port) {
+        builder.port(port.getPort(), port.getProtocols());
+    }
+
+    private GatewayServerConfigurationUtil() {}
 }
