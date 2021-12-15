@@ -3,6 +3,7 @@
 ![Build master](https://github.com/ghkim3221/tollgate/workflows/Build%20master/badge.svg)
 ![Build pull request](https://github.com/ghkim3221/tollgate/workflows/Build%20pull%20request/badge.svg)
 [![codecov](https://codecov.io/gh/ghkim3221/tollgate/branch/master/graph/badge.svg)](https://codecov.io/gh/ghkim3221/tollgate)
+[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/ghkim3221/tollgate.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ghkim3221/tollgate/context:java)
 
 Tollgate is an application-level API gateway for your microservice.
 
