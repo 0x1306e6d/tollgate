@@ -41,6 +41,7 @@ dependencies {
     testImplementation(Dependency.springBootStarterTest)
     testImplementation(Dependency.assertj)
     testImplementation(Dependency.mockito)
+    testImplementation(Dependency.armeriaJunit)
 }
 
 java {
