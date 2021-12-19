@@ -40,7 +40,7 @@ import com.linecorp.armeria.server.ServerPort;
 
 import dev.gihwan.tollgate.springframework.boot.autoconfigure.TollgateProperties.Server.Port;
 
-class GatewayServerConfigurationUtilsTest {
+class GatewayServerConfigurationUtilTest {
 
     @Test
     void configurePort() {
@@ -48,7 +48,7 @@ class GatewayServerConfigurationUtilsTest {
         properties.setPorts(List.of(newPort(8080, List.of(SessionProtocol.HTTP))));
 
         final ServerBuilder builder = newServerBuilder();
-        GatewayServerConfigurationUtils.configureServer(builder, properties);
+        GatewayServerConfigurationUtil.configureServer(builder, properties);
         final Server server = builder.build();
         final ServerConfig serverConfig = server.config();
 
@@ -62,7 +62,7 @@ class GatewayServerConfigurationUtilsTest {
         properties.setPorts(List.of(newPort(8080, List.of(SessionProtocol.HTTP, SessionProtocol.HTTPS))));
 
         final ServerBuilder builder = newServerBuilder().tlsSelfSigned();
-        GatewayServerConfigurationUtils.configureServer(builder, properties);
+        GatewayServerConfigurationUtil.configureServer(builder, properties);
         final Server server = builder.build();
         final ServerConfig serverConfig = server.config();
 
@@ -77,7 +77,7 @@ class GatewayServerConfigurationUtilsTest {
                                     newPort(8443, List.of(SessionProtocol.HTTPS))));
 
         final ServerBuilder builder = newServerBuilder().tlsSelfSigned();
-        GatewayServerConfigurationUtils.configureServer(builder, properties);
+        GatewayServerConfigurationUtil.configureServer(builder, properties);
         final Server server = builder.build();
         final ServerConfig serverConfig = server.config();
 
@@ -91,7 +91,7 @@ class GatewayServerConfigurationUtilsTest {
         final TollgateProperties.Server properties = new TollgateProperties.Server();
 
         final ServerBuilder builder = newServerBuilder();
-        GatewayServerConfigurationUtils.configureServer(builder, properties);
+        GatewayServerConfigurationUtil.configureServer(builder, properties);
         final Server server = builder.build();
         final ServerConfig serverConfig = server.config();
 

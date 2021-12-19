@@ -22,7 +22,13 @@
 # SOFTWARE.
 #
 tollgate:
-  server:
-    ports:
-      - port: 8080
-        protocol: HTTP
+  gateway:
+    server:
+      ports:
+        - port: 8080
+          protocol: HTTP
+    routes:
+      - name: exampleProxy
+        path: /
+        upstream:
+          uri: https://example.com

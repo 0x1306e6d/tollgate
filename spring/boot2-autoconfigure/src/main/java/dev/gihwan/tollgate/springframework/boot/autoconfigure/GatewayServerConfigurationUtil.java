@@ -22,15 +22,27 @@
  * SOFTWARE.
  */
 
-package boot;
+package dev.gihwan.tollgate.springframework.boot.autoconfigure;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.util.List;
 
-@SpringBootApplication
-public class TollgateApplication {
+import com.linecorp.armeria.server.ServerBuilder;
 
-    public static void main(String[] args) {
-        SpringApplication.run(TollgateApplication.class, args);
+import dev.gihwan.tollgate.springframework.boot.autoconfigure.TollgateProperties.Server.Port;
+
+final class GatewayServerConfigurationUtil {
+
+    static void configureServer(ServerBuilder builder, TollgateProperties.Server properties) {
+        configurePorts(builder, properties.getPorts());
     }
+
+    private static void configurePorts(ServerBuilder builder, List<Port> ports) {
+        ports.forEach(port -> configurePort(builder, port));
+    }
+
+    private static void configurePort(ServerBuilder builder, Port port) {
+        builder.port(port.getPort(), port.getProtocols());
+    }
+
+    private GatewayServerConfigurationUtil() {}
 }

@@ -27,33 +27,85 @@ package dev.gihwan.tollgate.springframework.boot.autoconfigure;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.linecorp.armeria.client.WebClient;
+import com.linecorp.armeria.common.AggregatedHttpResponse;
+import com.linecorp.armeria.common.HttpResponse;
+import com.linecorp.armeria.common.HttpStatus;
+import com.linecorp.armeria.server.ServerBuilder;
+import com.linecorp.armeria.testing.junit5.server.ServerExtension;
 
 import dev.gihwan.tollgate.gateway.Gateway;
 import dev.gihwan.tollgate.gateway.Upstream;
 
 class TollgateAutoConfigurationTest {
 
+    @RegisterExtension
+    static ServerExtension upstreamServer = new ServerExtension() {
+        @Override
+        protected void configure(ServerBuilder builder) {
+            builder.service("/", (ctx, req) -> HttpResponse.of(HttpStatus.OK));
+        }
+    };
+
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
             .withConfiguration(AutoConfigurations.of(TollgateAutoConfiguration.class));
 
     @Test
-    void shouldNotCreateGatewayBeanByDefault() {
-        contextRunner.run(context -> {
-            assertThat(context).doesNotHaveBean(Gateway.class);
-            assertThat(context).doesNotHaveBean(GatewayStartStopLifecycle.class);
-        });
-    }
-
-    @Test
-    void createGatewayBean() {
+    void createGatewayBeanWithGatewayCustomizerBean() {
         contextRunner.withUserConfiguration(CustomGatewayConfiguration.class)
                      .run(context -> {
                          assertThat(context).hasSingleBean(Gateway.class);
                          assertThat(context).hasSingleBean(GatewayStartStopLifecycle.class);
+                     });
+    }
+
+    @Test
+    void createGatewayBeanWithProperties() {
+        contextRunner.withPropertyValues("tollgate.gateway.routes[0].name:exampleProxy",
+                                         "tollgate.gateway.routes[0].path:/",
+                                         "tollgate.gateway.routes[0].upstream.uri:https://example.com")
+                     .run(context -> {
+                         assertThat(context).hasSingleBean(Gateway.class);
+                         assertThat(context).hasSingleBean(GatewayStartStopLifecycle.class);
+                     });
+    }
+
+    @Test
+    void sendRequestToUpstreamUriProperty() {
+        contextRunner.withPropertyValues("tollgate.gateway.routes[0].name:exampleProxy",
+                                         "tollgate.gateway.routes[0].path:/",
+                                         "tollgate.gateway.routes[0].upstream.uri:" + upstreamServer.httpUri())
+                     .run(context -> {
+                         assertThat(context).hasSingleBean(Gateway.class);
+                         final Gateway gateway = context.getBean(Gateway.class);
+
+                         final WebClient client = WebClient.of("http://127.0.0.1:" + gateway.activeLocalPort());
+                         final AggregatedHttpResponse res = client.get("/").aggregate().join();
+                         assertThat(res.status()).isEqualTo(HttpStatus.OK);
+                     });
+    }
+
+    @Test
+    void sendRequestToUpstreamSchemeAndEndpointProperties() {
+        final int port = upstreamServer.httpPort();
+        contextRunner.withPropertyValues("tollgate.gateway.routes[0].name:exampleProxy",
+                                         "tollgate.gateway.routes[0].path:/",
+                                         "tollgate.gateway.routes[0].upstream.scheme:http",
+                                         "tollgate.gateway.routes[0].upstream.endpoints[0].host:127.0.0.1",
+                                         "tollgate.gateway.routes[0].upstream.endpoints[0].port:" + port)
+                     .run(context -> {
+                         assertThat(context).hasSingleBean(Gateway.class);
+                         final Gateway gateway = context.getBean(Gateway.class);
+
+                         final WebClient client = WebClient.of("http://127.0.0.1:" + gateway.activeLocalPort());
+                         final AggregatedHttpResponse res = client.get("/").aggregate().join();
+                         assertThat(res.status()).isEqualTo(HttpStatus.OK);
                      });
     }
 

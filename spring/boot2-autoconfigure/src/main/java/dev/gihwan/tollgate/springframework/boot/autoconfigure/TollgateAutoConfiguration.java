@@ -24,11 +24,11 @@
 
 package dev.gihwan.tollgate.springframework.boot.autoconfigure;
 
-import static dev.gihwan.tollgate.springframework.boot.autoconfigure.GatewayServerConfigurationUtils.configureServer;
+import static dev.gihwan.tollgate.springframework.boot.autoconfigure.GatewayRouteConfigurationUtil.configureRoute;
+import static dev.gihwan.tollgate.springframework.boot.autoconfigure.GatewayServerConfigurationUtil.configureServer;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.context.annotation.Bean;
@@ -41,7 +41,6 @@ import dev.gihwan.tollgate.gateway.GatewayBuilder;
  * {@link EnableAutoConfiguration Auto-configuration} for Tollgate.
  */
 @Configuration(proxyBeanMethods = false)
-@ConditionalOnBean(GatewayCustomizer.class)
 @EnableConfigurationProperties(TollgateProperties.class)
 public class TollgateAutoConfiguration {
 
@@ -49,6 +48,7 @@ public class TollgateAutoConfiguration {
     public Gateway gateway(TollgateProperties properties, ObjectProvider<GatewayCustomizer> customizers) {
         final GatewayBuilder builder = Gateway.builder();
         builder.server(serverBuilder -> configureServer(serverBuilder, properties.getServer()));
+        properties.getRoutes().forEach(route -> configureRoute(builder, route));
         customizers.forEach(customizer -> customizer.customize(builder));
         return builder.build();
     }

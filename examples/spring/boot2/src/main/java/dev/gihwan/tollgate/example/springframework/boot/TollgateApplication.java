@@ -22,19 +22,15 @@
  * SOFTWARE.
  */
 
-package boot;
+package dev.gihwan.tollgate.example.springframework.boot;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import dev.gihwan.tollgate.gateway.Upstream;
-import dev.gihwan.tollgate.springframework.boot.autoconfigure.GatewayCustomizer;
+@SpringBootApplication
+public class TollgateApplication {
 
-@Configuration
-public class ExampleProxyConfiguration {
-
-    @Bean
-    public GatewayCustomizer googleProxyCustomizer() {
-        return builder -> builder.upstream("/", Upstream.of("https://example.com"));
+    public static void main(String[] args) {
+        SpringApplication.run(TollgateApplication.class, args);
     }
 }
